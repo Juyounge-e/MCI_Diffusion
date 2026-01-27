@@ -14,8 +14,9 @@
   - 출력: `outputs/mlp_diffusion/model_last.pt`, `scalers.pkl`
 - **샘플링 스크립트**: `scripts/sample_mlp.py`
   - 조건 `--cond <float>`로 좌표를 생성하여 `outputs/mlp_diffusion/samples.csv`에 저장
-  - **2600126 기준 cond 0.030349 사용**
-- **분석 ipynb **: 
+  - **260126 cond 0.030349 사용**
+  - **260127 cond 0.016263 사용**
+- **분석 ipynb**: 
   - notebooks/pdr_analysis.ipynb: 테스트 데이터셋과 샘플링 데이터 셋 비교 
 
 ### 설치/환경
