@@ -1,0 +1,3 @@
+[submodule "tab-ddpm"]
+	path = tab-ddpm
+	url = https://github.com/yandex-research/tab-ddpm
