@@ -64,3 +64,11 @@ python scripts/sample_mlp.py --cond 0.030349 --n 100
 
 ### 디바이스/호환성
 - 현재 CUDA 호환 이슈로 기본 CPU 실행
+
+### 클론시 주의점 
+```
+git clone --recurse-submodules https://github.com/<YOUR_USERNAME>/MCI_Diffusion.git
+
+# 이미 클론했다면 
+git submodule update --init --recursive
+```
