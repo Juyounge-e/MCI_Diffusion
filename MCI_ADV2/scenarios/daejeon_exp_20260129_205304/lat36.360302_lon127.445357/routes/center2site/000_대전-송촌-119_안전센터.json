@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-송촌-119 안전센터",
+    "center": [
+      127.441969,
+      36.3634599
+    ],
+    "site": [
+      127.445357,
+      36.360302
+    ],
+    "saved_at": "2026-01-30T06:41:17.324471+09:00",
+    "data_version": null,
+    "distance_km": 0.635,
+    "duration_min": 0.96,
+    "duration_sec": 57.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 57.5,
+              "summary": "",
+              "duration": 57.5,
+              "distance": 635.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.441795,
+                36.363373
+              ],
+              [
+                127.441733,
+                36.363453
+              ],
+              [
+                127.441614,
+                36.3636
+              ],
+              [
+                127.441843,
+                36.363699
+              ],
+              [
+                127.442036,
+                36.363822
+              ],
+              [
+                127.443744,
+                36.362853
+              ],
+              [
+                127.444254,
+                36.362542
+              ],
+              [
+                127.445102,
+                36.361902
+              ],
+              [
+                127.445152,
+                36.361865
+              ],
+              [
+                127.445631,
+                36.361529
+              ],
+              [
+                127.445791,
+                36.361406
+              ],
+              [
+                127.445357,
+                36.360302
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 57.5,
+          "duration": 57.5,
+          "distance": 635.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "81hCgF3vy4gEAAAADwAAANcAAAAcAAAAZzw4QC6gJ0GZ-BVDrvibQQQAAAAPAAAA1wAAABwAAAA3awAAg5uYB23cKgIxnJgHxNwqAggAfxQAAAAA",
+          "location": [
+            127.441795,
+            36.363373
+          ],
+          "name": "송촌로",
+          "distance": 18.357381
+        },
+        {
+          "hint": "STkegG1JRIC5AAAAIQAAAAAAAAAAAAAAPIwAQ963tUEAAAAAAAAAALkAAAAhAAAAAAAAAAAAAAA3awAAbamYB27QKgJtqZgHbtAqAgAAXwwAAAAA",
+          "location": [
+            127.445357,
+            36.360302
+          ],
+          "name": "동춘당로23번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

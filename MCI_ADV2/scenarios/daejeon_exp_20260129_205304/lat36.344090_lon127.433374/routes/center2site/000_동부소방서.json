@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "동부소방서",
+    "center": [
+      127.43759,
+      36.34137
+    ],
+    "site": [
+      127.433374,
+      36.34409
+    ],
+    "saved_at": "2026-01-30T00:45:35.945821+09:00",
+    "data_version": null,
+    "distance_km": 0.654,
+    "duration_min": 0.97,
+    "duration_sec": 58.2,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 58.2,
+              "summary": "",
+              "duration": 58.2,
+              "distance": 654
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.437467,
+                36.341311
+              ],
+              [
+                127.437339,
+                36.341484
+              ],
+              [
+                127.436877,
+                36.341246
+              ],
+              [
+                127.435989,
+                36.34076
+              ],
+              [
+                127.435542,
+                36.341539
+              ],
+              [
+                127.43511,
+                36.342227
+              ],
+              [
+                127.434984,
+                36.342458
+              ],
+              [
+                127.434689,
+                36.342961
+              ],
+              [
+                127.434351,
+                36.343538
+              ],
+              [
+                127.434032,
+                36.344069
+              ],
+              [
+                127.433897,
+                36.344289
+              ],
+              [
+                127.433374,
+                36.344091
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 58.2,
+          "duration": 58.2,
+          "distance": 654
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "3b9giOC_YIggAAAA5wAAAAAAAACaAAAAIP-yQUb5H0MAAAAA9ZXVQiAAAADnAAAAAAAAAJoAAAA3awAAm4qYBz-GKgIWi5gHeoYqAgAAXwkAAAAA",
+          "location": [
+            127.437467,
+            36.341311
+          ],
+          "name": "",
+          "distance": 12.83909223
+        },
+        {
+          "hint": "0XYegEnaaIAJAAAAIgAAAAAAAAAAAAAA48RkQTJjT0IAAAAAAAAAAAkAAAAiAAAAAAAAAAAAAAA3awAAnnqYBxuRKgKeepgHGpEqAgAADwQAAAAA",
+          "location": [
+            127.433374,
+            36.344091
+          ],
+          "name": "성남로",
+          "distance": 0.1109650364
+        }
+      ]
+    }
+  }
+}

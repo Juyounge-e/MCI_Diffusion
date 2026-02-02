@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-노은-119 안전센터",
+    "center": [
+      127.3174158,
+      36.3686828
+    ],
+    "site": [
+      127.323425,
+      36.36784
+    ],
+    "saved_at": "2026-01-30T08:29:38.293193+09:00",
+    "data_version": null,
+    "distance_km": 0.883,
+    "duration_min": 1.34,
+    "duration_sec": 80.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 80.5,
+              "summary": "",
+              "duration": 80.5,
+              "distance": 883.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.317287,
+                36.368683
+              ],
+              [
+                127.317288,
+                36.368478
+              ],
+              [
+                127.31779,
+                36.368477
+              ],
+              [
+                127.317784,
+                36.367398
+              ],
+              [
+                127.317783,
+                36.367053
+              ],
+              [
+                127.317783,
+                36.366945
+              ],
+              [
+                127.317783,
+                36.366774
+              ],
+              [
+                127.317934,
+                36.366775
+              ],
+              [
+                127.318028,
+                36.366775
+              ],
+              [
+                127.318636,
+                36.366771
+              ],
+              [
+                127.323429,
+                36.366759
+              ],
+              [
+                127.323429,
+                36.366922
+              ],
+              [
+                127.323428,
+                36.367086
+              ],
+              [
+                127.323427,
+                36.367291
+              ],
+              [
+                127.323425,
+                36.367722
+              ],
+              [
+                127.323425,
+                36.36784
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 80.5,
+          "duration": 80.5,
+          "distance": 883.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "Zx0ugGsdLoAgAAAAHAAAAAAAAAAAAAAAUPy1QRgHlkEAAAAAAAAAACAAAAAcAAAAAAAAAAAAAAA3awAAJ7WWByvxKgKotZYHK_EqAgAAfxYAAAAA",
+          "location": [
+            127.317287,
+            36.368683
+          ],
+          "name": "노은서로96번길",
+          "distance": 11.57580086
+        },
+        {
+          "hint": "DrE6gP7GeIAsAAAACQAAAAAAAAAAAAAA_nyIQvaAUUEAAAAAAAAAACwAAAAJAAAAAAAAAAAAAAA3awAAIc2WB-DtKgIhzZYH4O0qAgAATwsAAAAA",
+          "location": [
+            127.323425,
+            36.36784
+          ],
+          "name": "노은동로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-부사-119 안전센터",
+    "center": [
+      127.4329189,
+      36.32699
+    ],
+    "site": [
+      127.434912,
+      36.325486
+    ],
+    "saved_at": "2026-01-30T05:33:37.709599+09:00",
+    "data_version": null,
+    "distance_km": 0.287,
+    "duration_min": 0.72,
+    "duration_sec": 43.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 43.3,
+              "summary": "",
+              "duration": 43.3,
+              "distance": 287.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.433063,
+                36.326734
+              ],
+              [
+                127.433557,
+                36.326914
+              ],
+              [
+                127.434012,
+                36.327076
+              ],
+              [
+                127.434359,
+                36.326474
+              ],
+              [
+                127.434635,
+                36.326002
+              ],
+              [
+                127.434873,
+                36.32556
+              ],
+              [
+                127.434913,
+                36.325486
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 43.3,
+          "duration": 43.3,
+          "distance": 287.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "rnQ_gLF0P4BNAAAARwAAAAAAAAAAAAAAm5JYQn2WQkIAAAAAAAAAAE0AAABHAAAAAAAAAAAAAAA3awAAZ3mYB05NKgLXeJgHTk4qAgAAHwQAAAAA",
+          "location": [
+            127.433063,
+            36.326734
+          ],
+          "name": "대전천동로",
+          "distance": 31.21133869
+        },
+        {
+          "hint": "kUIigNRCIoAVAQAADQAAAAAAAAAAAAAArpxAQ6lmD0EAAAAAAAAAABUBAAANAAAAAAAAAAAAAAA3awAAoYCYB25IKgKggJgHbkgqAgAADxUAAAAA",
+          "location": [
+            127.434913,
+            36.325486
+          ],
+          "name": "대흥로206번길",
+          "distance": 0.08979228625
+        }
+      ]
+    }
+  }
+}

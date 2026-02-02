@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 2,
+    "name": "대전-송촌-119 안전센터",
+    "center": [
+      127.441969,
+      36.3634599
+    ],
+    "site": [
+      127.431015,
+      36.365593
+    ],
+    "saved_at": "2026-01-30T05:29:05.694184+09:00",
+    "data_version": null,
+    "distance_km": 1.372,
+    "duration_min": 2.03,
+    "duration_sec": 121.6,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 121.6,
+              "summary": "",
+              "duration": 121.6,
+              "distance": 1372.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.441795,
+                36.363373
+              ],
+              [
+                127.441733,
+                36.363453
+              ],
+              [
+                127.441614,
+                36.3636
+              ],
+              [
+                127.441435,
+                36.363523
+              ],
+              [
+                127.441041,
+                36.363323
+              ],
+              [
+                127.440312,
+                36.36309
+              ],
+              [
+                127.439465,
+                36.362921
+              ],
+              [
+                127.437152,
+                36.362453
+              ],
+              [
+                127.435454,
+                36.362177
+              ],
+              [
+                127.435297,
+                36.362644
+              ],
+              [
+                127.435095,
+                36.363522
+              ],
+              [
+                127.434994,
+                36.36388
+              ],
+              [
+                127.434598,
+                36.36529
+              ],
+              [
+                127.434494,
+                36.365271
+              ],
+              [
+                127.43338,
+                36.365061
+              ],
+              [
+                127.432544,
+                36.364904
+              ],
+              [
+                127.431289,
+                36.364668
+              ],
+              [
+                127.431179,
+                36.36504
+              ],
+              [
+                127.431015,
+                36.365593
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 121.6,
+          "duration": 121.6,
+          "distance": 1372.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "81hCgF3vy4gEAAAADwAAANcAAAAcAAAAZzw4QC6gJ0GZ-BVDrvibQQQAAAAPAAAA1wAAABwAAAA3awAAg5uYB23cKgIxnJgHxNwqAggAfxQAAAAA",
+          "location": [
+            127.441795,
+            36.363373
+          ],
+          "name": "송촌로",
+          "distance": 18.357381
+        },
+        {
+          "hint": "PFtYgKZbWIBaAAAAQAAAAAAAAAAAAAAAsGp8QvGUMEIAAAAAAAAAAFoAAABAAAAAAAAAAAAAAAA3awAAZ3GYBxnlKgJncZgHGeUqAgAArxUAAAAA",
+          "location": [
+            127.431015,
+            36.365593
+          ],
+          "name": "계족산로5번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

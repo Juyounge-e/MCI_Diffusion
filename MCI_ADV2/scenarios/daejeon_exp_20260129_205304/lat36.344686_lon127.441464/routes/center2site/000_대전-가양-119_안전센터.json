@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-가양-119 안전센터",
+    "center": [
+      127.4405715,
+      36.3474872
+    ],
+    "site": [
+      127.441464,
+      36.344686
+    ],
+    "saved_at": "2026-01-30T02:40:10.535578+09:00",
+    "data_version": null,
+    "distance_km": 0.386,
+    "duration_min": 0.73,
+    "duration_sec": 43.6,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 43.6,
+              "summary": "",
+              "duration": 43.6,
+              "distance": 386.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.440328,
+                36.347468
+              ],
+              [
+                127.440392,
+                36.346934
+              ],
+              [
+                127.440469,
+                36.346218
+              ],
+              [
+                127.440583,
+                36.345306
+              ],
+              [
+                127.440599,
+                36.345152
+              ],
+              [
+                127.440684,
+                36.344634
+              ],
+              [
+                127.441464,
+                36.344686
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 43.6,
+          "duration": 43.6,
+          "distance": 386.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "BVUkgBVVJIA1AAAANAAAAAAAAAAAAAAAJCJuQkbeY0IAAAAAAAAAADUAAAA0AAAAAAAAAAAAAAA3awAAyJWYB0yeKgK8lpgHX54qAgAALxYAAAAA",
+          "location": [
+            127.440328,
+            36.347468
+          ],
+          "name": "합내로",
+          "distance": 22.01052681
+        },
+        {
+          "hint": "pVQkgKZUJIB1AAAAZgAAAAAAAAAAAAAAD0SjQvGMjEIAAAAAAAAAAHUAAABmAAAAAAAAAAAAAAA3awAAOJqYB26TKgI4mpgHbpMqAgAAnxAAAAAA",
+          "location": [
+            127.441464,
+            36.344686
+          ],
+          "name": "계족로368번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

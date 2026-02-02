@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-법동-119 안전센터",
+    "center": [
+      127.4290118,
+      36.3723802
+    ],
+    "site": [
+      127.429441,
+      36.366204
+    ],
+    "saved_at": "2026-01-30T03:54:40.608627+09:00",
+    "data_version": null,
+    "distance_km": 0.777,
+    "duration_min": 1.33,
+    "duration_sec": 79.8,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 85.2,
+              "summary": "",
+              "duration": 79.8,
+              "distance": 776.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.429048,
+                36.372237
+              ],
+              [
+                127.428801,
+                36.372197
+              ],
+              [
+                127.428594,
+                36.372164
+              ],
+              [
+                127.428687,
+                36.371833
+              ],
+              [
+                127.428884,
+                36.371125
+              ],
+              [
+                127.429006,
+                36.370703
+              ],
+              [
+                127.42908,
+                36.370403
+              ],
+              [
+                127.429677,
+                36.368308
+              ],
+              [
+                127.429818,
+                36.367801
+              ],
+              [
+                127.42996,
+                36.367288
+              ],
+              [
+                127.429172,
+                36.367153
+              ],
+              [
+                127.429282,
+                36.366764
+              ],
+              [
+                127.429441,
+                36.366204
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 85.2,
+          "duration": 79.8,
+          "distance": 776.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "YLpgiGS6YIioAAAAbQAAAAAAAAAtAAAAn40MQjLWtEEAAAAAB3aXQVQAAAA3AAAAAAAAAC0AAAA3awAAuGmYBw3_KgKUaZgHnP8qAgAALxAAAAAA",
+          "location": [
+            127.429048,
+            36.372237
+          ],
+          "name": "",
+          "distance": 16.19362532
+        },
+        {
+          "hint": "oiNGgLgjRoBIAAAAXAAAAAAAAAAAAAAAwkBJQhMIf0IAAAAAAAAAAEgAAABcAAAAAAAAAAAAAAA3awAAQWuYB3znKgJBa5gHfOcqAgAAvxUAAAAA",
+          "location": [
+            127.429441,
+            36.366204
+          ],
+          "name": "중리남로8번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

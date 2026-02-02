@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 1,
+    "name": "학교법인 가톨릭학원 가톨릭대학교 대전성모병원",
+    "site": [
+      127.41774,
+      36.333334
+    ],
+    "hospital": [
+      127.420163,
+      36.323042
+    ],
+    "saved_at": "2026-01-29T23:30:55.895203+09:00",
+    "data_version": null,
+    "distance_km": 1.446,
+    "duration_min": 2.53,
+    "duration_sec": 151.7,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 151.7,
+              "summary": "",
+              "duration": 151.7,
+              "distance": 1446.5
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.41774,
+                36.333334
+              ],
+              [
+                127.417452,
+                36.333093
+              ],
+              [
+                127.4172,
+                36.332472
+              ],
+              [
+                127.418665,
+                36.332123
+              ],
+              [
+                127.418753,
+                36.332042
+              ],
+              [
+                127.419288,
+                36.331088
+              ],
+              [
+                127.419307,
+                36.331054
+              ],
+              [
+                127.419852,
+                36.330084
+              ],
+              [
+                127.420116,
+                36.329614
+              ],
+              [
+                127.420755,
+                36.328478
+              ],
+              [
+                127.421315,
+                36.327481
+              ],
+              [
+                127.421555,
+                36.327066
+              ],
+              [
+                127.421763,
+                36.3267
+              ],
+              [
+                127.421708,
+                36.326546
+              ],
+              [
+                127.421619,
+                36.326394
+              ],
+              [
+                127.421491,
+                36.32626
+              ],
+              [
+                127.421311,
+                36.326132
+              ],
+              [
+                127.421059,
+                36.325934
+              ],
+              [
+                127.4203,
+                36.3254
+              ],
+              [
+                127.419849,
+                36.325082
+              ],
+              [
+                127.419674,
+                36.32495
+              ],
+              [
+                127.420028,
+                36.324486
+              ],
+              [
+                127.420272,
+                36.324092
+              ],
+              [
+                127.41968,
+                36.323413
+              ],
+              [
+                127.419595,
+                36.323275
+              ],
+              [
+                127.419587,
+                36.323208
+              ],
+              [
+                127.419611,
+                36.323135
+              ],
+              [
+                127.419725,
+                36.322902
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 151.7,
+          "duration": 151.7,
+          "distance": 1446.5
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "SRwugDseLoA1AAAAigAAAAAAAAAAAAAA0s0UQmECv0IAAAAAAAAAADUAAACKAAAAAAAAAAAAAAA3awAAjD2YBxZnKgKMPZgHFmcqAgAAzwIAAAAA",
+          "location": [
+            127.41774,
+            36.333334
+          ],
+          "name": "대종로583번길",
+          "distance": 0
+        },
+        {
+          "hint": "sC4fgLsiKIlCAAAAlQAAACwBAAAAAAAAtnXeQXx9d0JpV_pCAAAAAEIAAACVAAAALAEAAAAAAAA3awAATUWYB1Y-KgIDR5gH4j4qAggA7wkAAAAA",
+          "location": [
+            127.419725,
+            36.322902
+          ],
+          "name": "",
+          "distance": 42.28606652
+        }
+      ]
+    }
+  }
+}

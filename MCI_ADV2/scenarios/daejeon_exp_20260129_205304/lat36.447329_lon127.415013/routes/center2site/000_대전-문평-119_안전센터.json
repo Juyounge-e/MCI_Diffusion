@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-문평-119 안전센터",
+    "center": [
+      127.4047254,
+      36.4469491
+    ],
+    "site": [
+      127.415013,
+      36.447329
+    ],
+    "saved_at": "2026-01-29T22:31:42.603052+09:00",
+    "data_version": null,
+    "distance_km": 1.371,
+    "duration_min": 2.81,
+    "duration_sec": 168.8,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 168.8,
+              "summary": "",
+              "duration": 168.8,
+              "distance": 1371.1
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.404552,
+                36.447098
+              ],
+              [
+                127.404748,
+                36.447246
+              ],
+              [
+                127.405999,
+                36.448158
+              ],
+              [
+                127.406198,
+                36.447731
+              ],
+              [
+                127.406327,
+                36.447379
+              ],
+              [
+                127.406393,
+                36.44724
+              ],
+              [
+                127.406824,
+                36.446636
+              ],
+              [
+                127.406892,
+                36.446505
+              ],
+              [
+                127.406981,
+                36.446366
+              ],
+              [
+                127.407599,
+                36.446714
+              ],
+              [
+                127.408461,
+                36.447216
+              ],
+              [
+                127.409175,
+                36.447614
+              ],
+              [
+                127.409788,
+                36.447944
+              ],
+              [
+                127.410387,
+                36.448241
+              ],
+              [
+                127.410686,
+                36.448388
+              ],
+              [
+                127.41092,
+                36.448503
+              ],
+              [
+                127.411806,
+                36.448862
+              ],
+              [
+                127.412797,
+                36.449303
+              ],
+              [
+                127.413287,
+                36.449515
+              ],
+              [
+                127.413367,
+                36.449532
+              ],
+              [
+                127.413681,
+                36.44907
+              ],
+              [
+                127.414047,
+                36.448627
+              ],
+              [
+                127.414392,
+                36.448017
+              ],
+              [
+                127.414455,
+                36.447895
+              ],
+              [
+                127.414557,
+                36.447697
+              ],
+              [
+                127.4148,
+                36.447259
+              ],
+              [
+                127.415013,
+                36.447329
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 168.8,
+          "duration": 168.8,
+          "distance": 1371.1
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "tol2gLqJdoAiAAAANgAAAAAAAAAAAAAAa3HAQbrFFEIAAAAAAAAAACIAAAA2AAAAAAAAAAAAAAA3awAACAqYB3ojLAK1CpgH5SIsAgAAPw4AAAAA",
+          "location": [
+            127.404552,
+            36.447098
+          ],
+          "name": "문평동로18번길",
+          "distance": 22.67301559
+        },
+        {
+          "hint": "jphngM6YZ4A1AAAAHgAAAAAAAAAAAAAAmQATQln2pEEAAAAAAAAAADUAAAAeAAAAAAAAAAAAAAA3awAA5TKYB2EkLALlMpgHYSQsAgAAfw8AAAAA",
+          "location": [
+            127.415013,
+            36.447329
+          ],
+          "name": "대덕대로1508번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-원동-119 안전센터",
+    "center": [
+      127.4291671,
+      36.3169676
+    ],
+    "site": [
+      127.426998,
+      36.318255
+    ],
+    "saved_at": "2026-01-30T00:05:04.760335+09:00",
+    "data_version": null,
+    "distance_km": 0.603,
+    "duration_min": 1.24,
+    "duration_sec": 74.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 74.3,
+              "summary": "",
+              "duration": 74.3,
+              "distance": 603
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.429349,
+                36.316169
+              ],
+              [
+                127.429326,
+                36.316166
+              ],
+              [
+                127.42852,
+                36.315803
+              ],
+              [
+                127.427894,
+                36.316739
+              ],
+              [
+                127.42731,
+                36.316498
+              ],
+              [
+                127.426758,
+                36.316266
+              ],
+              [
+                127.426282,
+                36.316992
+              ],
+              [
+                127.426107,
+                36.317232
+              ],
+              [
+                127.425925,
+                36.317507
+              ],
+              [
+                127.426609,
+                36.318085
+              ],
+              [
+                127.426829,
+                36.318193
+              ],
+              [
+                127.426998,
+                36.318255
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 74.3,
+          "duration": 74.3,
+          "distance": 603
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "HB_Tgy_54ogDAAAACQAAAHcAAAAAAAAAXuEFQA8dvkBep6VCAAAAAAMAAAAJAAAAdwAAAAAAAAA3awAA5WqYBwkkKgIvapgHKCcqAgIA_wQAAAAA",
+          "location": [
+            127.429349,
+            36.316169
+          ],
+          "name": "",
+          "distance": 90.15459885
+        },
+        {
+          "hint": "oUMigKRDIoAKAAAAHgAAAA8AAAAAAAAA_0qFQVl3MkKf17hBAAAAAAoAAAAeAAAADwAAAAAAAAA3awAAtmGYBy8sKgK2YZgHLywqAgIAHwQAAAAA",
+          "location": [
+            127.426998,
+            36.318255
+          ],
+          "name": "보문로162번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

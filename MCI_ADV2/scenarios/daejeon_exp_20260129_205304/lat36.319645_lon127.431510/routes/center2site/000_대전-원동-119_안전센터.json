@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-원동-119 안전센터",
+    "center": [
+      127.4291671,
+      36.3169676
+    ],
+    "site": [
+      127.43151,
+      36.319645
+    ],
+    "saved_at": "2026-01-29T23:02:33.534503+09:00",
+    "data_version": null,
+    "distance_km": 0.852,
+    "duration_min": 1.63,
+    "duration_sec": 98,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 98,
+              "summary": "",
+              "duration": 98,
+              "distance": 852
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.429349,
+                36.316169
+              ],
+              [
+                127.429326,
+                36.316166
+              ],
+              [
+                127.42852,
+                36.315803
+              ],
+              [
+                127.427894,
+                36.316739
+              ],
+              [
+                127.427343,
+                36.317585
+              ],
+              [
+                127.427277,
+                36.317686
+              ],
+              [
+                127.427743,
+                36.317862
+              ],
+              [
+                127.428841,
+                36.318278
+              ],
+              [
+                127.429141,
+                36.318392
+              ],
+              [
+                127.430784,
+                36.319014
+              ],
+              [
+                127.431221,
+                36.31918
+              ],
+              [
+                127.431376,
+                36.319242
+              ],
+              [
+                127.431294,
+                36.319392
+              ],
+              [
+                127.431133,
+                36.319689
+              ],
+              [
+                127.431086,
+                36.319778
+              ],
+              [
+                127.431381,
+                36.319889
+              ],
+              [
+                127.431441,
+                36.319779
+              ],
+              [
+                127.43151,
+                36.319645
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 98,
+          "duration": 98,
+          "distance": 852
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "HB_Tgy_54ogDAAAACQAAAHcAAAAAAAAAXuEFQA8dvkBep6VCAAAAAAMAAAAJAAAAdwAAAAAAAAA3awAA5WqYBwkkKgIvapgHKCcqAgIA_wQAAAAA",
+          "location": [
+            127.429349,
+            36.316169
+          ],
+          "name": "",
+          "distance": 90.15459885
+        },
+        {
+          "hint": "YyTjiGYk44gnAAAAAAAAAAAAAAAzAAAAJt6AQQAAAAAAAAAAl_KqQScAAAAAAAAAAAAAADMAAAA3awAAVnOYB50xKgJWc5gHnTEqAgAA3wkAAAAA",
+          "location": [
+            127.43151,
+            36.319645
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "의료법인 영훈의료재단 대전선병원",
+    "site": [
+      127.416514,
+      36.332504
+    ],
+    "hospital": [
+      127.4104139,
+      36.3360669
+    ],
+    "saved_at": "2026-01-30T03:36:58.964752+09:00",
+    "data_version": null,
+    "distance_km": 0.699,
+    "duration_min": 1.2,
+    "duration_sec": 72.3,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 72.3,
+              "summary": "",
+              "duration": 72.3,
+              "distance": 699.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.416514,
+                36.332504
+              ],
+              [
+                127.416533,
+                36.332558
+              ],
+              [
+                127.416557,
+                36.332627
+              ],
+              [
+                127.415831,
+                36.332848
+              ],
+              [
+                127.415736,
+                36.332913
+              ],
+              [
+                127.41535,
+                36.333167
+              ],
+              [
+                127.414991,
+                36.33341
+              ],
+              [
+                127.414732,
+                36.333592
+              ],
+              [
+                127.414301,
+                36.333905
+              ],
+              [
+                127.414028,
+                36.334094
+              ],
+              [
+                127.413878,
+                36.334204
+              ],
+              [
+                127.413719,
+                36.334319
+              ],
+              [
+                127.413492,
+                36.334498
+              ],
+              [
+                127.413386,
+                36.334584
+              ],
+              [
+                127.41326,
+                36.334675
+              ],
+              [
+                127.412846,
+                36.334951
+              ],
+              [
+                127.412422,
+                36.33525
+              ],
+              [
+                127.411976,
+                36.335564
+              ],
+              [
+                127.411564,
+                36.335854
+              ],
+              [
+                127.411099,
+                36.336182
+              ],
+              [
+                127.410694,
+                36.335847
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 72.3,
+          "duration": 72.3,
+          "distance": 699.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "gEkdgIsORYAIAAAAHQAAAAsAAAAAAAAAN17HQNUXnEHXh_5AAAAAAAgAAAAdAAAACwAAAAAAAAA3awAAwjiYB9hjKgLCOJgH2GMqAgIAPwwAAAAA",
+          "location": [
+            127.416514,
+            36.332504
+          ],
+          "name": "",
+          "distance": 0
+        },
+        {
+          "hint": "aAEhgBRxM4BKAAAAQgAAAAAAAAAAAAAAQANQQmaPNUIAAAAAAAAAAEoAAABCAAAAAAAAAAAAAAA3awAABiKYB-dwKgLuIJgHw3EqAgAADw4AAAAA",
+          "location": [
+            127.410694,
+            36.335847
+          ],
+          "name": "목중로25번길",
+          "distance": 35.04387128
+        }
+      ]
+    }
+  }
+}

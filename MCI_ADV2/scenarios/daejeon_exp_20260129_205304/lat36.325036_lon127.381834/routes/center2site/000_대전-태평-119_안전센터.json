@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-태평-119 안전센터",
+    "center": [
+      127.3942065,
+      36.3249014
+    ],
+    "site": [
+      127.381834,
+      36.325036
+    ],
+    "saved_at": "2026-01-29T23:57:58.527470+09:00",
+    "data_version": null,
+    "distance_km": 1.588,
+    "duration_min": 1.85,
+    "duration_sec": 111.2,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 111.2,
+              "summary": "",
+              "duration": 111.2,
+              "distance": 1588.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.394433,
+                36.324846
+              ],
+              [
+                127.393996,
+                36.323688
+              ],
+              [
+                127.39391,
+                36.323461
+              ],
+              [
+                127.393593,
+                36.322621
+              ],
+              [
+                127.393306,
+                36.321862
+              ],
+              [
+                127.393217,
+                36.321628
+              ],
+              [
+                127.39311,
+                36.321343
+              ],
+              [
+                127.392986,
+                36.321015
+              ],
+              [
+                127.392749,
+                36.32104
+              ],
+              [
+                127.391328,
+                36.321521
+              ],
+              [
+                127.391224,
+                36.321556
+              ],
+              [
+                127.390345,
+                36.321858
+              ],
+              [
+                127.390291,
+                36.321877
+              ],
+              [
+                127.389075,
+                36.322297
+              ],
+              [
+                127.388944,
+                36.322341
+              ],
+              [
+                127.388281,
+                36.322567
+              ],
+              [
+                127.388053,
+                36.32265
+              ],
+              [
+                127.387841,
+                36.322737
+              ],
+              [
+                127.385738,
+                36.323343
+              ],
+              [
+                127.38563,
+                36.323375
+              ],
+              [
+                127.385541,
+                36.323404
+              ],
+              [
+                127.38467,
+                36.323682
+              ],
+              [
+                127.383209,
+                36.324147
+              ],
+              [
+                127.382469,
+                36.324375
+              ],
+              [
+                127.381634,
+                36.324647
+              ],
+              [
+                127.381835,
+                36.325036
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 111.2,
+          "duration": 111.2,
+          "distance": 1588.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "iUkdgIxJHYAQAAAAWQAAAAAAAAAAAAAAxBrOQfBaBkMAAAAAAAAAABAAAABZAAAAAAAAAAAAAAA3awAAgeKXB-5FKgKf4ZcHJUYqAgAATwwAAAAA",
+          "location": [
+            127.394433,
+            36.324846
+          ],
+          "name": "태평로",
+          "distance": 21.19093441
+        },
+        {
+          "hint": "GrEigFILPYBDAAAAJQAAAAAAAAAAAAAAiSU7QnvryUEAAAAAAAAAAEMAAAAlAAAAAAAAAAAAAAA3awAAS7GXB6xGKgJKsZcHrEYqAgAAbwEAAAAA",
+          "location": [
+            127.381835,
+            36.325036
+          ],
+          "name": "중반6길",
+          "distance": 0.08979228625
+        }
+      ]
+    }
+  }
+}

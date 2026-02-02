@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-산내-119 안전센터",
+    "center": [
+      127.467491,
+      36.2819026
+    ],
+    "site": [
+      127.474495,
+      36.279544
+    ],
+    "saved_at": "2026-01-30T03:18:55.582537+09:00",
+    "data_version": null,
+    "distance_km": 0.793,
+    "duration_min": 1.13,
+    "duration_sec": 67.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 67.7,
+              "summary": "",
+              "duration": 67.7,
+              "distance": 793
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.46727,
+                36.281829
+              ],
+              [
+                127.467735,
+                36.280924
+              ],
+              [
+                127.467839,
+                36.280722
+              ],
+              [
+                127.468144,
+                36.280126
+              ],
+              [
+                127.468169,
+                36.280078
+              ],
+              [
+                127.468894,
+                36.280032
+              ],
+              [
+                127.469955,
+                36.279946
+              ],
+              [
+                127.470512,
+                36.279887
+              ],
+              [
+                127.471316,
+                36.279681
+              ],
+              [
+                127.471772,
+                36.27955
+              ],
+              [
+                127.471998,
+                36.279486
+              ],
+              [
+                127.472168,
+                36.279444
+              ],
+              [
+                127.4724,
+                36.279403
+              ],
+              [
+                127.472525,
+                36.27939
+              ],
+              [
+                127.472886,
+                36.279338
+              ],
+              [
+                127.473295,
+                36.279325
+              ],
+              [
+                127.473803,
+                36.279347
+              ],
+              [
+                127.474078,
+                36.279403
+              ],
+              [
+                127.474227,
+                36.279451
+              ],
+              [
+                127.474409,
+                36.27951
+              ],
+              [
+                127.474495,
+                36.279544
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 67.7,
+          "duration": 67.7,
+          "distance": 793
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "70gtgPNILYBHAAAACwAAAAAAAAAAAAAAsojZQo-HhUEAAAAAAAAAAEcAAAALAAAAAAAAAAAAAAA3awAABv-YB-WdKQLj_5gHL54pAgAAHxUAAAAA",
+          "location": [
+            127.46727,
+            36.281829
+          ],
+          "name": "산내로",
+          "distance": 21.48760741
+        },
+        {
+          "hint": "doREgLCERIAHAAAAGwAAAKYAAABPAAAALZUJQRPR5kE7QThDFZ-uQgcAAAAbAAAApgAAAE8AAAA3awAAPxuZB_iUKQI_G5kH-JQpAg4A_wMAAAAA",
+          "location": [
+            127.474495,
+            36.279544
+          ],
+          "name": "곤룡로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

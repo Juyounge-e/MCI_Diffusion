@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-삼성-119 안전센터",
+    "center": [
+      127.4218609,
+      36.3402664
+    ],
+    "site": [
+      127.427852,
+      36.335521
+    ],
+    "saved_at": "2026-01-30T05:40:00.282190+09:00",
+    "data_version": null,
+    "distance_km": 0.781,
+    "duration_min": 1.43,
+    "duration_sec": 86,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 86,
+              "summary": "",
+              "duration": 86,
+              "distance": 781.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.42172,
+                36.340155
+              ],
+              [
+                127.421924,
+                36.339986
+              ],
+              [
+                127.422372,
+                36.339623
+              ],
+              [
+                127.422663,
+                36.339374
+              ],
+              [
+                127.423158,
+                36.33896
+              ],
+              [
+                127.423367,
+                36.33879
+              ],
+              [
+                127.423555,
+                36.338639
+              ],
+              [
+                127.423833,
+                36.338416
+              ],
+              [
+                127.424252,
+                36.338087
+              ],
+              [
+                127.424714,
+                36.337697
+              ],
+              [
+                127.424739,
+                36.337674
+              ],
+              [
+                127.425226,
+                36.337252
+              ],
+              [
+                127.425271,
+                36.337216
+              ],
+              [
+                127.425675,
+                36.336882
+              ],
+              [
+                127.426057,
+                36.336534
+              ],
+              [
+                127.426174,
+                36.336438
+              ],
+              [
+                127.426415,
+                36.33624
+              ],
+              [
+                127.426796,
+                36.33593
+              ],
+              [
+                127.427144,
+                36.335653
+              ],
+              [
+                127.427508,
+                36.335348
+              ],
+              [
+                127.427552,
+                36.335369
+              ],
+              [
+                127.427852,
+                36.335521
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 86,
+          "duration": 86,
+          "distance": 781.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "lRowgPgaMIAQAAAAGAAAAAAAAAAAAAAAnh-WQda30UEAAAAAAAAAABAAAAAYAAAAAAAAAAAAAAA3awAAGE2YB7uBKgKlTZgHKoIqAgAAfwgAAAAA",
+          "location": [
+            127.42172,
+            36.340155
+          ],
+          "name": "태전로",
+          "distance": 17.66366498
+        },
+        {
+          "hint": "SNJBgFvSQYAtAAAAPgAAAAcAAAAAAAAAdEL-QazjKUKyx5JAAAAAAC0AAAA-AAAABwAAAAAAAAA3awAADGWYB6FvKgIMZZgHoW8qAgIAnwMAAAAA",
+          "location": [
+            127.427852,
+            36.335521
+          ],
+          "name": "대전로867번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

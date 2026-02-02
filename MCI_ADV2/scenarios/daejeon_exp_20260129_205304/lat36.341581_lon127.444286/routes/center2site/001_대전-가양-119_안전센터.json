@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 1,
+    "name": "대전-가양-119 안전센터",
+    "center": [
+      127.4405715,
+      36.3474872
+    ],
+    "site": [
+      127.444286,
+      36.341581
+    ],
+    "saved_at": "2026-01-30T00:43:03.837619+09:00",
+    "data_version": null,
+    "distance_km": 0.917,
+    "duration_min": 2.0,
+    "duration_sec": 120.1,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 120.1,
+              "summary": "",
+              "duration": 120.1,
+              "distance": 916.9
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.440328,
+                36.347468
+              ],
+              [
+                127.440392,
+                36.346934
+              ],
+              [
+                127.441128,
+                36.34706
+              ],
+              [
+                127.441206,
+                36.346902
+              ],
+              [
+                127.441625,
+                36.346312
+              ],
+              [
+                127.44181,
+                36.346063
+              ],
+              [
+                127.442229,
+                36.345455
+              ],
+              [
+                127.44229,
+                36.345303
+              ],
+              [
+                127.442331,
+                36.345184
+              ],
+              [
+                127.442339,
+                36.345161
+              ],
+              [
+                127.44237,
+                36.34492
+              ],
+              [
+                127.44237,
+                36.344747
+              ],
+              [
+                127.442358,
+                36.344525
+              ],
+              [
+                127.442287,
+                36.344159
+              ],
+              [
+                127.442191,
+                36.343744
+              ],
+              [
+                127.44213,
+                36.343508
+              ],
+              [
+                127.442185,
+                36.343396
+              ],
+              [
+                127.442254,
+                36.343313
+              ],
+              [
+                127.442517,
+                36.343035
+              ],
+              [
+                127.44278,
+                36.34268
+              ],
+              [
+                127.443103,
+                36.342287
+              ],
+              [
+                127.443384,
+                36.341841
+              ],
+              [
+                127.443848,
+                36.34115
+              ],
+              [
+                127.444286,
+                36.341581
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 120.1,
+          "duration": 120.1,
+          "distance": 916.9
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "BVUkgBVVJIA1AAAANAAAAAAAAAAAAAAAJCJuQkbeY0IAAAAAAAAAADUAAAA0AAAAAAAAAAAAAAA3awAAyJWYB0yeKgK8lpgHX54qAgAALxYAAAAA",
+          "location": [
+            127.440328,
+            36.347468
+          ],
+          "name": "합내로",
+          "distance": 22.01052681
+        },
+        {
+          "hint": "_CQhgFBw04BZAAAAjgAAAAAAAAAPAAAAH653Qj7AxEIAAAAADHEjQVkAAACOAAAAAAAAAA8AAAA3awAAPqWYB02HKgI-pZgHTYcqAgAAfwIAAAAA",
+          "location": [
+            127.444286,
+            36.341581
+          ],
+          "name": "가양남로13번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

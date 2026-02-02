@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-부사-119 안전센터",
+    "center": [
+      127.4329189,
+      36.32699
+    ],
+    "site": [
+      127.44557,
+      36.321038
+    ],
+    "saved_at": "2026-01-30T08:35:33.628309+09:00",
+    "data_version": null,
+    "distance_km": 1.62,
+    "duration_min": 2.0,
+    "duration_sec": 119.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 119.7,
+              "summary": "",
+              "duration": 119.7,
+              "distance": 1619.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.433063,
+                36.326734
+              ],
+              [
+                127.433557,
+                36.326914
+              ],
+              [
+                127.434012,
+                36.327076
+              ],
+              [
+                127.434785,
+                36.32738
+              ],
+              [
+                127.434959,
+                36.32706
+              ],
+              [
+                127.435057,
+                36.32688
+              ],
+              [
+                127.435168,
+                36.326779
+              ],
+              [
+                127.435446,
+                36.326306
+              ],
+              [
+                127.43569,
+                36.32583
+              ],
+              [
+                127.436431,
+                36.324518
+              ],
+              [
+                127.436608,
+                36.324179
+              ],
+              [
+                127.436739,
+                36.323929
+              ],
+              [
+                127.436809,
+                36.323795
+              ],
+              [
+                127.436835,
+                36.323738
+              ],
+              [
+                127.437254,
+                36.322891
+              ],
+              [
+                127.437508,
+                36.322355
+              ],
+              [
+                127.437849,
+                36.321709
+              ],
+              [
+                127.438733,
+                36.321922
+              ],
+              [
+                127.439002,
+                36.321986
+              ],
+              [
+                127.439632,
+                36.322142
+              ],
+              [
+                127.441143,
+                36.322449
+              ],
+              [
+                127.441331,
+                36.322482
+              ],
+              [
+                127.441636,
+                36.322546
+              ],
+              [
+                127.442128,
+                36.322676
+              ],
+              [
+                127.442168,
+                36.322579
+              ],
+              [
+                127.442251,
+                36.322496
+              ],
+              [
+                127.443999,
+                36.321718
+              ],
+              [
+                127.444389,
+                36.321545
+              ],
+              [
+                127.44557,
+                36.321038
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 119.7,
+          "duration": 119.7,
+          "distance": 1619.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "rnQ_gLF0P4BNAAAARwAAAAAAAAAAAAAAm5JYQn2WQkIAAAAAAAAAAE0AAABHAAAAAAAAAAAAAAA3awAAZ3mYB05NKgLXeJgHTk4qAgAAHwQAAAAA",
+          "location": [
+            127.433063,
+            36.326734
+          ],
+          "name": "대전천동로",
+          "distance": 31.21133869
+        },
+        {
+          "hint": "S4Cwh____39CAAAAigAAAAAAAAAAAAAAkhbwQkiAAUMAAAAAAAAAAEIAAACKAAAAAAAAAAAAAAA3awAAQqqYBw43KgJCqpgHDjcqAgAAXwcAAAAA",
+          "location": [
+            127.44557,
+            36.321038
+          ],
+          "name": "옥천로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

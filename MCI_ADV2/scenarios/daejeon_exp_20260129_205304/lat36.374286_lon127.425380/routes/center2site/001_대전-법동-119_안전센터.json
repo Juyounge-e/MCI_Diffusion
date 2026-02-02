@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 1,
+    "name": "대전-법동-119 안전센터",
+    "center": [
+      127.4290118,
+      36.3723802
+    ],
+    "site": [
+      127.42538,
+      36.374286
+    ],
+    "saved_at": "2026-01-30T07:29:51.798445+09:00",
+    "data_version": null,
+    "distance_km": 0.626,
+    "duration_min": 1.11,
+    "duration_sec": 66.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 71.8,
+              "summary": "",
+              "duration": 66.4,
+              "distance": 626.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.429048,
+                36.372237
+              ],
+              [
+                127.428801,
+                36.372197
+              ],
+              [
+                127.428594,
+                36.372164
+              ],
+              [
+                127.428489,
+                36.372534
+              ],
+              [
+                127.428367,
+                36.372965
+              ],
+              [
+                127.428027,
+                36.374226
+              ],
+              [
+                127.427936,
+                36.374524
+              ],
+              [
+                127.426953,
+                36.374147
+              ],
+              [
+                127.426146,
+                36.373826
+              ],
+              [
+                127.425534,
+                36.373599
+              ],
+              [
+                127.42538,
+                36.374286
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 71.8,
+          "duration": 66.4,
+          "distance": 626.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "YLpgiGS6YIioAAAAbQAAAAAAAAAtAAAAn40MQjLWtEEAAAAAB3aXQVQAAAA3AAAAAAAAAC0AAAA3awAAuGmYBw3_KgKUaZgHnP8qAgAALxAAAAAA",
+          "location": [
+            127.429048,
+            36.372237
+          ],
+          "name": "",
+          "distance": 16.19362532
+        },
+        {
+          "hint": "MrMOgzSzDoNvAAAATAAAAAAAAAAAAAAAufOaQgRfUEIAAAAAAAAAAG8AAABMAAAAAAAAAAAAAAA3awAAZFuYBw4HKwJkW5gHDgcrAgAA3xUAAAAA",
+          "location": [
+            127.42538,
+            36.374286
+          ],
+          "name": "아리랑로197번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

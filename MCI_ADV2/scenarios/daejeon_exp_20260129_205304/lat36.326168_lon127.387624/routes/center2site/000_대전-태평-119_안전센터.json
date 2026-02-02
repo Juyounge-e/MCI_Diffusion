@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-태평-119 안전센터",
+    "center": [
+      127.3942065,
+      36.3249014
+    ],
+    "site": [
+      127.387624,
+      36.326168
+    ],
+    "saved_at": "2026-01-29T22:51:24.700118+09:00",
+    "data_version": null,
+    "distance_km": 1.14,
+    "duration_min": 1.62,
+    "duration_sec": 97.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 97.3,
+              "summary": "",
+              "duration": 97.3,
+              "distance": 1140.1
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.394433,
+                36.324846
+              ],
+              [
+                127.394517,
+                36.325068
+              ],
+              [
+                127.39479,
+                36.325789
+              ],
+              [
+                127.394863,
+                36.325925
+              ],
+              [
+                127.394569,
+                36.325997
+              ],
+              [
+                127.394031,
+                36.326143
+              ],
+              [
+                127.393347,
+                36.326353
+              ],
+              [
+                127.392776,
+                36.326516
+              ],
+              [
+                127.392623,
+                36.32656
+              ],
+              [
+                127.39175,
+                36.326819
+              ],
+              [
+                127.391019,
+                36.327036
+              ],
+              [
+                127.390907,
+                36.327065
+              ],
+              [
+                127.390873,
+                36.327076
+              ],
+              [
+                127.388866,
+                36.32789
+              ],
+              [
+                127.388699,
+                36.327885
+              ],
+              [
+                127.38858,
+                36.327882
+              ],
+              [
+                127.388519,
+                36.327775
+              ],
+              [
+                127.388416,
+                36.327609
+              ],
+              [
+                127.388305,
+                36.327357
+              ],
+              [
+                127.388236,
+                36.327199
+              ],
+              [
+                127.388185,
+                36.32708
+              ],
+              [
+                127.388043,
+                36.326857
+              ],
+              [
+                127.387865,
+                36.326607
+              ],
+              [
+                127.386937,
+                36.325512
+              ],
+              [
+                127.387015,
+                36.325469
+              ],
+              [
+                127.387326,
+                36.325825
+              ],
+              [
+                127.387624,
+                36.326168
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 97.3,
+          "duration": 97.3,
+          "distance": 1140.1
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "iUkdgIxJHYAQAAAAWQAAAAAAAAAAAAAAxBrOQfBaBkMAAAAAAAAAABAAAABZAAAAAAAAAAAAAAA3awAAgeKXB-5FKgKf4ZcHJUYqAgAATwwAAAAA",
+          "location": [
+            127.394433,
+            36.324846
+          ],
+          "name": "태평로",
+          "distance": 21.19093441
+        },
+        {
+          "hint": "Wjv6iP___38dAAAAQQAAAB8AAABfAAAARBo6Qi1oW0JPgkFCWl4UQx0AAABBAAAAHwAAAF8AAAA3awAA6MeXBxhLKgLox5cHGEsqAgIAPwIAAAAA",
+          "location": [
+            127.387624,
+            36.326168
+          ],
+          "name": "유등로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

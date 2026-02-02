@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-태평-119 안전센터",
+    "center": [
+      127.3942065,
+      36.3249014
+    ],
+    "site": [
+      127.395705,
+      36.318601
+    ],
+    "saved_at": "2026-01-30T07:42:29.287180+09:00",
+    "data_version": null,
+    "distance_km": 0.725,
+    "duration_min": 1.55,
+    "duration_sec": 92.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 92.7,
+              "summary": "",
+              "duration": 92.7,
+              "distance": 724.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.394433,
+                36.324846
+              ],
+              [
+                127.393996,
+                36.323688
+              ],
+              [
+                127.39391,
+                36.323461
+              ],
+              [
+                127.394048,
+                36.323282
+              ],
+              [
+                127.394177,
+                36.322987
+              ],
+              [
+                127.394627,
+                36.321731
+              ],
+              [
+                127.394795,
+                36.321177
+              ],
+              [
+                127.394946,
+                36.320752
+              ],
+              [
+                127.395084,
+                36.320364
+              ],
+              [
+                127.39525,
+                36.319894
+              ],
+              [
+                127.395454,
+                36.319298
+              ],
+              [
+                127.395533,
+                36.319095
+              ],
+              [
+                127.395638,
+                36.318783
+              ],
+              [
+                127.395705,
+                36.318601
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 92.7,
+          "duration": 92.7,
+          "distance": 724.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "iUkdgIxJHYAQAAAAWQAAAAAAAAAAAAAAxBrOQfBaBkMAAAAAAAAAABAAAABZAAAAAAAAAAAAAAA3awAAgeKXB-5FKgKf4ZcHJUYqAgAATwwAAAAA",
+          "location": [
+            127.394433,
+            36.324846
+          ],
+          "name": "태평로",
+          "distance": 21.19093441
+        },
+        {
+          "hint": "rGcigOhPLYBJAAAAHwAAABUAAAAAAAAA5ntNQs-UqEGXrGlBAAAAAEkAAAAfAAAAFQAAAAAAAAA3awAAeeeXB4ktKgJ555cHiS0qAgIAfxUAAAAA",
+          "location": [
+            127.395705,
+            36.318601
+          ],
+          "name": "계백로1583번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "국군대전병원",
+    "site": [
+      127.346397,
+      36.420408
+    ],
+    "hospital": [
+      127.3497314,
+      36.3983507
+    ],
+    "saved_at": "2026-01-29T23:19:50.835026+09:00",
+    "data_version": null,
+    "distance_km": 2.954,
+    "duration_min": 5.62,
+    "duration_sec": 337.4,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 337.4,
+              "summary": "",
+              "duration": 337.4,
+              "distance": 2954.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.346397,
+                36.420408
+              ],
+              [
+                127.346365,
+                36.420182
+              ],
+              [
+                127.346343,
+                36.420054
+              ],
+              [
+                127.34615,
+                36.420007
+              ],
+              [
+                127.345761,
+                36.419981
+              ],
+              [
+                127.345501,
+                36.41994
+              ],
+              [
+                127.345362,
+                36.419862
+              ],
+              [
+                127.34533,
+                36.419759
+              ],
+              [
+                127.345316,
+                36.417286
+              ],
+              [
+                127.346053,
+                36.417282
+              ],
+              [
+                127.346056,
+                36.417115
+              ],
+              [
+                127.34598,
+                36.416926
+              ],
+              [
+                127.345984,
+                36.414926
+              ],
+              [
+                127.345977,
+                36.414015
+              ],
+              [
+                127.345965,
+                36.412782
+              ],
+              [
+                127.345955,
+                36.410766
+              ],
+              [
+                127.345954,
+                36.410556
+              ],
+              [
+                127.345941,
+                36.407549
+              ],
+              [
+                127.345946,
+                36.40713
+              ],
+              [
+                127.345942,
+                36.407017
+              ],
+              [
+                127.345941,
+                36.406924
+              ],
+              [
+                127.345915,
+                36.401744
+              ],
+              [
+                127.345914,
+                36.401603
+              ],
+              [
+                127.346063,
+                36.401607
+              ],
+              [
+                127.346204,
+                36.401606
+              ],
+              [
+                127.346544,
+                36.401602
+              ],
+              [
+                127.347671,
+                36.401601
+              ],
+              [
+                127.348065,
+                36.4016
+              ],
+              [
+                127.348023,
+                36.398146
+              ],
+              [
+                127.34973,
+                36.39814
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 337.4,
+          "duration": 337.4,
+          "distance": 2954.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "eSpoiHoqaIgkAAAAAAAAADUCAADoAAAA9-_JQQAAAACtR8RDco8gQyQAAAAAAAAANQIAAOgAAAA3awAA3SaXBzi7KwLdJpcHOLsrAg4AbwAAAAAA",
+          "location": [
+            127.346397,
+            36.420408
+          ],
+          "name": "",
+          "distance": 0
+        },
+        {
+          "hint": "XkGOh3lBjofcAAAA4QEAAAAAAAAAAAAAzS0ZQ5C6pkMAAAAAAAAAANwAAADhAQAAAAAAAAAAAAA3awAA4jOXBzxkKwLjM5cHD2UrAgAArwUAAAAA",
+          "location": [
+            127.34973,
+            36.39814
+          ],
+          "name": "",
+          "distance": 23.41399104
+        }
+      ]
+    }
+  }
+}

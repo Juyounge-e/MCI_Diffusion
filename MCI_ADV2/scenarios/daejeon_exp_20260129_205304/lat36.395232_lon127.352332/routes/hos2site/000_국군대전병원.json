@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "국군대전병원",
+    "site": [
+      127.352332,
+      36.395232
+    ],
+    "hospital": [
+      127.3497314,
+      36.3983507
+    ],
+    "saved_at": "2026-01-30T05:19:57.232450+09:00",
+    "data_version": null,
+    "distance_km": 2.145,
+    "duration_min": 3.77,
+    "duration_sec": 226.4,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 226.4,
+              "summary": "",
+              "duration": 226.4,
+              "distance": 2144.8
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.352332,
+                36.395232
+              ],
+              [
+                127.353245,
+                36.395902
+              ],
+              [
+                127.353156,
+                36.395993
+              ],
+              [
+                127.351344,
+                36.394684
+              ],
+              [
+                127.350646,
+                36.394163
+              ],
+              [
+                127.350516,
+                36.394064
+              ],
+              [
+                127.350395,
+                36.394038
+              ],
+              [
+                127.350132,
+                36.394048
+              ],
+              [
+                127.350029,
+                36.394051
+              ],
+              [
+                127.349701,
+                36.394386
+              ],
+              [
+                127.349556,
+                36.394535
+              ],
+              [
+                127.348661,
+                36.395453
+              ],
+              [
+                127.348082,
+                36.396047
+              ],
+              [
+                127.347696,
+                36.396453
+              ],
+              [
+                127.347316,
+                36.396923
+              ],
+              [
+                127.346902,
+                36.39755
+              ],
+              [
+                127.34669,
+                36.39794
+              ],
+              [
+                127.34642,
+                36.398542
+              ],
+              [
+                127.346251,
+                36.399074
+              ],
+              [
+                127.346142,
+                36.399554
+              ],
+              [
+                127.346094,
+                36.399831
+              ],
+              [
+                127.34604,
+                36.400544
+              ],
+              [
+                127.346063,
+                36.401607
+              ],
+              [
+                127.346204,
+                36.401606
+              ],
+              [
+                127.346544,
+                36.401602
+              ],
+              [
+                127.347671,
+                36.401601
+              ],
+              [
+                127.348065,
+                36.4016
+              ],
+              [
+                127.348023,
+                36.398146
+              ],
+              [
+                127.34973,
+                36.39814
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 226.4,
+          "duration": 226.4,
+          "distance": 2144.8
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "YCs6hP___388AAAAegAAAAAAAAAAAAAADOrZQi1E3UIAAAAAAAAAADwAAAB6AAAAAAAAAAAAAAA3awAADD6XB-BYKwIMPpcH4FgrAgAA_wIAAAAA",
+          "location": [
+            127.352332,
+            36.395232
+          ],
+          "name": "유성대로",
+          "distance": 0
+        },
+        {
+          "hint": "XkGOh3lBjofcAAAA4QEAAAAAAAAAAAAAzS0ZQ5C6pkMAAAAAAAAAANwAAADhAQAAAAAAAAAAAAA3awAA4jOXBzxkKwLjM5cHD2UrAgAArwUAAAAA",
+          "location": [
+            127.34973,
+            36.39814
+          ],
+          "name": "",
+          "distance": 23.41399104
+        }
+      ]
+    }
+  }
+}

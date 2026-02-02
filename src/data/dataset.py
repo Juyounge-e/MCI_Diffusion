@@ -3,8 +3,8 @@ import re
 import csv
 from glob import glob
 
-RESULTS_ROOT = r"./simul_data/results/exp_20260108_115527"  
-OUT_CSV = "dataset.csv"
+RESULTS_ROOT = r"./MCI_ADV2/results/daejeon_exp_20260129_205304"  
+OUT_CSV = "src/data/dataset.csv"
 
 PDR_LINE_INDEX = 2   
 

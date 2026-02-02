@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-문평-119 안전센터",
+    "center": [
+      127.4047254,
+      36.4469491
+    ],
+    "site": [
+      127.401421,
+      36.444829
+    ],
+    "saved_at": "2026-01-30T02:40:56.033962+09:00",
+    "data_version": null,
+    "distance_km": 0.377,
+    "duration_min": 0.71,
+    "duration_sec": 42.9,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 42.9,
+              "summary": "",
+              "duration": 42.9,
+              "distance": 377.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.404552,
+                36.447098
+              ],
+              [
+                127.404248,
+                36.44687
+              ],
+              [
+                127.404167,
+                36.446803
+              ],
+              [
+                127.404052,
+                36.446725
+              ],
+              [
+                127.403585,
+                36.446399
+              ],
+              [
+                127.403173,
+                36.446108
+              ],
+              [
+                127.401421,
+                36.444829
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 42.9,
+          "duration": 42.9,
+          "distance": 377.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "tol2gLqJdoAiAAAANgAAAAAAAAAAAAAAa3HAQbrFFEIAAAAAAAAAACIAAAA2AAAAAAAAAAAAAAA3awAACAqYB3ojLAK1CpgH5SIsAgAAPw4AAAAA",
+          "location": [
+            127.404552,
+            36.447098
+          ],
+          "name": "문평동로18번길",
+          "distance": 22.67301559
+        },
+        {
+          "hint": "wiw3gPmFOYC-AAAAEQEAAAAAAAAAAAAAErpTQ6lMl0MAAAAAAAAAAL4AAAARAQAAAAAAAAAAAAA3awAAzf2XB50aLALN_ZcHnRosAgAAPw4AAAAA",
+          "location": [
+            127.401421,
+            36.444829
+          ],
+          "name": "문평서로18번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

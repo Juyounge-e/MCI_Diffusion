@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-용운-119 안전센터",
+    "center": [
+      127.4618264,
+      36.3312594
+    ],
+    "site": [
+      127.453891,
+      36.330382
+    ],
+    "saved_at": "2026-01-30T05:41:54.090175+09:00",
+    "data_version": null,
+    "distance_km": 1.202,
+    "duration_min": 2.5,
+    "duration_sec": 149.8,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 149.8,
+              "summary": "",
+              "duration": 149.8,
+              "distance": 1201.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.461568,
+                36.331446
+              ],
+              [
+                127.461235,
+                36.331147
+              ],
+              [
+                127.461182,
+                36.3311
+              ],
+              [
+                127.461036,
+                36.331034
+              ],
+              [
+                127.460732,
+                36.330976
+              ],
+              [
+                127.46067,
+                36.330933
+              ],
+              [
+                127.459852,
+                36.329721
+              ],
+              [
+                127.459551,
+                36.329283
+              ],
+              [
+                127.459143,
+                36.328701
+              ],
+              [
+                127.459139,
+                36.328582
+              ],
+              [
+                127.459125,
+                36.328094
+              ],
+              [
+                127.458747,
+                36.328087
+              ],
+              [
+                127.458576,
+                36.328084
+              ],
+              [
+                127.457091,
+                36.328056
+              ],
+              [
+                127.45625,
+                36.327933
+              ],
+              [
+                127.456167,
+                36.327927
+              ],
+              [
+                127.455136,
+                36.327923
+              ],
+              [
+                127.454503,
+                36.328148
+              ],
+              [
+                127.45419,
+                36.328248
+              ],
+              [
+                127.454195,
+                36.328544
+              ],
+              [
+                127.454124,
+                36.328665
+              ],
+              [
+                127.454138,
+                36.328797
+              ],
+              [
+                127.454013,
+                36.328961
+              ],
+              [
+                127.454306,
+                36.329402
+              ],
+              [
+                127.454694,
+                36.329985
+              ],
+              [
+                127.453891,
+                36.330382
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 149.8,
+          "duration": 149.8,
+          "distance": 1201.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "GqYhgGinE4hFAAAAQQAAAAAAAAAAAAAAY01BQvinMkIAAAAAAAAAAEUAAABBAAAAAAAAAAAAAAA3awAAwOiYB7ZfKgLC6ZgH-14qAgAA7w0AAAAA",
+          "location": [
+            127.461568,
+            36.331446
+          ],
+          "name": "용운로151번길",
+          "distance": 31.10087161
+        },
+        {
+          "hint": "f069goFOvYIAAAAAegAAAAAAAAAAAAAAAAAAAOH9qEIAAAAAAAAAAAAAAAB6AAAAAAAAAAAAAAA3awAAw8qYB45bKgLDypgHjlsqAgAAnwcAAAAA",
+          "location": [
+            127.453891,
+            36.330382
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

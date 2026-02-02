@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-월평-119 안전센터",
+    "center": [
+      127.3668674,
+      36.3600048
+    ],
+    "site": [
+      127.367541,
+      36.361123
+    ],
+    "saved_at": "2026-01-30T07:16:59.828510+09:00",
+    "data_version": null,
+    "distance_km": 0.168,
+    "duration_min": 0.44,
+    "duration_sec": 26.2,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 26.2,
+              "summary": "",
+              "duration": 26.2,
+              "distance": 168.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.367044,
+                36.360004
+              ],
+              [
+                127.367052,
+                36.361124
+              ],
+              [
+                127.367541,
+                36.361123
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 26.2,
+          "duration": 26.2,
+          "distance": 168.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "gPRBg4L0QYMZAAAAswAAAAAAAAAAAAAASEOMQWOR-EIAAAAAAAAAABkAAACzAAAAAAAAAAAAAAA3awAAhHeXB0TPKgLTdpcHRc8qAgAADwAAAAAA",
+          "location": [
+            127.367044,
+            36.360004
+          ],
+          "name": "청사로",
+          "distance": 15.88346322
+        },
+        {
+          "hint": "g_RBg4b0QYM_AAAAcwAAAAAAAAAAAAAAooUvQoxen0IAAAAAAAAAAD8AAABzAAAAAAAAAAAAAAA3awAAdXmXB6PTKgJ1eZcHo9MqAgAArwUAAAAA",
+          "location": [
+            127.367541,
+            36.361123
+          ],
+          "name": "청사로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "국군대전병원",
+    "site": [
+      127.346343,
+      36.420054
+    ],
+    "hospital": [
+      127.3497314,
+      36.3983507
+    ],
+    "saved_at": "2026-01-30T05:30:13.498006+09:00",
+    "data_version": null,
+    "distance_km": 2.915,
+    "duration_min": 5.53,
+    "duration_sec": 331.7,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 331.7,
+              "summary": "",
+              "duration": 331.7,
+              "distance": 2914.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.346343,
+                36.420054
+              ],
+              [
+                127.34615,
+                36.420007
+              ],
+              [
+                127.345761,
+                36.419981
+              ],
+              [
+                127.345501,
+                36.41994
+              ],
+              [
+                127.345362,
+                36.419862
+              ],
+              [
+                127.34533,
+                36.419759
+              ],
+              [
+                127.345316,
+                36.417286
+              ],
+              [
+                127.346053,
+                36.417282
+              ],
+              [
+                127.346056,
+                36.417115
+              ],
+              [
+                127.34598,
+                36.416926
+              ],
+              [
+                127.345984,
+                36.414926
+              ],
+              [
+                127.345977,
+                36.414015
+              ],
+              [
+                127.345965,
+                36.412782
+              ],
+              [
+                127.345955,
+                36.410766
+              ],
+              [
+                127.345954,
+                36.410556
+              ],
+              [
+                127.345941,
+                36.407549
+              ],
+              [
+                127.345946,
+                36.40713
+              ],
+              [
+                127.345942,
+                36.407017
+              ],
+              [
+                127.345941,
+                36.406924
+              ],
+              [
+                127.345915,
+                36.401744
+              ],
+              [
+                127.345914,
+                36.401603
+              ],
+              [
+                127.346063,
+                36.401607
+              ],
+              [
+                127.346204,
+                36.401606
+              ],
+              [
+                127.346544,
+                36.401602
+              ],
+              [
+                127.347671,
+                36.401601
+              ],
+              [
+                127.348065,
+                36.4016
+              ],
+              [
+                127.348023,
+                36.398146
+              ],
+              [
+                127.34973,
+                36.39814
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 331.7,
+          "duration": 331.7,
+          "distance": 2914.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "eSpoiHoqaIgaAAAAAAAAAAYCAAAhAQAAnZyQQQAAAABaErRDhCRIQxoAAAAAAAAABgIAACEBAAA3awAApyaXB9a5KwKnJpcH1rkrAgoAnwQAAAAA",
+          "location": [
+            127.346343,
+            36.420054
+          ],
+          "name": "",
+          "distance": 0
+        },
+        {
+          "hint": "XkGOh3lBjofcAAAA4QEAAAAAAAAAAAAAzS0ZQ5C6pkMAAAAAAAAAANwAAADhAQAAAAAAAAAAAAA3awAA4jOXBzxkKwLjM5cHD2UrAgAArwUAAAAA",
+          "location": [
+            127.34973,
+            36.39814
+          ],
+          "name": "",
+          "distance": 23.41399104
+        }
+      ]
+    }
+  }
+}

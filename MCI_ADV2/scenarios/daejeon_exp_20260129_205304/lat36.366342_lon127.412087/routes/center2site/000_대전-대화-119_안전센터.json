@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-대화-119 안전센터",
+    "center": [
+      127.4108438,
+      36.3669187
+    ],
+    "site": [
+      127.412087,
+      36.366342
+    ],
+    "saved_at": "2026-01-29T23:54:01.627973+09:00",
+    "data_version": null,
+    "distance_km": 0.203,
+    "duration_min": 0.41,
+    "duration_sec": 24.9,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 24.9,
+              "summary": "",
+              "duration": 24.9,
+              "distance": 202.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.410768,
+                36.367111
+              ],
+              [
+                127.41167,
+                36.367344
+              ],
+              [
+                127.411895,
+                36.366696
+              ],
+              [
+                127.411964,
+                36.366548
+              ],
+              [
+                127.412087,
+                36.366342
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 24.9,
+          "duration": 24.9,
+          "distance": 202.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "NWcmgEDDLYCjAAAAOAAAAAAAAAAAAAAABFF6Q6rwqUIAAAAAAAAAAKMAAAA4AAAAAAAAAAAAAAA3awAAUCKYBwfrKgKcIpgHR-oqAgAAjwQAAAAA",
+          "location": [
+            127.410768,
+            36.367111
+          ],
+          "name": "대화로",
+          "distance": 22.37036535
+        },
+        {
+          "hint": "OMMtgEHDLYANAAAAJQAAAE4AAACFAAAA6ZoVQdUSy0Gt_FdC8Hm4Qg0AAAAlAAAATgAAAIUAAAA3awAAdyeYBwboKgJ3J5gHBugqAgIA7xQAAAAA",
+          "location": [
+            127.412087,
+            36.366342
+          ],
+          "name": "동심5길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

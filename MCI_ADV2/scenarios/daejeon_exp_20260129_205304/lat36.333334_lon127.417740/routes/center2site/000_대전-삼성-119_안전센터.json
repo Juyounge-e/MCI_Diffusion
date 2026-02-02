@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-삼성-119 안전센터",
+    "center": [
+      127.4218609,
+      36.3402664
+    ],
+    "site": [
+      127.41774,
+      36.333334
+    ],
+    "saved_at": "2026-01-29T23:30:24.730914+09:00",
+    "data_version": null,
+    "distance_km": 1.248,
+    "duration_min": 1.91,
+    "duration_sec": 114.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 114.3,
+              "summary": "",
+              "duration": 114.3,
+              "distance": 1248.5
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.42172,
+                36.340155
+              ],
+              [
+                127.421574,
+                36.340276
+              ],
+              [
+                127.421162,
+                36.340617
+              ],
+              [
+                127.421056,
+                36.340704
+              ],
+              [
+                127.420393,
+                36.34018
+              ],
+              [
+                127.419737,
+                36.339661
+              ],
+              [
+                127.419058,
+                36.339123
+              ],
+              [
+                127.418995,
+                36.339073
+              ],
+              [
+                127.417758,
+                36.338094
+              ],
+              [
+                127.417618,
+                36.337978
+              ],
+              [
+                127.417125,
+                36.337547
+              ],
+              [
+                127.416705,
+                36.337218
+              ],
+              [
+                127.416529,
+                36.33707
+              ],
+              [
+                127.41596,
+                36.336647
+              ],
+              [
+                127.415916,
+                36.336615
+              ],
+              [
+                127.41603,
+                36.336525
+              ],
+              [
+                127.416545,
+                36.336115
+              ],
+              [
+                127.416779,
+                36.33593
+              ],
+              [
+                127.417456,
+                36.335391
+              ],
+              [
+                127.418086,
+                36.33489
+              ],
+              [
+                127.418173,
+                36.334821
+              ],
+              [
+                127.418863,
+                36.334273
+              ],
+              [
+                127.418479,
+                36.333953
+              ],
+              [
+                127.41774,
+                36.333334
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 114.3,
+          "duration": 114.3,
+          "distance": 1248.5
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "lRowgPgaMIAQAAAAGAAAAAAAAAAAAAAAnh-WQda30UEAAAAAAAAAABAAAAAYAAAAAAAAAAAAAAA3awAAGE2YB7uBKgKlTZgHKoIqAgAAfwgAAAAA",
+          "location": [
+            127.42172,
+            36.340155
+          ],
+          "name": "태전로",
+          "distance": 17.66366498
+        },
+        {
+          "hint": "SRwugDseLoA1AAAAigAAAAAAAAAAAAAA0s0UQmECv0IAAAAAAAAAADUAAACKAAAAAAAAAAAAAAA3awAAjD2YBxZnKgKMPZgHFmcqAgAAzwIAAAAA",
+          "location": [
+            127.41774,
+            36.333334
+          ],
+          "name": "대종로583번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

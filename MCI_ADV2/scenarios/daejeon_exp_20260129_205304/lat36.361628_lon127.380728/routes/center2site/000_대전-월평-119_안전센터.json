@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-월평-119 안전센터",
+    "center": [
+      127.3668674,
+      36.3600048
+    ],
+    "site": [
+      127.380728,
+      36.361628
+    ],
+    "saved_at": "2026-01-30T07:33:12.406643+09:00",
+    "data_version": null,
+    "distance_km": 1.88,
+    "duration_min": 3.52,
+    "duration_sec": 211.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 3488.2,
+              "summary": "",
+              "duration": 211.5,
+              "distance": 1880
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.367044,
+                36.360004
+              ],
+              [
+                127.367043,
+                36.359846
+              ],
+              [
+                127.36842,
+                36.359835
+              ],
+              [
+                127.369876,
+                36.359835
+              ],
+              [
+                127.371602,
+                36.359829
+              ],
+              [
+                127.371739,
+                36.359828
+              ],
+              [
+                127.372324,
+                36.359826
+              ],
+              [
+                127.374299,
+                36.359822
+              ],
+              [
+                127.374375,
+                36.359821
+              ],
+              [
+                127.376254,
+                36.359812
+              ],
+              [
+                127.376366,
+                36.359775
+              ],
+              [
+                127.376656,
+                36.359773
+              ],
+              [
+                127.377475,
+                36.359768
+              ],
+              [
+                127.379128,
+                36.359765
+              ],
+              [
+                127.379425,
+                36.359764
+              ],
+              [
+                127.379589,
+                36.359764
+              ],
+              [
+                127.379589,
+                36.359844
+              ],
+              [
+                127.37959,
+                36.359975
+              ],
+              [
+                127.379605,
+                36.362104
+              ],
+              [
+                127.379606,
+                36.362257
+              ],
+              [
+                127.379783,
+                36.362256
+              ],
+              [
+                127.381891,
+                36.362243
+              ],
+              [
+                127.38206,
+                36.362243
+              ],
+              [
+                127.382053,
+                36.361436
+              ],
+              [
+                127.382053,
+                36.361398
+              ],
+              [
+                127.380727,
+                36.361392
+              ],
+              [
+                127.380728,
+                36.361628
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 3488.2,
+          "duration": 211.5,
+          "distance": 1880
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "gPRBg4L0QYMZAAAAswAAAAAAAAAAAAAASEOMQWOR-EIAAAAAAAAAABkAAACzAAAAAAAAAAAAAAA3awAAhHeXB0TPKgLTdpcHRc8qAgAADwAAAAAA",
+          "location": [
+            127.367044,
+            36.360004
+          ],
+          "name": "청사로",
+          "distance": 15.88346322
+        },
+        {
+          "hint": "GwrHhzJF_IgAAAAAPwAAAAAAAAAeAQAAAAAAAEaB0UEAAAAADPvtQgAAAAA_AAAAAAAAAB4BAAA3awAA-KyXB5zVKgL4rJcHnNUqAgAATwsAAAAA",
+          "location": [
+            127.380728,
+            36.361628
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

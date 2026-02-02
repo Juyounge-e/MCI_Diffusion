@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-산성-119 안전센터",
+    "center": [
+      127.394996,
+      36.3077317
+    ],
+    "site": [
+      127.399486,
+      36.30574
+    ],
+    "saved_at": "2026-01-30T00:10:56.040333+09:00",
+    "data_version": null,
+    "distance_km": 0.759,
+    "duration_min": 1.07,
+    "duration_sec": 64,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 64,
+              "summary": "",
+              "duration": 64,
+              "distance": 759
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.39489,
+                36.307674
+              ],
+              [
+                127.395062,
+                36.307471
+              ],
+              [
+                127.394975,
+                36.307401
+              ],
+              [
+                127.39451,
+                36.307174
+              ],
+              [
+                127.394166,
+                36.307068
+              ],
+              [
+                127.394334,
+                36.306644
+              ],
+              [
+                127.394516,
+                36.306187
+              ],
+              [
+                127.394687,
+                36.305761
+              ],
+              [
+                127.394821,
+                36.305415
+              ],
+              [
+                127.394779,
+                36.305247
+              ],
+              [
+                127.394985,
+                36.305224
+              ],
+              [
+                127.395241,
+                36.305218
+              ],
+              [
+                127.396147,
+                36.30533
+              ],
+              [
+                127.396778,
+                36.305407
+              ],
+              [
+                127.398225,
+                36.305585
+              ],
+              [
+                127.398334,
+                36.305599
+              ],
+              [
+                127.399446,
+                36.305736
+              ],
+              [
+                127.399486,
+                36.30574
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 64,
+          "duration": 64,
+          "distance": 759
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "vLcrgCLoiYAnAAAAVQAAAAAAAABYAAAA2H7aQdbSaUIAAAAAnBB1QicAAABVAAAAAAAAAFgAAAA3awAASuSXB9oCKgK05JcHFAMqAgAAXxQAAAAA",
+          "location": [
+            127.39489,
+            36.307674
+          ],
+          "name": "산성로57번길",
+          "distance": 11.4897226
+        },
+        {
+          "hint": "_LcrgA64K4ACAAAAIAAAAAAAAAAAAAAA651nQP8VREIAAAAAAAAAAAIAAAAgAAAAAAAAAAAAAAA3awAAPvaXB0z7KQI-9pcHTPspAgAAPwUAAAAA",
+          "location": [
+            127.399486,
+            36.30574
+          ],
+          "name": "보문산로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "대전한국병원",
+    "site": [
+      127.446871,
+      36.350108
+    ],
+    "hospital": [
+      127.4358152,
+      36.3482008
+    ],
+    "saved_at": "2026-01-30T04:03:38.947016+09:00",
+    "data_version": null,
+    "distance_km": 1.104,
+    "duration_min": 2.69,
+    "duration_sec": 161.4,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 161.4,
+              "summary": "",
+              "duration": 161.4,
+              "distance": 1104.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.446871,
+                36.350108
+              ],
+              [
+                127.446549,
+                36.349547
+              ],
+              [
+                127.444807,
+                36.35017
+              ],
+              [
+                127.444335,
+                36.35033
+              ],
+              [
+                127.443553,
+                36.350588
+              ],
+              [
+                127.442765,
+                36.350296
+              ],
+              [
+                127.442638,
+                36.350249
+              ],
+              [
+                127.441773,
+                36.349957
+              ],
+              [
+                127.441359,
+                36.349794
+              ],
+              [
+                127.440063,
+                36.349343
+              ],
+              [
+                127.439653,
+                36.3492
+              ],
+              [
+                127.438999,
+                36.348973
+              ],
+              [
+                127.438208,
+                36.348697
+              ],
+              [
+                127.438016,
+                36.348631
+              ],
+              [
+                127.436568,
+                36.34812
+              ],
+              [
+                127.435968,
+                36.347913
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 161.4,
+          "duration": 161.4,
+          "distance": 1104.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "BcMhgLnDIYBiAAAAEAAAAAAAAAAAAAAAw0aJQt5UKkEAAAAAAAAAAGIAAAAQAAAAAAAAAAAAAAA3awAAV6-YB5yoKgJXr5gHnKgqAgAAjwEAAAAA",
+          "location": [
+            127.446871,
+            36.350108
+          ],
+          "name": "비래서로42번길",
+          "distance": 0
+        },
+        {
+          "hint": "yVQkgNZUJIB1AAAAVQAAAAAAAAAAAAAA3ZajQj1FakIAAAAAAAAAAHUAAABVAAAAAAAAAAAAAAA3awAAwISYBwmgKgInhJgHKaEqAgAALwQAAAAA",
+          "location": [
+            127.435968,
+            36.347913
+          ],
+          "name": "계족로392번길",
+          "distance": 34.78574434
+        }
+      ]
+    }
+  }
+}

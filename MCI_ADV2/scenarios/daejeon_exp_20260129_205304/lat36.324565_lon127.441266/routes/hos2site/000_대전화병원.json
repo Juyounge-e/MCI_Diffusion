@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "대전화병원",
+    "site": [
+      127.441266,
+      36.324565
+    ],
+    "hospital": [
+      127.4389764,
+      36.329087
+    ],
+    "saved_at": "2026-01-30T01:50:19.896630+09:00",
+    "data_version": null,
+    "distance_km": 0.675,
+    "duration_min": 1.25,
+    "duration_sec": 75,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 75,
+              "summary": "",
+              "duration": 75,
+              "distance": 675.1
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.441266,
+                36.324565
+              ],
+              [
+                127.440981,
+                36.32456
+              ],
+              [
+                127.440911,
+                36.324561
+              ],
+              [
+                127.440919,
+                36.324785
+              ],
+              [
+                127.440904,
+                36.325342
+              ],
+              [
+                127.440879,
+                36.325872
+              ],
+              [
+                127.440871,
+                36.326028
+              ],
+              [
+                127.440882,
+                36.326277
+              ],
+              [
+                127.440873,
+                36.326372
+              ],
+              [
+                127.44041,
+                36.327184
+              ],
+              [
+                127.439888,
+                36.328325
+              ],
+              [
+                127.439884,
+                36.328464
+              ],
+              [
+                127.439675,
+                36.328962
+              ],
+              [
+                127.439616,
+                36.329054
+              ],
+              [
+                127.439355,
+                36.329552
+              ],
+              [
+                127.439272,
+                36.329504
+              ],
+              [
+                127.43893,
+                36.329385
+              ],
+              [
+                127.438878,
+                36.329359
+              ],
+              [
+                127.438761,
+                36.329269
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 75,
+          "duration": 75,
+          "distance": 675.1
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "VUIigFxCIoAlAAAAAAAAAAkAAAAAAAAAR8bMQQAAAACDKslAAAAAACUAAAAAAAAACQAAAAAAAAA3awAAcpmYB9VEKgJymZgH1UQqAgIAjwUAAAAA",
+          "location": [
+            127.441266,
+            36.324565
+          ],
+          "name": "",
+          "distance": 0
+        },
+        {
+          "hint": "TUIigKSUiIYUAAAAFgAAAKcAAAAIAAAAH6hlQcrrZ0Gy7-dC8KKvQBQAAAAWAAAApwAAAAgAAAA3awAAqY-YBzVXKgKAkJgHf1YqAgQA7wIAAAAA",
+          "location": [
+            127.438761,
+            36.329269
+          ],
+          "name": "부흥길",
+          "distance": 27.93850308
+        }
+      ]
+    }
+  }
+}

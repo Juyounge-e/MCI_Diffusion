@@ -1,0 +1,5 @@
+﻿type,ratio,rescue_param_alpha,rescue_param_beta,treat_tier1,treat_tier2,treat_tier1_mean,treat_tier2_mean
+Red,0.1,6,5,True,False,40,60
+Yellow,0.3,2,13,True,True,20,30
+Green,0.5,1,22,True,True,10,15
+Black,0.1,0,0,True,True,0,0

@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-산성-119 안전센터",
+    "center": [
+      127.394996,
+      36.3077317
+    ],
+    "site": [
+      127.388669,
+      36.304926
+    ],
+    "saved_at": "2026-01-30T03:04:46.631572+09:00",
+    "data_version": null,
+    "distance_km": 0.72,
+    "duration_min": 1.31,
+    "duration_sec": 78.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 78.5,
+              "summary": "",
+              "duration": 78.5,
+              "distance": 720.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.39489,
+                36.307674
+              ],
+              [
+                127.395062,
+                36.307471
+              ],
+              [
+                127.394975,
+                36.307401
+              ],
+              [
+                127.39451,
+                36.307174
+              ],
+              [
+                127.394166,
+                36.307068
+              ],
+              [
+                127.392474,
+                36.306548
+              ],
+              [
+                127.390814,
+                36.306041
+              ],
+              [
+                127.389185,
+                36.305506
+              ],
+              [
+                127.388838,
+                36.305397
+              ],
+              [
+                127.388942,
+                36.305232
+              ],
+              [
+                127.389076,
+                36.304992
+              ],
+              [
+                127.388669,
+                36.304926
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 78.5,
+          "duration": 78.5,
+          "distance": 720.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "vLcrgCLoiYAnAAAAVQAAAAAAAABYAAAA2H7aQdbSaUIAAAAAnBB1QicAAABVAAAAAAAAAFgAAAA3awAASuSXB9oCKgK05JcHFAMqAgAAXxQAAAAA",
+          "location": [
+            127.39489,
+            36.307674
+          ],
+          "name": "산성로57번길",
+          "distance": 11.4897226
+        },
+        {
+          "hint": "751LgP6dS4AVAAAANgAAAG0AAAAAAAAAvd1rQZkWFUI2QpdCAAAAABUAAAA2AAAAbQAAAAAAAAA3awAA_cuXBx74KQL9y5cHHvgpAgQA7wQAAAAA",
+          "location": [
+            127.388669,
+            36.304926
+          ],
+          "name": "가재울로4번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}
