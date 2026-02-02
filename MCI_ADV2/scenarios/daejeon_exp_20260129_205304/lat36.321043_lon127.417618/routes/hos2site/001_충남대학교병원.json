@@ -1,0 +1,150 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 1,
+    "name": "충남대학교병원",
+    "site": [
+      127.417618,
+      36.321043
+    ],
+    "hospital": [
+      127.415363,
+      36.31690800000001
+    ],
+    "saved_at": "2026-01-30T00:48:05.365282+09:00",
+    "data_version": null,
+    "distance_km": 0.976,
+    "duration_min": 2.17,
+    "duration_sec": 130.5,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 130.5,
+              "summary": "",
+              "duration": 130.5,
+              "distance": 975.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.417618,
+                36.321043
+              ],
+              [
+                127.418048,
+                36.320684
+              ],
+              [
+                127.418137,
+                36.320626
+              ],
+              [
+                127.418469,
+                36.320418
+              ],
+              [
+                127.418612,
+                36.320368
+              ],
+              [
+                127.418582,
+                36.319425
+              ],
+              [
+                127.418516,
+                36.318266
+              ],
+              [
+                127.418372,
+                36.318255
+              ],
+              [
+                127.417695,
+                36.318185
+              ],
+              [
+                127.417093,
+                36.318112
+              ],
+              [
+                127.416794,
+                36.318081
+              ],
+              [
+                127.415983,
+                36.317991
+              ],
+              [
+                127.415671,
+                36.317984
+              ],
+              [
+                127.414929,
+                36.317934
+              ],
+              [
+                127.414371,
+                36.317883
+              ],
+              [
+                127.414369,
+                36.317782
+              ],
+              [
+                127.414358,
+                36.317114
+              ],
+              [
+                127.414377,
+                36.316492
+              ],
+              [
+                127.414375,
+                36.316437
+              ],
+              [
+                127.415371,
+                36.316448
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 130.5,
+          "duration": 130.5,
+          "distance": 975.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "2_BGgIFXX4AxAAAAUAAAAAAAAAAAAAAAJG4IQrnoXUIAAAAAAAAAADEAAABQAAAAAAAAAAAAAAA3awAAEj2YBxM3KgISPZgHEzcqAgAAfwgAAAAA",
+          "location": [
+            127.417618,
+            36.321043
+          ],
+          "name": "대흥로24번길",
+          "distance": 0
+        },
+        {
+          "hint": "KR_TgzMf04MJAAAA1wAAALsAAAAAAAAAglmBQAXiskK3TptCAAAAAAkAAADXAAAAuwAAAAAAAAA3awAASzSYByAlKgJDNJgH7CYqAgYA3xAAAAAA",
+          "location": [
+            127.415371,
+            36.316448
+          ],
+          "name": "",
+          "distance": 51.04897117
+        }
+      ]
+    }
+  }
+}

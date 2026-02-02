@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "둔산소방서",
+    "center": [
+      127.37111,
+      36.34789
+    ],
+    "site": [
+      127.363612,
+      36.349396
+    ],
+    "saved_at": "2026-01-30T07:23:27.467672+09:00",
+    "data_version": null,
+    "distance_km": 0.949,
+    "duration_min": 2.24,
+    "duration_sec": 134.6,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 134.6,
+              "summary": "",
+              "duration": 134.6,
+              "distance": 948.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.371124,
+                36.347604
+              ],
+              [
+                127.370981,
+                36.347599
+              ],
+              [
+                127.370246,
+                36.347572
+              ],
+              [
+                127.369895,
+                36.347559
+              ],
+              [
+                127.369383,
+                36.34753
+              ],
+              [
+                127.368375,
+                36.347492
+              ],
+              [
+                127.368315,
+                36.348735
+              ],
+              [
+                127.368286,
+                36.349287
+              ],
+              [
+                127.368256,
+                36.349837
+              ],
+              [
+                127.367299,
+                36.349806
+              ],
+              [
+                127.366854,
+                36.349791
+              ],
+              [
+                127.36648,
+                36.349779
+              ],
+              [
+                127.365561,
+                36.349749
+              ],
+              [
+                127.364889,
+                36.349728
+              ],
+              [
+                127.364138,
+                36.349703
+              ],
+              [
+                127.364145,
+                36.349536
+              ],
+              [
+                127.363654,
+                36.349454
+              ],
+              [
+                127.363612,
+                36.349396
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 134.6,
+          "duration": 134.6,
+          "distance": 948.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "SdtogCw_-ogSAAAAlAAAAAAAAAAAAAAA76JNQfo_zUIAAAAAAAAAABIAAACUAAAAAAAAAAAAAAA3awAAdIeXB9SeKgJmh5cH8p8qAgAAfwUAAAAA",
+          "location": [
+            127.371124,
+            36.347604
+          ],
+          "name": "갈마중로",
+          "distance": 31.760888
+        },
+        {
+          "hint": "aKWVg2mllYMSAAAAAAAAAGwAAAAYAAAASrTuQAAAAACZETRCkOIgQRIAAAAAAAAAbAAAABgAAAA3awAAHGqXB9SlKgIcapcH1KUqAgIALw0AAAAA",
+          "location": [
+            127.363612,
+            36.349396
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

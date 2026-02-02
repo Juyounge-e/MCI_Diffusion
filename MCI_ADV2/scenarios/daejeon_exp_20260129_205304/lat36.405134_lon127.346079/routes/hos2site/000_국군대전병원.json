@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "국군대전병원",
+    "site": [
+      127.346079,
+      36.405134
+    ],
+    "hospital": [
+      127.3497314,
+      36.3983507
+    ],
+    "saved_at": "2026-01-30T01:03:41.458149+09:00",
+    "data_version": null,
+    "distance_km": 1.552,
+    "duration_min": 3.22,
+    "duration_sec": 192.9,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 192.9,
+              "summary": "",
+              "duration": 192.9,
+              "distance": 1551.8
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.346079,
+                36.405134
+              ],
+              [
+                127.346083,
+                36.405877
+              ],
+              [
+                127.346084,
+                36.406922
+              ],
+              [
+                127.346084,
+                36.407017
+              ],
+              [
+                127.345942,
+                36.407017
+              ],
+              [
+                127.345941,
+                36.406924
+              ],
+              [
+                127.345915,
+                36.401744
+              ],
+              [
+                127.345914,
+                36.401603
+              ],
+              [
+                127.346063,
+                36.401607
+              ],
+              [
+                127.346204,
+                36.401606
+              ],
+              [
+                127.346544,
+                36.401602
+              ],
+              [
+                127.347671,
+                36.401601
+              ],
+              [
+                127.348065,
+                36.4016
+              ],
+              [
+                127.348023,
+                36.398146
+              ],
+              [
+                127.34973,
+                36.39814
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 192.9,
+          "duration": 192.9,
+          "distance": 1551.8
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "glEtgP___39uAAAAuQAAAPAAAABxAAAAkgP3QvzlpEJS8IVDLQH9Qm4AAAC5AAAA8AAAAHEAAAA3awAAnyWXB45_KwKfJZcHjn8rAgYADwAAAAAA",
+          "location": [
+            127.346079,
+            36.405134
+          ],
+          "name": "자운로",
+          "distance": 0
+        },
+        {
+          "hint": "XkGOh3lBjofcAAAA4QEAAAAAAAAAAAAAzS0ZQ5C6pkMAAAAAAAAAANwAAADhAQAAAAAAAAAAAAA3awAA4jOXBzxkKwLjM5cHD2UrAgAArwUAAAAA",
+          "location": [
+            127.34973,
+            36.39814
+          ],
+          "name": "",
+          "distance": 23.41399104
+        }
+      ]
+    }
+  }
+}

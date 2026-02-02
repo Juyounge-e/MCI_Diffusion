@@ -1,0 +1,162 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-덕암-119 안전센터",
+    "center": [
+      127.4260783,
+      36.4391257
+    ],
+    "site": [
+      127.426621,
+      36.438681
+    ],
+    "saved_at": "2026-01-30T03:48:08.724753+09:00",
+    "data_version": null,
+    "distance_km": 1.445,
+    "duration_min": 2.06,
+    "duration_sec": 123.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 124.9,
+              "summary": "",
+              "duration": 123.4,
+              "distance": 1445.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.426062,
+                36.438987
+              ],
+              [
+                127.425826,
+                36.439005
+              ],
+              [
+                127.425827,
+                36.438946
+              ],
+              [
+                127.426572,
+                36.438874
+              ],
+              [
+                127.426203,
+                36.437884
+              ],
+              [
+                127.425871,
+                36.436995
+              ],
+              [
+                127.425796,
+                36.436795
+              ],
+              [
+                127.425329,
+                36.435632
+              ],
+              [
+                127.425162,
+                36.435248
+              ],
+              [
+                127.425042,
+                36.435007
+              ],
+              [
+                127.424731,
+                36.434556
+              ],
+              [
+                127.424009,
+                36.433447
+              ],
+              [
+                127.423865,
+                36.433226
+              ],
+              [
+                127.423862,
+                36.433148
+              ],
+              [
+                127.423953,
+                36.433183
+              ],
+              [
+                127.424098,
+                36.433411
+              ],
+              [
+                127.424822,
+                36.434511
+              ],
+              [
+                127.425136,
+                36.434979
+              ],
+              [
+                127.425255,
+                36.435232
+              ],
+              [
+                127.425424,
+                36.435585
+              ],
+              [
+                127.425858,
+                36.436687
+              ],
+              [
+                127.425963,
+                36.436967
+              ],
+              [
+                127.426621,
+                36.438681
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 124.9,
+          "duration": 123.4,
+          "distance": 1445.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "_qVAif___38fAAAALgAAAAAAAAAAAAAAIHxBQjgQqkEAAAAAAAAAAB8AAAAuAAAAAAAAAAAAAAA3awAADl6YB8sDLAIeXpgHVgQsAgAAPxEAAAAA",
+          "location": [
+            127.426062,
+            36.438987
+          ],
+          "name": "신탄진로681번길",
+          "distance": 15.49099231
+        },
+        {
+          "hint": "cSRYgP___39uAAAAegAAAAQBAAAAAAAA9CNHQ79vpkHm0ulDAAAAAG4AAAB6AAAABAEAAAAAAAA3awAAPWCYB5kCLAI9YJgHmQIsAhAAHwEAAAAA",
+          "location": [
+            127.426621,
+            36.438681
+          ],
+          "name": "신탄진로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

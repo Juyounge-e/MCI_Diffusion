@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "의료법인 영훈의료재단 대전선병원",
+    "site": [
+      127.41774,
+      36.333334
+    ],
+    "hospital": [
+      127.4104139,
+      36.3360669
+    ],
+    "saved_at": "2026-01-29T23:30:54.891549+09:00",
+    "data_version": null,
+    "distance_km": 0.855,
+    "duration_min": 1.48,
+    "duration_sec": 88.7,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 88.7,
+              "summary": "",
+              "duration": 88.7,
+              "distance": 855.2
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.41774,
+                36.333334
+              ],
+              [
+                127.417452,
+                36.333093
+              ],
+              [
+                127.4172,
+                36.332472
+              ],
+              [
+                127.416557,
+                36.332627
+              ],
+              [
+                127.415831,
+                36.332848
+              ],
+              [
+                127.415736,
+                36.332913
+              ],
+              [
+                127.41535,
+                36.333167
+              ],
+              [
+                127.414991,
+                36.33341
+              ],
+              [
+                127.414732,
+                36.333592
+              ],
+              [
+                127.414301,
+                36.333905
+              ],
+              [
+                127.414028,
+                36.334094
+              ],
+              [
+                127.413878,
+                36.334204
+              ],
+              [
+                127.413719,
+                36.334319
+              ],
+              [
+                127.413492,
+                36.334498
+              ],
+              [
+                127.413386,
+                36.334584
+              ],
+              [
+                127.41326,
+                36.334675
+              ],
+              [
+                127.412846,
+                36.334951
+              ],
+              [
+                127.412422,
+                36.33525
+              ],
+              [
+                127.411976,
+                36.335564
+              ],
+              [
+                127.411564,
+                36.335854
+              ],
+              [
+                127.411099,
+                36.336182
+              ],
+              [
+                127.410694,
+                36.335847
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 88.7,
+          "duration": 88.7,
+          "distance": 855.2
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "SRwugDseLoA1AAAAigAAAAAAAAAAAAAA0s0UQmECv0IAAAAAAAAAADUAAACKAAAAAAAAAAAAAAA3awAAjD2YBxZnKgKMPZgHFmcqAgAAzwIAAAAA",
+          "location": [
+            127.41774,
+            36.333334
+          ],
+          "name": "대종로583번길",
+          "distance": 0
+        },
+        {
+          "hint": "aAEhgBRxM4BKAAAAQgAAAAAAAAAAAAAAQANQQmaPNUIAAAAAAAAAAEoAAABCAAAAAAAAAAAAAAA3awAABiKYB-dwKgLuIJgHw3EqAgAADw4AAAAA",
+          "location": [
+            127.410694,
+            36.335847
+          ],
+          "name": "목중로25번길",
+          "distance": 35.04387128
+        }
+      ]
+    }
+  }
+}

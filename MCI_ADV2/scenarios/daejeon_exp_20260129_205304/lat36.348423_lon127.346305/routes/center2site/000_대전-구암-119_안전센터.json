@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-구암-119 안전센터",
+    "center": [
+      127.3292431,
+      36.3489264
+    ],
+    "site": [
+      127.346305,
+      36.348423
+    ],
+    "saved_at": "2026-01-30T07:43:08.447991+09:00",
+    "data_version": null,
+    "distance_km": 1.985,
+    "duration_min": 2.33,
+    "duration_sec": 140,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 140,
+              "summary": "",
+              "duration": 140,
+              "distance": 1984.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.329357,
+                36.348833
+              ],
+              [
+                127.329357,
+                36.348746
+              ],
+              [
+                127.329357,
+                36.348729
+              ],
+              [
+                127.329356,
+                36.348641
+              ],
+              [
+                127.328309,
+                36.348642
+              ],
+              [
+                127.327378,
+                36.348641
+              ],
+              [
+                127.327232,
+                36.348639
+              ],
+              [
+                127.326998,
+                36.348615
+              ],
+              [
+                127.326951,
+                36.348589
+              ],
+              [
+                127.326939,
+                36.348553
+              ],
+              [
+                127.326961,
+                36.348518
+              ],
+              [
+                127.327023,
+                36.348499
+              ],
+              [
+                127.327167,
+                36.348475
+              ],
+              [
+                127.327488,
+                36.348473
+              ],
+              [
+                127.330265,
+                36.348459
+              ],
+              [
+                127.330676,
+                36.348459
+              ],
+              [
+                127.330974,
+                36.348459
+              ],
+              [
+                127.331463,
+                36.348461
+              ],
+              [
+                127.332281,
+                36.348461
+              ],
+              [
+                127.333403,
+                36.348456
+              ],
+              [
+                127.334402,
+                36.348453
+              ],
+              [
+                127.33559,
+                36.348451
+              ],
+              [
+                127.335891,
+                36.348448
+              ],
+              [
+                127.336364,
+                36.348477
+              ],
+              [
+                127.33964,
+                36.348479
+              ],
+              [
+                127.341054,
+                36.348472
+              ],
+              [
+                127.344648,
+                36.348446
+              ],
+              [
+                127.344829,
+                36.348424
+              ],
+              [
+                127.346305,
+                36.348423
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 140,
+          "duration": 140,
+          "distance": 1984.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "clcpiXNXKYkXAAAAAAAAABwAAAAmAAAAnXYaQQAAAACJbTpBf9x8QRcAAAAAAAAAHAAAACYAAAA3awAATeSWB6GjKgLb45YH_qMqAgQADwAAAAAA",
+          "location": [
+            127.329357,
+            36.348833
+          ],
+          "name": "",
+          "distance": 14.53545554
+        },
+        {
+          "hint": "jS1jgP___39WAAAAlgAAAAAAAAAAAAAAkYgEQ7PfwEIAAAAAAAAAAFYAAACWAAAAAAAAAAAAAAA3awAAgSaXBweiKgKBJpcHB6IqAgAArwUAAAAA",
+          "location": [
+            127.346305,
+            36.348423
+          ],
+          "name": "월드컵대로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

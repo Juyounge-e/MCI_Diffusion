@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-대화-119 안전센터",
+    "center": [
+      127.4108438,
+      36.3669187
+    ],
+    "site": [
+      127.420537,
+      36.370611
+    ],
+    "saved_at": "2026-01-30T06:48:28.051133+09:00",
+    "data_version": null,
+    "distance_km": 1.147,
+    "duration_min": 1.35,
+    "duration_sec": 81.2,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 81.2,
+              "summary": "",
+              "duration": 81.2,
+              "distance": 1147.5
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.410768,
+                36.367111
+              ],
+              [
+                127.41167,
+                36.367344
+              ],
+              [
+                127.412842,
+                36.367652
+              ],
+              [
+                127.413232,
+                36.367759
+              ],
+              [
+                127.413578,
+                36.367789
+              ],
+              [
+                127.414074,
+                36.367784
+              ],
+              [
+                127.414492,
+                36.367779
+              ],
+              [
+                127.416172,
+                36.367765
+              ],
+              [
+                127.419204,
+                36.367713
+              ],
+              [
+                127.419523,
+                36.367708
+              ],
+              [
+                127.419717,
+                36.367705
+              ],
+              [
+                127.420198,
+                36.368892
+              ],
+              [
+                127.420398,
+                36.369483
+              ],
+              [
+                127.42054,
+                36.370211
+              ],
+              [
+                127.420542,
+                36.370579
+              ],
+              [
+                127.420537,
+                36.370611
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 81.2,
+          "duration": 81.2,
+          "distance": 1147.5
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "NWcmgEDDLYCjAAAAOAAAAAAAAAAAAAAABFF6Q6rwqUIAAAAAAAAAAKMAAAA4AAAAAAAAAAAAAAA3awAAUCKYBwfrKgKcIpgHR-oqAgAAjwQAAAAA",
+          "location": [
+            127.410768,
+            36.367111
+          ],
+          "name": "대화로",
+          "distance": 22.37036535
+        },
+        {
+          "hint": "RxEVgPJmJoACAAAAOwAAAB8AAAArAAAAtRBlQGgnnELuVyNC5GhnQgIAAAA7AAAAHwAAACsAAAA3awAAeUiYB7P4KgJ5SJgHs_gqAgIADxYAAAAA",
+          "location": [
+            127.420537,
+            36.370611
+          ],
+          "name": "대전로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

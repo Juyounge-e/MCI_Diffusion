@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 2,
+    "name": "대전-송촌-119 안전센터",
+    "center": [
+      127.441969,
+      36.3634599
+    ],
+    "site": [
+      127.429901,
+      36.363324
+    ],
+    "saved_at": "2026-01-30T02:45:34.064248+09:00",
+    "data_version": null,
+    "distance_km": 1.296,
+    "duration_min": 2.03,
+    "duration_sec": 121.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 121.7,
+              "summary": "",
+              "duration": 121.7,
+              "distance": 1296.5
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.441795,
+                36.363373
+              ],
+              [
+                127.441733,
+                36.363453
+              ],
+              [
+                127.441614,
+                36.3636
+              ],
+              [
+                127.441435,
+                36.363523
+              ],
+              [
+                127.441041,
+                36.363323
+              ],
+              [
+                127.440312,
+                36.36309
+              ],
+              [
+                127.439465,
+                36.362921
+              ],
+              [
+                127.437152,
+                36.362453
+              ],
+              [
+                127.435454,
+                36.362177
+              ],
+              [
+                127.43423,
+                36.361945
+              ],
+              [
+                127.433403,
+                36.361788
+              ],
+              [
+                127.432626,
+                36.36165
+              ],
+              [
+                127.432244,
+                36.361583
+              ],
+              [
+                127.431619,
+                36.361472
+              ],
+              [
+                127.430815,
+                36.361354
+              ],
+              [
+                127.4307,
+                36.361757
+              ],
+              [
+                127.43038,
+                36.362889
+              ],
+              [
+                127.43004,
+                36.362829
+              ],
+              [
+                127.429901,
+                36.363324
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 121.7,
+          "duration": 121.7,
+          "distance": 1296.5
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "81hCgF3vy4gEAAAADwAAANcAAAAcAAAAZzw4QC6gJ0GZ-BVDrvibQQQAAAAPAAAA1wAAABwAAAA3awAAg5uYB23cKgIxnJgHxNwqAggAfxQAAAAA",
+          "location": [
+            127.441795,
+            36.363373
+          ],
+          "name": "송촌로",
+          "distance": 18.357381
+        },
+        {
+          "hint": "SiNGgF8jRoBRAAAAZwAAAAAAAAAAAAAAZk5hQixCjkIAAAAAAAAAAFEAAABnAAAAAAAAAAAAAAA3awAADW2YBzzcKgINbZgHPNwqAgAAvxUAAAAA",
+          "location": [
+            127.429901,
+            36.363324
+          ],
+          "name": "중리동로40번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "연합정형외과병원",
+    "site": [
+      127.388876,
+      36.337522
+    ],
+    "hospital": [
+      127.3916456,
+      36.3400711
+    ],
+    "saved_at": "2026-01-30T05:36:04.559653+09:00",
+    "data_version": null,
+    "distance_km": 0.873,
+    "duration_min": 1.42,
+    "duration_sec": 85.4,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 85.4,
+              "summary": "",
+              "duration": 85.4,
+              "distance": 873.1
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.388876,
+                36.337522
+              ],
+              [
+                127.388601,
+                36.337753
+              ],
+              [
+                127.389125,
+                36.33818
+              ],
+              [
+                127.389742,
+                36.337658
+              ],
+              [
+                127.390348,
+                36.337146
+              ],
+              [
+                127.391026,
+                36.336573
+              ],
+              [
+                127.39207,
+                36.337418
+              ],
+              [
+                127.392643,
+                36.337868
+              ],
+              [
+                127.393193,
+                36.338259
+              ],
+              [
+                127.393295,
+                36.338342
+              ],
+              [
+                127.392169,
+                36.339272
+              ],
+              [
+                127.39142,
+                36.339894
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 85.4,
+          "duration": 85.4,
+          "distance": 873.1
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "pSdGgLknRoCwAAAANAAAAAAAAAAAAAAA-Q31QiFeDkIAAAAAAAAAALAAAAA0AAAAAAAAAAAAAAA3awAAzMyXB3J3KgLMzJcHcncqAgAAzxMAAAAA",
+          "location": [
+            127.388876,
+            36.337522
+          ],
+          "name": "도산로349번길",
+          "distance": 0
+        },
+        {
+          "hint": "SXf6iP___389AAAAVgAAAAAAAAAAAAAA2LzAQp4fFkIAAAAAAAAAAD0AAABWAAAAAAAAAAAAAAA3awAAvNaXB7aAKgKe15cHZ4EqAgAAvxMAAAAA",
+          "location": [
+            127.39142,
+            36.339894
+          ],
+          "name": "계룡로",
+          "distance": 28.24127525
+        }
+      ]
+    }
+  }
+}

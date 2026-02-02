@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-월평-119 안전센터",
+    "center": [
+      127.3668674,
+      36.3600048
+    ],
+    "site": [
+      127.380428,
+      36.364708
+    ],
+    "saved_at": "2026-01-30T04:47:00.257546+09:00",
+    "data_version": null,
+    "distance_km": 1.763,
+    "duration_min": 2.31,
+    "duration_sec": 138.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 138.3,
+              "summary": "",
+              "duration": 138.3,
+              "distance": 1762.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.367044,
+                36.360004
+              ],
+              [
+                127.367043,
+                36.359846
+              ],
+              [
+                127.36842,
+                36.359835
+              ],
+              [
+                127.369876,
+                36.359835
+              ],
+              [
+                127.371602,
+                36.359829
+              ],
+              [
+                127.371739,
+                36.359828
+              ],
+              [
+                127.372324,
+                36.359826
+              ],
+              [
+                127.374299,
+                36.359822
+              ],
+              [
+                127.374375,
+                36.359821
+              ],
+              [
+                127.376254,
+                36.359812
+              ],
+              [
+                127.376366,
+                36.359775
+              ],
+              [
+                127.376656,
+                36.359773
+              ],
+              [
+                127.377475,
+                36.359768
+              ],
+              [
+                127.379128,
+                36.359765
+              ],
+              [
+                127.379425,
+                36.359764
+              ],
+              [
+                127.379589,
+                36.359764
+              ],
+              [
+                127.379589,
+                36.359844
+              ],
+              [
+                127.37959,
+                36.359975
+              ],
+              [
+                127.379605,
+                36.362104
+              ],
+              [
+                127.379606,
+                36.362257
+              ],
+              [
+                127.379607,
+                36.362337
+              ],
+              [
+                127.379652,
+                36.364558
+              ],
+              [
+                127.379653,
+                36.36463
+              ],
+              [
+                127.379655,
+                36.364712
+              ],
+              [
+                127.379791,
+                36.364711
+              ],
+              [
+                127.380428,
+                36.364708
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 138.3,
+          "duration": 138.3,
+          "distance": 1762.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "gPRBg4L0QYMZAAAAswAAAAAAAAAAAAAASEOMQWOR-EIAAAAAAAAAABkAAACzAAAAAAAAAAAAAAA3awAAhHeXB0TPKgLTdpcHRc8qAgAADwAAAAAA",
+          "location": [
+            127.367044,
+            36.360004
+          ],
+          "name": "청사로",
+          "distance": 15.88346322
+        },
+        {
+          "hint": "JBSDh____38kAAAAQQAAAAgAAAAAAAAA_KVkQkcJMkJtRUNBAAAAACQAAABBAAAACAAAAAAAAAA3awAAzKuXB6ThKgLMq5cHpOEqAgIArwUAAAAA",
+          "location": [
+            127.380428,
+            36.364708
+          ],
+          "name": "둔산대로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

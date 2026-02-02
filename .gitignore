@@ -6,3 +6,6 @@ simul_data/
 
 *__pycache__/
 *.pyc
+
+.claude/
+MCI_ADV2/visualizations/

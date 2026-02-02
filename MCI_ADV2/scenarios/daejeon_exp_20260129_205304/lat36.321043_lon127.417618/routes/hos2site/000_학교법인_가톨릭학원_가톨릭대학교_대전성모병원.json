@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "학교법인 가톨릭학원 가톨릭대학교 대전성모병원",
+    "site": [
+      127.417618,
+      36.321043
+    ],
+    "hospital": [
+      127.420163,
+      36.323042
+    ],
+    "saved_at": "2026-01-30T00:48:04.365807+09:00",
+    "data_version": null,
+    "distance_km": 0.732,
+    "duration_min": 1.73,
+    "duration_sec": 103.6,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 103.6,
+              "summary": "",
+              "duration": 103.6,
+              "distance": 731.9
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.417618,
+                36.321043
+              ],
+              [
+                127.417354,
+                36.321264
+              ],
+              [
+                127.417044,
+                36.32159
+              ],
+              [
+                127.416575,
+                36.322089
+              ],
+              [
+                127.416741,
+                36.322252
+              ],
+              [
+                127.416857,
+                36.322448
+              ],
+              [
+                127.416895,
+                36.322517
+              ],
+              [
+                127.416948,
+                36.322723
+              ],
+              [
+                127.416963,
+                36.322842
+              ],
+              [
+                127.416976,
+                36.322991
+              ],
+              [
+                127.41711,
+                36.323018
+              ],
+              [
+                127.41726,
+                36.323058
+              ],
+              [
+                127.417655,
+                36.323192
+              ],
+              [
+                127.418856,
+                36.323633
+              ],
+              [
+                127.419689,
+                36.323922
+              ],
+              [
+                127.419776,
+                36.323947
+              ],
+              [
+                127.420272,
+                36.324092
+              ],
+              [
+                127.41968,
+                36.323413
+              ],
+              [
+                127.419595,
+                36.323275
+              ],
+              [
+                127.419587,
+                36.323208
+              ],
+              [
+                127.419611,
+                36.323135
+              ],
+              [
+                127.419725,
+                36.322902
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 103.6,
+          "duration": 103.6,
+          "distance": 731.9
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "2_BGgIFXX4AxAAAAUAAAAAAAAAAAAAAAJG4IQrnoXUIAAAAAAAAAADEAAABQAAAAAAAAAAAAAAA3awAAEj2YBxM3KgISPZgHEzcqAgAAfwgAAAAA",
+          "location": [
+            127.417618,
+            36.321043
+          ],
+          "name": "대흥로24번길",
+          "distance": 0
+        },
+        {
+          "hint": "sC4fgLsiKIlCAAAAlQAAACwBAAAAAAAAtnXeQXx9d0JpV_pCAAAAAEIAAACVAAAALAEAAAAAAAA3awAATUWYB1Y-KgIDR5gH4j4qAggA7wkAAAAA",
+          "location": [
+            127.419725,
+            36.322902
+          ],
+          "name": "",
+          "distance": 42.28606652
+        }
+      ]
+    }
+  }
+}

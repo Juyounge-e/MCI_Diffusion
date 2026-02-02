@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 1,
+    "name": "대전-복수-119 안전센터",
+    "center": [
+      127.3723393,
+      36.3093101
+    ],
+    "site": [
+      127.378431,
+      36.309795
+    ],
+    "saved_at": "2026-01-30T06:42:37.833484+09:00",
+    "data_version": null,
+    "distance_km": 1.003,
+    "duration_min": 3.05,
+    "duration_sec": 182.8,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 182.8,
+              "summary": "",
+              "duration": 182.8,
+              "distance": 1002.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.372278,
+                36.309653
+              ],
+              [
+                127.372574,
+                36.309687
+              ],
+              [
+                127.372696,
+                36.309705
+              ],
+              [
+                127.372865,
+                36.309749
+              ],
+              [
+                127.373212,
+                36.309753
+              ],
+              [
+                127.373356,
+                36.30974
+              ],
+              [
+                127.373509,
+                36.309789
+              ],
+              [
+                127.37362,
+                36.309825
+              ],
+              [
+                127.374824,
+                36.310133
+              ],
+              [
+                127.375834,
+                36.310469
+              ],
+              [
+                127.375902,
+                36.3103
+              ],
+              [
+                127.3764,
+                36.310478
+              ],
+              [
+                127.376992,
+                36.310623
+              ],
+              [
+                127.377078,
+                36.310749
+              ],
+              [
+                127.377297,
+                36.310789
+              ],
+              [
+                127.377593,
+                36.310814
+              ],
+              [
+                127.377921,
+                36.310849
+              ],
+              [
+                127.377936,
+                36.310993
+              ],
+              [
+                127.378428,
+                36.310997
+              ],
+              [
+                127.379167,
+                36.310972
+              ],
+              [
+                127.379823,
+                36.310836
+              ],
+              [
+                127.379861,
+                36.310828
+              ],
+              [
+                127.379768,
+                36.309898
+              ],
+              [
+                127.379736,
+                36.3096
+              ],
+              [
+                127.379733,
+                36.309575
+              ],
+              [
+                127.378709,
+                36.309696
+              ],
+              [
+                127.378496,
+                36.309785
+              ],
+              [
+                127.378431,
+                36.309795
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 182.8,
+          "duration": 182.8,
+          "distance": 1002.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "6v61gP___38tAAAAVAAAAJYAAAAnAAAAyTP9QXjC1kHNSNFCNpzYQS0AAABUAAAAlgAAACcAAAA3awAA9ouXB5UKKgIzjJcHPgkqAggAHwUAAAAA",
+          "location": [
+            127.372278,
+            36.309653
+          ],
+          "name": "",
+          "distance": 38.45310696
+        },
+        {
+          "hint": "yXk-iMx5PoguAAAADwAAAA8DAAA0AAAAN9WcQQ8dvkDvHiNDTTOsQS4AAAAPAAAAiAEAADQAAAA3awAA_6OXByMLKgL_o5cHIwsqAgYAXwYAAAAA",
+          "location": [
+            127.378431,
+            36.309795
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

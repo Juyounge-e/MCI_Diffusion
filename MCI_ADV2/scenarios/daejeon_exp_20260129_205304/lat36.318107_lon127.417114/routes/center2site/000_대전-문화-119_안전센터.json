@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-문화-119 안전센터",
+    "center": [
+      127.4112705,
+      36.3193046
+    ],
+    "site": [
+      127.417114,
+      36.318107
+    ],
+    "saved_at": "2026-01-30T04:15:54.227915+09:00",
+    "data_version": null,
+    "distance_km": 0.763,
+    "duration_min": 1.06,
+    "duration_sec": 63.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 63.4,
+              "summary": "",
+              "duration": 63.4,
+              "distance": 762.6
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.411206,
+                36.319464
+              ],
+              [
+                127.410951,
+                36.319396
+              ],
+              [
+                127.411668,
+                36.317959
+              ],
+              [
+                127.412067,
+                36.317159
+              ],
+              [
+                127.413588,
+                36.317728
+              ],
+              [
+                127.413972,
+                36.317826
+              ],
+              [
+                127.414371,
+                36.317883
+              ],
+              [
+                127.414929,
+                36.317934
+              ],
+              [
+                127.415671,
+                36.317984
+              ],
+              [
+                127.415983,
+                36.317991
+              ],
+              [
+                127.416794,
+                36.318081
+              ],
+              [
+                127.417093,
+                36.318112
+              ],
+              [
+                127.417114,
+                36.318107
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 63.4,
+          "duration": 63.4,
+          "distance": 762.6
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "bJ5LgG6eS4AiAAAArQAAAAAAAAAAAAAA0d3AQTpF70IAAAAAAAAAACIAAACtAAAAAAAAAAAAAAA3awAABiSYB-gwKgJHJJgHSTAqAgAAfwQAAAAA",
+          "location": [
+            127.411206,
+            36.319464
+          ],
+          "name": "계룡로918번길",
+          "distance": 18.58374882
+        },
+        {
+          "hint": "pjmFhv___38CAAAAKQAAAAAAAAA5AAAAxJf7P-P-00EAAAAAnEEhQgIAAAApAAAAAAAAADkAAAA3awAAGjuYB5srKgIaO5gHmysqAgAAnwYAAAAA",
+          "location": [
+            127.417114,
+            36.318107
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

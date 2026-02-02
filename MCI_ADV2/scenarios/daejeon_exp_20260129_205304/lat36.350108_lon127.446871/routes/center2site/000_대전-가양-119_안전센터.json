@@ -1,0 +1,150 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-가양-119 안전센터",
+    "center": [
+      127.4405715,
+      36.3474872
+    ],
+    "site": [
+      127.446871,
+      36.350108
+    ],
+    "saved_at": "2026-01-30T04:03:08.944966+09:00",
+    "data_version": null,
+    "distance_km": 1.052,
+    "duration_min": 1.93,
+    "duration_sec": 115.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 115.5,
+              "summary": "",
+              "duration": 115.5,
+              "distance": 1052.1
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.440328,
+                36.347468
+              ],
+              [
+                127.440267,
+                36.347979
+              ],
+              [
+                127.440063,
+                36.349343
+              ],
+              [
+                127.439945,
+                36.35018
+              ],
+              [
+                127.440827,
+                36.350496
+              ],
+              [
+                127.441393,
+                36.350679
+              ],
+              [
+                127.441523,
+                36.350721
+              ],
+              [
+                127.44189,
+                36.350923
+              ],
+              [
+                127.441942,
+                36.350957
+              ],
+              [
+                127.442061,
+                36.351058
+              ],
+              [
+                127.442156,
+                36.351146
+              ],
+              [
+                127.442253,
+                36.351236
+              ],
+              [
+                127.442299,
+                36.351286
+              ],
+              [
+                127.442342,
+                36.35134
+              ],
+              [
+                127.442599,
+                36.351745
+              ],
+              [
+                127.442636,
+                36.351813
+              ],
+              [
+                127.443495,
+                36.351489
+              ],
+              [
+                127.445194,
+                36.350847
+              ],
+              [
+                127.446921,
+                36.350195
+              ],
+              [
+                127.446871,
+                36.350108
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 115.5,
+          "duration": 115.5,
+          "distance": 1052.1
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "BVUkgBVVJIA1AAAANAAAAAAAAAAAAAAAJCJuQkbeY0IAAAAAAAAAADUAAAA0AAAAAAAAAAAAAAA3awAAyJWYB0yeKgK8lpgHX54qAgAALxYAAAAA",
+          "location": [
+            127.440328,
+            36.347468
+          ],
+          "name": "합내로",
+          "distance": 22.01052681
+        },
+        {
+          "hint": "BcMhgLnDIYBiAAAAEAAAAAAAAAAAAAAAw0aJQt5UKkEAAAAAAAAAAGIAAAAQAAAAAAAAAAAAAAA3awAAV6-YB5yoKgJXr5gHnKgqAgAAjwEAAAAA",
+          "location": [
+            127.446871,
+            36.350108
+          ],
+          "name": "비래서로42번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

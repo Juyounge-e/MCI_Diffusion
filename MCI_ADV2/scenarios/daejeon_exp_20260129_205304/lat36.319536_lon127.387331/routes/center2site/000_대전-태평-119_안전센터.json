@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-태평-119 안전센터",
+    "center": [
+      127.3942065,
+      36.3249014
+    ],
+    "site": [
+      127.387331,
+      36.319536
+    ],
+    "saved_at": "2026-01-30T02:02:02.410205+09:00",
+    "data_version": null,
+    "distance_km": 1.387,
+    "duration_min": 2.13,
+    "duration_sec": 128,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 138.9,
+              "summary": "",
+              "duration": 128,
+              "distance": 1386.9
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.394433,
+                36.324846
+              ],
+              [
+                127.393996,
+                36.323688
+              ],
+              [
+                127.39391,
+                36.323461
+              ],
+              [
+                127.393593,
+                36.322621
+              ],
+              [
+                127.393306,
+                36.321862
+              ],
+              [
+                127.393217,
+                36.321628
+              ],
+              [
+                127.39311,
+                36.321343
+              ],
+              [
+                127.392986,
+                36.321015
+              ],
+              [
+                127.392749,
+                36.32104
+              ],
+              [
+                127.391328,
+                36.321521
+              ],
+              [
+                127.391224,
+                36.321556
+              ],
+              [
+                127.390345,
+                36.321858
+              ],
+              [
+                127.390291,
+                36.321877
+              ],
+              [
+                127.389075,
+                36.322297
+              ],
+              [
+                127.388944,
+                36.322341
+              ],
+              [
+                127.388281,
+                36.322567
+              ],
+              [
+                127.388053,
+                36.32265
+              ],
+              [
+                127.387971,
+                36.322501
+              ],
+              [
+                127.38764,
+                36.32202
+              ],
+              [
+                127.386902,
+                36.320912
+              ],
+              [
+                127.386498,
+                36.320219
+              ],
+              [
+                127.386411,
+                36.320016
+              ],
+              [
+                127.386367,
+                36.319897
+              ],
+              [
+                127.386655,
+                36.319835
+              ],
+              [
+                127.386904,
+                36.319811
+              ],
+              [
+                127.387113,
+                36.319823
+              ],
+              [
+                127.387196,
+                36.319847
+              ],
+              [
+                127.387215,
+                36.319532
+              ],
+              [
+                127.387331,
+                36.319536
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 138.9,
+          "duration": 128,
+          "distance": 1386.9
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "iUkdgIxJHYAQAAAAWQAAAAAAAAAAAAAAxBrOQfBaBkMAAAAAAAAAABAAAABZAAAAAAAAAAAAAAA3awAAgeKXB-5FKgKf4ZcHJUYqAgAATwwAAAAA",
+          "location": [
+            127.394433,
+            36.324846
+          ],
+          "name": "태평로",
+          "distance": 21.19093441
+        },
+        {
+          "hint": "SQGXg1ABl4MoAwAAMwAAAAAAAACoAAAA9JQoQ0TOJkEAAAAAfvsLQpQBAAAaAAAAAAAAAFQAAAA3awAAw8aXBzAxKgLDxpcHMDEqAgAAvxAAAAAA",
+          "location": [
+            127.387331,
+            36.319536
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "의료법인영훈의료재단 유성선병원",
+    "site": [
+      127.315028,
+      36.376546
+    ],
+    "hospital": [
+      127.3249507,
+      36.3751715
+    ],
+    "saved_at": "2026-01-30T04:15:44.414628+09:00",
+    "data_version": null,
+    "distance_km": 1.133,
+    "duration_min": 1.52,
+    "duration_sec": 91.1,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 91.1,
+              "summary": "",
+              "duration": 91.1,
+              "distance": 1132.8
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.315028,
+                36.376546
+              ],
+              [
+                127.315033,
+                36.376491
+              ],
+              [
+                127.315146,
+                36.376136
+              ],
+              [
+                127.315244,
+                36.375983
+              ],
+              [
+                127.31526,
+                36.375961
+              ],
+              [
+                127.316021,
+                36.375948
+              ],
+              [
+                127.316551,
+                36.375947
+              ],
+              [
+                127.317605,
+                36.375948
+              ],
+              [
+                127.317899,
+                36.375948
+              ],
+              [
+                127.318207,
+                36.375949
+              ],
+              [
+                127.318776,
+                36.375951
+              ],
+              [
+                127.31941,
+                36.375962
+              ],
+              [
+                127.320671,
+                36.375957
+              ],
+              [
+                127.321217,
+                36.375958
+              ],
+              [
+                127.322671,
+                36.375976
+              ],
+              [
+                127.322812,
+                36.37603
+              ],
+              [
+                127.324669,
+                36.37676
+              ],
+              [
+                127.324715,
+                36.376782
+              ],
+              [
+                127.324844,
+                36.376884
+              ],
+              [
+                127.324942,
+                36.37672
+              ],
+              [
+                127.325189,
+                36.376235
+              ],
+              [
+                127.325627,
+                36.375403
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 91.1,
+          "duration": 91.1,
+          "distance": 1132.8
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "lZQUgCViG4AIAAAAJQAAAFsAAACLAAAAwNPDQCwxyUF3hHpC7rnAQggAAAAlAAAAWwAAAIsAAAA3awAAVKyWB-IPKwJUrJYH4g8rAgYAPxYAAAAA",
+          "location": [
+            127.315028,
+            36.376546
+          ],
+          "name": "노은서로",
+          "distance": 0
+        },
+        {
+          "hint": "LsA5gP___39AAAAAbgAAADIAAABwAQAA9K7IQiSojULa1JxCfsEOREAAAABuAAAAMgAAAHABAAA3awAAu9WWB2sLKwIX05YHhAorAgQAzwkAAAAA",
+          "location": [
+            127.325627,
+            36.375403
+          ],
+          "name": "북유성대로",
+          "distance": 65.85429928
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-구암-119 안전센터",
+    "center": [
+      127.3292431,
+      36.3489264
+    ],
+    "site": [
+      127.334121,
+      36.347486
+    ],
+    "saved_at": "2026-01-30T00:12:49.534080+09:00",
+    "data_version": null,
+    "distance_km": 0.988,
+    "duration_min": 1.57,
+    "duration_sec": 94.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 94.4,
+              "summary": "",
+              "duration": 94.4,
+              "distance": 988.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.329357,
+                36.348833
+              ],
+              [
+                127.329357,
+                36.348746
+              ],
+              [
+                127.329357,
+                36.348729
+              ],
+              [
+                127.329356,
+                36.348641
+              ],
+              [
+                127.328309,
+                36.348642
+              ],
+              [
+                127.327378,
+                36.348641
+              ],
+              [
+                127.327232,
+                36.348639
+              ],
+              [
+                127.326998,
+                36.348615
+              ],
+              [
+                127.326951,
+                36.348589
+              ],
+              [
+                127.326939,
+                36.348553
+              ],
+              [
+                127.326961,
+                36.348518
+              ],
+              [
+                127.327023,
+                36.348499
+              ],
+              [
+                127.327167,
+                36.348475
+              ],
+              [
+                127.327488,
+                36.348473
+              ],
+              [
+                127.330265,
+                36.348459
+              ],
+              [
+                127.330676,
+                36.348459
+              ],
+              [
+                127.330974,
+                36.348459
+              ],
+              [
+                127.331463,
+                36.348461
+              ],
+              [
+                127.332281,
+                36.348461
+              ],
+              [
+                127.333403,
+                36.348456
+              ],
+              [
+                127.333343,
+                36.348086
+              ],
+              [
+                127.333273,
+                36.347726
+              ],
+              [
+                127.334077,
+                36.347499
+              ],
+              [
+                127.334121,
+                36.347486
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 94.4,
+          "duration": 94.4,
+          "distance": 988.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "clcpiXNXKYkXAAAAAAAAABwAAAAmAAAAnXYaQQAAAACJbTpBf9x8QRcAAAAAAAAAHAAAACYAAAA3awAATeSWB6GjKgLb45YH_qMqAgQADwAAAAAA",
+          "location": [
+            127.329357,
+            36.348833
+          ],
+          "name": "",
+          "distance": 14.53545554
+        },
+        {
+          "hint": "ZCiXgAIpl4AGAAAAJwAAAAAAAABvAAAAXJeGQGNW10EAAAAA9eqaQgYAAAAnAAAAAAAAAG8AAAA3awAA6faWB16eKgLp9pYHXp4qAgAA3wYAAAAA",
+          "location": [
+            127.334121,
+            36.347486
+          ],
+          "name": "월드컵대로308번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

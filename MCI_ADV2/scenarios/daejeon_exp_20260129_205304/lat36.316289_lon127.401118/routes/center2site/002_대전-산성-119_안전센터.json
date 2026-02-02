@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 2,
+    "name": "대전-산성-119 안전센터",
+    "center": [
+      127.394996,
+      36.3077317
+    ],
+    "site": [
+      127.401118,
+      36.316289
+    ],
+    "saved_at": "2026-01-29T22:13:53.808513+09:00",
+    "data_version": null,
+    "distance_km": 1.801,
+    "duration_min": 2.54,
+    "duration_sec": 152.5,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 152.5,
+              "summary": "",
+              "duration": 152.5,
+              "distance": 1800.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.39489,
+                36.307674
+              ],
+              [
+                127.395062,
+                36.307471
+              ],
+              [
+                127.394975,
+                36.307401
+              ],
+              [
+                127.39451,
+                36.307174
+              ],
+              [
+                127.394166,
+                36.307068
+              ],
+              [
+                127.394115,
+                36.307197
+              ],
+              [
+                127.393833,
+                36.307906
+              ],
+              [
+                127.393634,
+                36.308382
+              ],
+              [
+                127.393358,
+                36.309138
+              ],
+              [
+                127.393204,
+                36.309558
+              ],
+              [
+                127.393067,
+                36.309933
+              ],
+              [
+                127.39266,
+                36.311047
+              ],
+              [
+                127.393597,
+                36.311284
+              ],
+              [
+                127.394294,
+                36.31146
+              ],
+              [
+                127.394356,
+                36.311477
+              ],
+              [
+                127.39606,
+                36.311921
+              ],
+              [
+                127.397348,
+                36.312284
+              ],
+              [
+                127.39794,
+                36.312434
+              ],
+              [
+                127.399465,
+                36.312788
+              ],
+              [
+                127.399249,
+                36.313385
+              ],
+              [
+                127.399108,
+                36.313779
+              ],
+              [
+                127.39896,
+                36.314192
+              ],
+              [
+                127.398758,
+                36.314758
+              ],
+              [
+                127.398451,
+                36.315618
+              ],
+              [
+                127.399265,
+                36.315818
+              ],
+              [
+                127.400674,
+                36.316172
+              ],
+              [
+                127.401118,
+                36.316289
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 152.5,
+          "duration": 152.5,
+          "distance": 1800.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "vLcrgCLoiYAnAAAAVQAAAAAAAABYAAAA2H7aQdbSaUIAAAAAnBB1QicAAABVAAAAAAAAAFgAAAA3awAASuSXB9oCKgK05JcHFAMqAgAAXxQAAAAA",
+          "location": [
+            127.39489,
+            36.307674
+          ],
+          "name": "산성로57번길",
+          "distance": 11.4897226
+        },
+        {
+          "hint": "2WcigDRoIoA8AAAALQAAAAAAAAAAAAAAvbYnQrsK-UEAAAAAAAAAADwAAAAtAAAAAAAAAAAAAAA3awAAnvyXB4EkKgKe_JcHgSQqAgAAjwQAAAAA",
+          "location": [
+            127.401118,
+            36.316289
+          ],
+          "name": "유천로34번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

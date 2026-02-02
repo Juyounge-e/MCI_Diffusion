@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-가양-119 안전센터",
+    "center": [
+      127.4405715,
+      36.3474872
+    ],
+    "site": [
+      127.443652,
+      36.356194
+    ],
+    "saved_at": "2026-01-29T23:05:50.302329+09:00",
+    "data_version": null,
+    "distance_km": 1.25,
+    "duration_min": 1.76,
+    "duration_sec": 105.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 105.4,
+              "summary": "",
+              "duration": 105.4,
+              "distance": 1249.9
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.440328,
+                36.347468
+              ],
+              [
+                127.440267,
+                36.347979
+              ],
+              [
+                127.440063,
+                36.349343
+              ],
+              [
+                127.439945,
+                36.35018
+              ],
+              [
+                127.440827,
+                36.350496
+              ],
+              [
+                127.441393,
+                36.350679
+              ],
+              [
+                127.441523,
+                36.350721
+              ],
+              [
+                127.44189,
+                36.350923
+              ],
+              [
+                127.441942,
+                36.350957
+              ],
+              [
+                127.442061,
+                36.351058
+              ],
+              [
+                127.442156,
+                36.351146
+              ],
+              [
+                127.442253,
+                36.351236
+              ],
+              [
+                127.442299,
+                36.351286
+              ],
+              [
+                127.442342,
+                36.35134
+              ],
+              [
+                127.442599,
+                36.351745
+              ],
+              [
+                127.442636,
+                36.351813
+              ],
+              [
+                127.443011,
+                36.352445
+              ],
+              [
+                127.443299,
+                36.352977
+              ],
+              [
+                127.443709,
+                36.353733
+              ],
+              [
+                127.444343,
+                36.354892
+              ],
+              [
+                127.4444,
+                36.354998
+              ],
+              [
+                127.444796,
+                36.355727
+              ],
+              [
+                127.444601,
+                36.355805
+              ],
+              [
+                127.444423,
+                36.355872
+              ],
+              [
+                127.444065,
+                36.355868
+              ],
+              [
+                127.443519,
+                36.35586
+              ],
+              [
+                127.443652,
+                36.356194
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 105.4,
+          "duration": 105.4,
+          "distance": 1249.9
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "BVUkgBVVJIA1AAAANAAAAAAAAAAAAAAAJCJuQkbeY0IAAAAAAAAAADUAAAA0AAAAAAAAAAAAAAA3awAAyJWYB0yeKgK8lpgHX54qAgAALxYAAAAA",
+          "location": [
+            127.440328,
+            36.347468
+          ],
+          "name": "합내로",
+          "distance": 22.01052681
+        },
+        {
+          "hint": "hVUkgC5ZQoA4AAAAOwAAAAAAAAAAAAAAUb8bQhBHI0IAAAAAAAAAADgAAAA7AAAAAAAAAAAAAAA3awAAxKKYB2LAKgLEopgHYsAqAgAAHwEAAAAA",
+          "location": [
+            127.443652,
+            36.356194
+          ],
+          "name": "송촌남로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

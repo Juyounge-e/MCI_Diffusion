@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 1,
+    "name": "대덕소방서",
+    "center": [
+      127.42893,
+      36.37251
+    ],
+    "site": [
+      127.429901,
+      36.363324
+    ],
+    "saved_at": "2026-01-30T02:45:33.071928+09:00",
+    "data_version": null,
+    "distance_km": 1.167,
+    "duration_min": 2.0,
+    "duration_sec": 120.3,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 125,
+              "summary": "",
+              "duration": 120.3,
+              "distance": 1167.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.428913,
+                36.3726
+              ],
+              [
+                127.428699,
+                36.372573
+              ],
+              [
+                127.428489,
+                36.372534
+              ],
+              [
+                127.428594,
+                36.372164
+              ],
+              [
+                127.428687,
+                36.371833
+              ],
+              [
+                127.428884,
+                36.371125
+              ],
+              [
+                127.429006,
+                36.370703
+              ],
+              [
+                127.42908,
+                36.370403
+              ],
+              [
+                127.429677,
+                36.368308
+              ],
+              [
+                127.429818,
+                36.367801
+              ],
+              [
+                127.42996,
+                36.367288
+              ],
+              [
+                127.430377,
+                36.365904
+              ],
+              [
+                127.430757,
+                36.364568
+              ],
+              [
+                127.42995,
+                36.364407
+              ],
+              [
+                127.430061,
+                36.364014
+              ],
+              [
+                127.429725,
+                36.363949
+              ],
+              [
+                127.429901,
+                36.363324
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 125,
+          "duration": 120.3,
+          "distance": 1167.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "XrpgiF-6YIhdAAAAEgAAAC4AAAA_AQAAFHybQRRzaEDTrZpBRXiEQi4AAAAJAAAALgAAAJ8AAAA3awAAMWmYB3gAKwJCaZgHHgArAgIAHwUAAAAA",
+          "location": [
+            127.428913,
+            36.3726
+          ],
+          "name": "",
+          "distance": 10.10277392
+        },
+        {
+          "hint": "SiNGgF8jRoBRAAAAZwAAAAAAAAAAAAAAZk5hQixCjkIAAAAAAAAAAFEAAABnAAAAAAAAAAAAAAA3awAADW2YBzzcKgINbZgHPNwqAgAAvxUAAAAA",
+          "location": [
+            127.429901,
+            36.363324
+          ],
+          "name": "중리동로40번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

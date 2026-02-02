@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "hos2site",
+    "source_index": 0,
+    "name": "학교법인 가톨릭학원 가톨릭대학교 대전성모병원",
+    "site": [
+      127.426998,
+      36.318255
+    ],
+    "hospital": [
+      127.420163,
+      36.323042
+    ],
+    "saved_at": "2026-01-30T00:05:34.752008+09:00",
+    "data_version": null,
+    "distance_km": 1.207,
+    "duration_min": 1.93,
+    "duration_sec": 115.5,
+    "direction_note": "site->hospital",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 115.5,
+              "summary": "",
+              "duration": 115.5,
+              "distance": 1206.7
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.426998,
+                36.318255
+              ],
+              [
+                127.426829,
+                36.318193
+              ],
+              [
+                127.426609,
+                36.318085
+              ],
+              [
+                127.425925,
+                36.317507
+              ],
+              [
+                127.425457,
+                36.318224
+              ],
+              [
+                127.425239,
+                36.318571
+              ],
+              [
+                127.424989,
+                36.318984
+              ],
+              [
+                127.424566,
+                36.319682
+              ],
+              [
+                127.424021,
+                36.320695
+              ],
+              [
+                127.423811,
+                36.321087
+              ],
+              [
+                127.423044,
+                36.322657
+              ],
+              [
+                127.422654,
+                36.32275
+              ],
+              [
+                127.422553,
+                36.322804
+              ],
+              [
+                127.42147,
+                36.323373
+              ],
+              [
+                127.421186,
+                36.323553
+              ],
+              [
+                127.420874,
+                36.323751
+              ],
+              [
+                127.420772,
+                36.323809
+              ],
+              [
+                127.420654,
+                36.323875
+              ],
+              [
+                127.420272,
+                36.324092
+              ],
+              [
+                127.41968,
+                36.323413
+              ],
+              [
+                127.419595,
+                36.323275
+              ],
+              [
+                127.419587,
+                36.323208
+              ],
+              [
+                127.419611,
+                36.323135
+              ],
+              [
+                127.419725,
+                36.322902
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 115.5,
+          "duration": 115.5,
+          "distance": 1206.7
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "oUMigKRDIoAKAAAAHgAAAA8AAAAAAAAA_0qFQVl3MkKf17hBAAAAAAoAAAAeAAAADwAAAAAAAAA3awAAtmGYBy8sKgK2YZgHLywqAgIAHwQAAAAA",
+          "location": [
+            127.426998,
+            36.318255
+          ],
+          "name": "보문로162번길",
+          "distance": 0
+        },
+        {
+          "hint": "sC4fgLsiKIlCAAAAlQAAACwBAAAAAAAAtnXeQXx9d0JpV_pCAAAAAEIAAACVAAAALAEAAAAAAAA3awAATUWYB1Y-KgIDR5gH4j4qAggA7wkAAAAA",
+          "location": [
+            127.419725,
+            36.322902
+          ],
+          "name": "",
+          "distance": 42.28606652
+        }
+      ]
+    }
+  }
+}

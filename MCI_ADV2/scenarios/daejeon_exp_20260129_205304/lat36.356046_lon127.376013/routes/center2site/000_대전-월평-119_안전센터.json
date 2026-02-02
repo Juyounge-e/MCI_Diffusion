@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-월평-119 안전센터",
+    "center": [
+      127.3668674,
+      36.3600048
+    ],
+    "site": [
+      127.376013,
+      36.356046
+    ],
+    "saved_at": "2026-01-30T07:32:32.574393+09:00",
+    "data_version": null,
+    "distance_km": 1.346,
+    "duration_min": 2.49,
+    "duration_sec": 149.4,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 149.4,
+              "summary": "",
+              "duration": 149.4,
+              "distance": 1346.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.367044,
+                36.360004
+              ],
+              [
+                127.367043,
+                36.359846
+              ],
+              [
+                127.36842,
+                36.359835
+              ],
+              [
+                127.368417,
+                36.358838
+              ],
+              [
+                127.368414,
+                36.358194
+              ],
+              [
+                127.368414,
+                36.358025
+              ],
+              [
+                127.368413,
+                36.357982
+              ],
+              [
+                127.368413,
+                36.357879
+              ],
+              [
+                127.368414,
+                36.357698
+              ],
+              [
+                127.369691,
+                36.357702
+              ],
+              [
+                127.370668,
+                36.357698
+              ],
+              [
+                127.370929,
+                36.357697
+              ],
+              [
+                127.371157,
+                36.357697
+              ],
+              [
+                127.37178,
+                36.357694
+              ],
+              [
+                127.373892,
+                36.357686
+              ],
+              [
+                127.374236,
+                36.357701
+              ],
+              [
+                127.374288,
+                36.357701
+              ],
+              [
+                127.374358,
+                36.357702
+              ],
+              [
+                127.374497,
+                36.3577
+              ],
+              [
+                127.374809,
+                36.357699
+              ],
+              [
+                127.375628,
+                36.35768
+              ],
+              [
+                127.375904,
+                36.357647
+              ],
+              [
+                127.376635,
+                36.357633
+              ],
+              [
+                127.376634,
+                36.357588
+              ],
+              [
+                127.376626,
+                36.356515
+              ],
+              [
+                127.37634,
+                36.356512
+              ],
+              [
+                127.376333,
+                36.356047
+              ],
+              [
+                127.376013,
+                36.356046
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 149.4,
+          "duration": 149.4,
+          "distance": 1346.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "gPRBg4L0QYMZAAAAswAAAAAAAAAAAAAASEOMQWOR-EIAAAAAAAAAABkAAACzAAAAAAAAAAAAAAA3awAAhHeXB0TPKgLTdpcHRc8qAgAADwAAAAAA",
+          "location": [
+            127.367044,
+            36.360004
+          ],
+          "name": "청사로",
+          "distance": 15.88346322
+        },
+        {
+          "hint": "pQuag6gLmoMxAQAARQAAAEAAAAB8AAAAPPP9Qhm55UGILdRBeGlOQjEBAABFAAAAQAAAAHwAAAA3awAAjZqXB86_KgKNmpcHzr8qAgIAnwUAAAAA",
+          "location": [
+            127.376013,
+            36.356046
+          ],
+          "name": "",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-산내-119 안전센터",
+    "center": [
+      127.467491,
+      36.2819026
+    ],
+    "site": [
+      127.466994,
+      36.280797
+    ],
+    "saved_at": "2026-01-30T07:29:13.827887+09:00",
+    "data_version": null,
+    "distance_km": 0.177,
+    "duration_min": 0.33,
+    "duration_sec": 19.9,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 19.9,
+              "summary": "",
+              "duration": 19.9,
+              "distance": 177.3
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.46727,
+                36.281829
+              ],
+              [
+                127.467735,
+                36.280924
+              ],
+              [
+                127.467345,
+                36.280832
+              ],
+              [
+                127.467228,
+                36.280803
+              ],
+              [
+                127.466994,
+                36.280797
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 19.9,
+          "duration": 19.9,
+          "distance": 177.3
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "70gtgPNILYBHAAAACwAAAAAAAAAAAAAAsojZQo-HhUEAAAAAAAAAAEcAAAALAAAAAAAAAAAAAAA3awAABv-YB-WdKQLj_5gHL54pAgAAHxUAAAAA",
+          "location": [
+            127.46727,
+            36.281829
+          ],
+          "name": "산내로",
+          "distance": 21.48760741
+        },
+        {
+          "hint": "6UgtgBVJLYB1AAAAHwAAAAAAAAAQAAAA5PijQmVIqEEAAAAAB-cvQXUAAAAfAAAAAAAAABAAAAA3awAA8v2YB92ZKQLy_ZgH3ZkpAgAAjwUAAAAA",
+          "location": [
+            127.466994,
+            36.280797
+          ],
+          "name": "산내로1315번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

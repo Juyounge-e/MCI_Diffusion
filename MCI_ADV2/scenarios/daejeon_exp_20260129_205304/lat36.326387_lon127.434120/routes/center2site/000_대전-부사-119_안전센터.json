@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-부사-119 안전센터",
+    "center": [
+      127.4329189,
+      36.32699
+    ],
+    "site": [
+      127.43412,
+      36.326387
+    ],
+    "saved_at": "2026-01-30T02:33:10.428960+09:00",
+    "data_version": null,
+    "distance_km": 0.145,
+    "duration_min": 0.45,
+    "duration_sec": 26.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 26.7,
+              "summary": "",
+              "duration": 26.7,
+              "distance": 145.5
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.433063,
+                36.326734
+              ],
+              [
+                127.433557,
+                36.326914
+              ],
+              [
+                127.433887,
+                36.326303
+              ],
+              [
+                127.43412,
+                36.326387
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 26.7,
+          "duration": 26.7,
+          "distance": 145.5
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "rnQ_gLF0P4BNAAAARwAAAAAAAAAAAAAAm5JYQn2WQkIAAAAAAAAAAE0AAABHAAAAAAAAAAAAAAA3awAAZ3mYB05NKgLXeJgHTk4qAgAAHwQAAAAA",
+          "location": [
+            127.433063,
+            36.326734
+          ],
+          "name": "대전천동로",
+          "distance": 31.21133869
+        },
+        {
+          "hint": "ykkYgHNDIoAOAAAAEAAAAAAAAAAAAAAAgTu3QSNBvEEAAAAAAAAAAA4AAAAQAAAAAAAAAAAAAAA3awAAiH2YB_NLKgKIfZgH80sqAgAAHwQAAAAA",
+          "location": [
+            127.43412,
+            36.326387
+          ],
+          "name": "대흥로",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

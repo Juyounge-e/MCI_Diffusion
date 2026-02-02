@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "대전-문평-119 안전센터",
+    "center": [
+      127.4047254,
+      36.4469491
+    ],
+    "site": [
+      127.404758,
+      36.449916
+    ],
+    "saved_at": "2026-01-30T07:37:54.983953+09:00",
+    "data_version": null,
+    "distance_km": 0.403,
+    "duration_min": 1.01,
+    "duration_sec": 60.7,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 60.7,
+              "summary": "",
+              "duration": 60.7,
+              "distance": 402.9
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.404552,
+                36.447098
+              ],
+              [
+                127.404748,
+                36.447246
+              ],
+              [
+                127.405999,
+                36.448158
+              ],
+              [
+                127.405365,
+                36.449384
+              ],
+              [
+                127.404955,
+                36.449744
+              ],
+              [
+                127.404758,
+                36.449916
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 60.7,
+          "duration": 60.7,
+          "distance": 402.9
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "tol2gLqJdoAiAAAANgAAAAAAAAAAAAAAa3HAQbrFFEIAAAAAAAAAACIAAAA2AAAAAAAAAAAAAAA3awAACAqYB3ojLAK1CpgH5SIsAgAAPw4AAAAA",
+          "location": [
+            127.404552,
+            36.447098
+          ],
+          "name": "문평동로18번길",
+          "distance": 22.67301559
+        },
+        {
+          "hint": "qSw3gAV0joeHAAAAJgAAAAAAAAAAAAAAR8W8QmIP0EEAAAAAAAAAAIcAAAAmAAAAAAAAAAAAAAA3awAA1gqYB3wuLALWCpgHfC4sAgAAnwgAAAAA",
+          "location": [
+            127.404758,
+            36.449916
+          ],
+          "name": "대덕대로1417번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}

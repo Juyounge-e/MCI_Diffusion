@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "api_provider": "osrm",
+    "route_type": "center2site",
+    "source_index": 0,
+    "name": "동부소방서",
+    "center": [
+      127.43759,
+      36.34137
+    ],
+    "site": [
+      127.44483,
+      36.344485
+    ],
+    "saved_at": "2026-01-30T07:02:48.711058+09:00",
+    "data_version": null,
+    "distance_km": 0.895,
+    "duration_min": 1.23,
+    "duration_sec": 73.6,
+    "direction_note": "center->site",
+    "radius_meters": 250
+  },
+  "payload": {
+    "osrm_response": {
+      "code": "Ok",
+      "routes": [
+        {
+          "legs": [
+            {
+              "steps": [],
+              "weight": 73.6,
+              "summary": "",
+              "duration": 73.6,
+              "distance": 895.4
+            }
+          ],
+          "weight_name": "routability",
+          "geometry": {
+            "coordinates": [
+              [
+                127.437467,
+                36.341311
+              ],
+              [
+                127.437339,
+                36.341484
+              ],
+              [
+                127.437462,
+                36.341548
+              ],
+              [
+                127.438405,
+                36.34194
+              ],
+              [
+                127.438764,
+                36.342108
+              ],
+              [
+                127.440106,
+                36.34278
+              ],
+              [
+                127.440895,
+                36.343133
+              ],
+              [
+                127.441835,
+                36.343568
+              ],
+              [
+                127.442191,
+                36.343744
+              ],
+              [
+                127.44264,
+                36.343974
+              ],
+              [
+                127.443554,
+                36.344403
+              ],
+              [
+                127.444497,
+                36.34485
+              ],
+              [
+                127.444912,
+                36.345046
+              ],
+              [
+                127.445178,
+                36.344651
+              ],
+              [
+                127.44483,
+                36.344485
+              ]
+            ],
+            "type": "LineString"
+          },
+          "weight": 73.6,
+          "duration": 73.6,
+          "distance": 895.4
+        }
+      ],
+      "waypoints": [
+        {
+          "hint": "3b9giOC_YIggAAAA5wAAAAAAAACaAAAAIP-yQUb5H0MAAAAA9ZXVQiAAAADnAAAAAAAAAJoAAAA3awAAm4qYBz-GKgIWi5gHeoYqAgAAXwkAAAAA",
+          "location": [
+            127.437467,
+            36.341311
+          ],
+          "name": "",
+          "distance": 12.83909223
+        },
+        {
+          "hint": "HiUhgCAlIYAOAAAANQAAAAAAAAAAAAAArQ0fQXMXEUIAAAAAAAAAAA4AAAA1AAAAAAAAAAAAAAA3awAAXqeYB6WSKgJep5gHpZIqAgAAvwMAAAAA",
+          "location": [
+            127.44483,
+            36.344485
+          ],
+          "name": "우암로246번길",
+          "distance": 0
+        }
+      ]
+    }
+  }
+}
