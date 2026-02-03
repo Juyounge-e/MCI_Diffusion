@@ -9,6 +9,9 @@ import pandas as pd
 import numpy as np
 import requests
 from haversine import haversine
+# Random coordinate generator with OSRM/Overpass snapping
+# OSRM/Overpass 기반 랜덤 좌표 생성기
+from random_coordinate_generator import RandomCoordinateGenerator
 # [ADD] ──────────────────────────────────────────────────────────────
 import re
 from datetime import timezone, timedelta, datetime
@@ -70,7 +73,10 @@ class ScenarioGenerator:
         # experiment_id 생성: exp_YYYYMMDD_HHMMSS 형식 (통일)
         if experiment_id:
             # 이미 exp_ 접두사가 있으면 그대로 사용
-            self.experiment_id = experiment_id if experiment_id.startswith("exp_") else f"exp_{experiment_id}"
+            if experiment_id.startswith("exp_") or "_exp_" in experiment_id:
+                self.experiment_id = experiment_id
+            else:
+                self.experiment_id = f"exp_{experiment_id}"
         else:
             # 기본 형식: exp_YYYYMMDD_HHMMSS
             self.experiment_id = f"exp_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -79,6 +85,12 @@ class ScenarioGenerator:
         self.kakao_api_key = kakao_api_key
         self.departure_time = departure_time  # YYYYMMDDHHMM 형식
         self.api_call_count = 0
+        self.api_error_count = 0
+        self.api_error_count = 0
+        try:
+            self.api_error_limit = int(os.environ.get("MCI_API_ERROR_LIMIT", "3"))
+        except Exception:
+            self.api_error_limit = 3
         
         # 데이터 파일 경로들 (절대경로로 설정)
         self.scenarios_path = os.path.join(self.base_path, "scenarios")
@@ -88,6 +100,9 @@ class ScenarioGenerator:
         
         # 파일 존재성 검증
         self._validate_data_files()
+
+        # Random coordinate generator (OSRM + Overpass snapping)
+        self.coord_generator = None
 
         # Patient 정보 (하드코딩)
         self.patient_config = {
@@ -141,6 +156,13 @@ class ScenarioGenerator:
             raise FileNotFoundError("필수 데이터 파일들을 확인해주세요.")
         print("✅ 모든 필수 데이터 파일 확인 완료")
 
+    def _record_api_error(self, reason: str):
+        self.api_error_count += 1
+        if self.api_error_count >= self.api_error_limit:
+            raise RuntimeError(
+                f"API error limit exceeded ({self.api_error_limit}). Last error: {reason}"
+            )
+
     def get_road_distance_kakao(self, start, end, max_retries=3, save_json_dir=None, route_type=None, source_index=None, name=None, start_label="start", goal_label="goal"):
         """카카오 모빌리티 API를 사용한 도로 거리 및 시간 계산 (재시도 로직 포함)
 
@@ -158,6 +180,9 @@ class ScenarioGenerator:
             dist_km = haversine(start, end)
             estimated_duration_min = (dist_km / 40) * 60  # 40km/h 가정
             return dist_km, estimated_duration_min
+
+        had_error = False
+        last_error = None
 
         url = "https://apis-navi.kakaomobility.com/v1/future/directions"
         headers = {
@@ -198,6 +223,8 @@ class ScenarioGenerator:
 
                     # 카카오 API 응답 구조: routes[0].summary
                     if not data.get("routes") or len(data["routes"]) == 0:
+                        last_error = "Kakao API response has no routes"
+                        had_error = True
                         print(f"  ⚠️ 카카오 API 응답에 경로 정보가 없습니다.")
                         break
 
@@ -250,21 +277,31 @@ class ScenarioGenerator:
                     return distance_km, duration_min
 
                 elif response.status_code == 401:
+                    last_error = "Kakao API unauthorized (401)"
+                    had_error = True
                     print(f"  ❌ 카카오 API 인증 실패 (401): API 키를 확인하세요.")
                     break
                 elif response.status_code == 429:
+                    last_error = "Kakao API rate limit (429)"
+                    had_error = True
                     print(f"  ⚠️ API 호출 한도 초과 (429): 3초 대기 중...")
                     time.sleep(3)
                 else:
+                    last_error = f"Kakao API status {response.status_code}"
+                    had_error = True
                     print(f"  ⚠️ API 호출 실패 (status {response.status_code})")
                     break
 
             except Exception as e:
+                last_error = f"Kakao API exception: {e}"
+                had_error = True
                 print(f"  ⚠️ API 호출 중 오류 발생: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(2)
 
         # API 실패 시 유클리드 거리 + 추정 시간으로 대체
+        if had_error:
+            self._record_api_error(last_error or "Kakao API error")
         dist_km = haversine(start, end)
         estimated_duration_min = (dist_km / 40) * 60  # 40km/h 가정
         print(f"  ⚠️ API 실패, 유클리드 거리 사용: {dist_km:.2f}km")
@@ -359,14 +396,17 @@ class ScenarioGenerator:
                     elif code == "NoRoute":
                         error_msg = f"NoRoute: 경로를 찾을 수 없음 (도로 연결 안됨)"
                         print(f"  ⚠️ OSRM API: {error_msg}")
+                        self._record_api_error(error_msg)
                         return None, None, error_msg
                     elif code == "NoSegment":
                         error_msg = f"NoSegment: {radius_meters}m 내에 도로 없음 (격오지)"
                         print(f"  ⚠️ OSRM API: {error_msg}")
+                        self._record_api_error(error_msg)
                         return None, None, error_msg
                     else:
                         error_msg = f"OSRM 응답 코드: {code}"
                         print(f"  ⚠️ OSRM API: {error_msg}")
+                        self._record_api_error(error_msg)
                         return None, None, error_msg
 
                 elif response.status_code == 429:
@@ -375,6 +415,7 @@ class ScenarioGenerator:
                         time.sleep(5)
                     else:
                         error_msg = "Rate limit 초과"
+                        self._record_api_error(error_msg)
                         return None, None, error_msg
 
                 elif response.status_code == 400:
@@ -388,11 +429,13 @@ class ScenarioGenerator:
                         print(f"     응답 상세: {error_detail}")
                     except:
                         pass
+                    self._record_api_error(error_msg)
                     return None, None, error_msg
 
                 else:
                     error_msg = f"HTTP {response.status_code}"
                     print(f"  ⚠️ OSRM API 오류: {error_msg}")
+                    self._record_api_error(error_msg)
                     return None, None, error_msg
 
             except requests.exceptions.Timeout:
@@ -401,51 +444,57 @@ class ScenarioGenerator:
                     time.sleep(2 ** attempt)  # 지수 백오프
                 else:
                     error_msg = "API 타임아웃"
+                    self._record_api_error(error_msg)
                     return None, None, error_msg
 
             except Exception as e:
                 error_msg = f"예외 발생: {str(e)}"
                 print(f"  ⚠️ OSRM 오류: {error_msg}")
+                self._record_api_error(error_msg)
                 return None, None, error_msg
 
         # 모든 재시도 실패
-        return None, None, "모든 재시도 실패"
+        error_msg = "모든 재시도 실패"
+        self._record_api_error(error_msg)
+        return None, None, error_msg
 
     def generate_coordinate_for_scenario(self, mode="korea_random", sido_name=None):
         """
-        시나리오용 좌표 생성 (JSON 형태로 상세 정보 출력)
-        Args:
-            mode: "korea_random", "sido", "manual"
-            sido_name: 시도명 (mode="sido"일 때 필요)
-        Returns:
-            (latitude, longitude) 또는 None
+        OSRM + Overpass로 스냅된 사고 좌표를 생성.
+        (snapped_latitude, snapped_longitude) 또는 None 반환.
         """
         try:
             if mode == "manual":
-                return None  # 수동은 외부에서 값 제공
-            
-            result = self.coord_generator.generate_valid_coordinate(mode, sido_name)
-            if result:
-                lat, lon, addr_info = result
-                output_info = {
-                    "latitude": lat,
-                    "longitude": lon,
-                    "full_address": addr_info.get("full_address", ""),
-                    "road_address": addr_info.get("road_address", ""),
-                    "area1": addr_info.get("area1", ""),
-                    "area2": addr_info.get("area2", ""),
-                    "area3": addr_info.get("area3", ""),
-                    "area4": addr_info.get("area4", ""),
-                    "is_valid": addr_info.get("is_valid", False)
-                }
-                print(f"COORDINATE_INFO:{json.dumps(output_info, ensure_ascii=False)}")
-                print(f"  📍 좌표 생성: ({lat}, {lon}) - {addr_info.get('area1','')} {addr_info.get('area2','')}")
-                return lat, lon
-            else:
-                print("  ❌ 유효한 좌표 생성 실패")
                 return None
+
+            if self.coord_generator is None:
+                self.coord_generator = RandomCoordinateGenerator(
+                    shp_path=self.shp_path,
+                    region="daejeon",
+                )
+            result = self.coord_generator.generate_valid_coordinate(mode, sido_name)
+            if not result:
+                print("  유효한 스냅 좌표 생성 실패")
+                return None
+
+            snapped_lat, snapped_lon, info = result
+            output_info = {
+                "random_latitude": info.get("random_latitude"),
+                "random_longitude": info.get("random_longitude"),
+                "snapped_latitude": snapped_lat,
+                "snapped_longitude": snapped_lon,
+                "snap_distance_m": info.get("snap_distance_m"),
+                "region": info.get("region"),
+                "is_valid": info.get("is_valid", False),
+            }
+            print(f"COORDINATE_INFO:{json.dumps(output_info, ensure_ascii=False)}")
+            print(
+                f"  스냅 좌표: ({snapped_lat}, {snapped_lon}) "
+                f"(랜덤: {info.get('random_latitude')}, {info.get('random_longitude')})"
+            )
+            return snapped_lat, snapped_lon
         except Exception as e:
-            print(f"  💥 좌표 생성 오류: {e}")
+            print(f"  좌표 생성 오류: {e}")
             return None
 
     def make_amb_info(self, latitude, longitude, incident_size, save_folder, save_routes_json=True, route_mode="osrm"):
@@ -1239,7 +1288,7 @@ class ScenarioGenerator:
         folder_name = f"lat{latitude:.6f}_lon{longitude:.6f}"
         config_filename = f"config_{folder_name}.yaml"
         config_path = os.path.join(save_folder, config_filename)
-        relative_base = f"./scenarios/{self.experiment_id}"
+        relative_base = f"./MCI_ADV2/scenarios/{self.experiment_id}"
         if scenario_subdir:
             relative_base = f"{relative_base}/{scenario_subdir}"
         relative_folder = f"{relative_base}/{folder_name}"
@@ -1284,7 +1333,7 @@ entity_info:
     handover_time: {uav_handover_time} # unit: minutes
     is_use_time: False # UAV는 항상 유클리드 거리 기반
 
-event_info_path: "event_info.json"
+event_info_path: "./MCI_ADV2/sim_src/event_info.json"
 
 rule_info:
   isFullFactorial: False  # 단일 룰 사용
@@ -1298,7 +1347,7 @@ run_setting:
   random_seed: {random_seed} # null, if do not want to fix
   rule_test: True
   eval_mode: True
-  output_path: "./results/{self.experiment_id}"
+  output_path: "./MCI_ADV2/results/{self.experiment_id}"
   exp_indicator: "{folder_name}"
   save_info: True # NotImplemented"""
         with open(config_path, 'w', encoding='utf-8') as file:

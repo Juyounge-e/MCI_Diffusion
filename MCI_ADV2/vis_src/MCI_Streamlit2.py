@@ -2,6 +2,12 @@ import json
 import re
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+import sys
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+SCE_DIR = BASE_DIR / "sce_src"
+if str(SCE_DIR) not in sys.path:
+    sys.path.append(str(SCE_DIR))
 
 import folium
 import pandas as pd

@@ -21,9 +21,9 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "samples_q1.csv"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0203_samples_994_q3.csv"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "scalers.pkl"))
-    parser.add_argument("--n", type=int, default=100)
+    parser.add_argument("--n", type=int, default=20)
     parser.add_argument("--cond", type=float, default=0.0, help="pdr_mean 값")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
