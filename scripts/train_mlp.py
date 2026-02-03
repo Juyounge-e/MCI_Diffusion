@@ -1,8 +1,10 @@
+import argparse
 import math
 import time
 from dataclasses import asdict
 import pickle
-import os, sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Ensure project root and tab-ddpm are importable
@@ -37,10 +39,29 @@ def linear_warmdown(step: int, total_steps: int, base_lr: float) -> float:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="MLP Diffusion 학습 (조건부 lat,lon 생성)")
+    parser.add_argument(
+        "--csv",
+        type=str,
+        default=os.path.join("src", "data", "snaped_dataset.csv"),
+        help="학습용 CSV 경로",
+    )
+    parser.add_argument(
+        "--max_train",
+        type=int,
+        default=0,
+        help="학습에 사용할 최대 train 샘플 수. 0이면 전체 사용.",
+    )
+    parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
+    args = parser.parse_args()
+
+    csv_path = args.csv
+    max_train_samples = args.max_train
+    seed = args.seed
+
     # ----------------
     # Config
     # ----------------
-    csv_path = os.path.join("src", "data", "dataset.csv")
     x_cols = ["lat", "lon"]
     c_cols = ["pdr_mean"]
 
@@ -64,8 +85,22 @@ def main():
     # ----------------
     # Data
     # ----------------
+    print(f"  data: {csv_path}")
     x, c = load_csv(csv_path, x_cols, c_cols)
-    train, val, test = make_splits(x, c, val_ratio=0.1, test_ratio=0.1, seed=42)
+    train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
+
+    # 학습 데이터 랜덤 샘플링 
+    if max_train_samples > 0:
+        x_train, c_train = train
+        n_train = len(x_train)
+        if n_train > max_train_samples:
+            rng = np.random.default_rng(seed)
+            idx = rng.choice(n_train, size=max_train_samples, replace=False)
+            x_train = x_train[idx]
+            c_train = c_train[idx]
+            train = (x_train, c_train)
+            print(f"  train 샘플링: {n_train} -> {max_train_samples}")
+
     train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=False)
     train_loader, val_loader, _ = make_loaders(train_s, val_s, test_s, batch_size=256, num_workers=0)
 
