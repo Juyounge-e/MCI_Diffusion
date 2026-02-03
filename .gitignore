@@ -9,4 +9,7 @@ simul_data/
 
 MCI_ADV2/results/
 MCI_ADV2/experiment_logs/
-MCI_ADV2/scenarios/
+scenarios/*/
+!scenarios/*
+.claude/
+MCI_ADV2/visualizations/
