@@ -53,9 +53,14 @@ def make_splits(
     test_ratio: float = 0.1,
     seed: int = 42,
 ):
+    total_ratio = val_ratio + test_ratio
+    if total_ratio <= 0:
+        # val/test 없이 전체를 train으로
+        return (x, c), (np.zeros((0, x.shape[1]), np.float32), np.zeros((0, c.shape[1]), np.float32)), (np.zeros((0, x.shape[1]), np.float32), np.zeros((0, c.shape[1]), np.float32))
+
     # 1) train vs temp
     x_train, x_temp, c_train, c_temp = train_test_split(
-        x, c, test_size=(val_ratio + test_ratio), random_state=seed
+        x, c, test_size=total_ratio, random_state=seed
     )
 
     # 2) val vs test
@@ -84,14 +89,14 @@ def fit_transform_scalers(
 
     x_scaler = StandardScaler()
     x_train_s = x_scaler.fit_transform(x_train)
-    x_val_s = x_scaler.transform(x_val)
+    x_val_s = x_scaler.transform(x_val) if len(x_val) else x_val
     x_test_s = x_scaler.transform(x_test) if len(x_test) else x_test
 
     c_scaler = None
     if scale_condition:
         c_scaler = StandardScaler()
         c_train_s = c_scaler.fit_transform(c_train)
-        c_val_s = c_scaler.transform(c_val)
+        c_val_s = c_scaler.transform(c_val) if len(c_val) else c_val
         c_test_s = c_scaler.transform(c_test) if len(c_test) else c_test
     else:
         c_train_s, c_val_s, c_test_s = c_train, c_val, c_test
@@ -105,12 +110,17 @@ def make_loaders(
     test: Tuple[np.ndarray, np.ndarray],
     batch_size: int = 128,
     num_workers: int = 0,
+    drop_last: bool = True,
 ):
     train_ds = LatLonCondDataset(*train)
     val_ds = LatLonCondDataset(*val)
     test_ds = LatLonCondDataset(*test) if len(test[0]) else None
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
+    # train 샘플 수 < batch_size 이면 drop_last=False (배치가 0개 되는 것 방지)
+    n_train = len(train_ds)
+    drop_train = drop_last and (n_train > batch_size)
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=drop_train)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False)
     test_loader = None if test_ds is None else DataLoader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 

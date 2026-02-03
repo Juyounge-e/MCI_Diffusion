@@ -7,5 +7,14 @@ simul_data/
 *__pycache__/
 *.pyc
 
+MCI_ADV2/results/
+MCI_ADV2/experiment_logs/
+MCI_ADV2/scenarios/*/
+MCI_ADV2/!scenarios/*
+
 .claude/
 MCI_ADV2/visualizations/
+
+#ddpm 실험 결과
+0202/
+0203/
