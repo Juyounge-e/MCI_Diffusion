@@ -27,6 +27,12 @@ def main() -> int:
         default=str(Path("simul4eval_with_metrics.csv")),
         help="cond 및 오차 컬럼이 추가된 결과 CSV 경로",
     )
+    parser.add_argument(
+        "--tol",
+        type=float,
+        default=0.005,
+        help="허용 오차(|pdr_mean - cond| < tol) 기준값 (default: 0.005)",
+    )
     args = parser.parse_args()
 
     simul_path = Path(args.simul_csv).resolve()
@@ -53,12 +59,15 @@ def main() -> int:
     df["err"] = df["pdr_mean"] - df["cond"]
     df["abs_err"] = df["err"].abs()
     df["sq_err"] = df["err"] ** 2
+    tol = float(args.tol)
+    df["within_tol"] = df["abs_err"] < tol
 
     # 
     n = df.shape[0]
     mae = float(df["abs_err"].mean()) if n > 0 else np.nan
     rmse = float(np.sqrt(df["sq_err"].mean())) if n > 0 else np.nan
     bias = float(df["err"].mean()) if n > 0 else np.nan
+    within_ratio = float(df["within_tol"].mean()) if n > 0 else np.nan
     # if df["cond"].nunique() > 1 and df["pdr_mean"].nunique() > 1:
     #     pearson = float(df["cond"].corr(df["pdr_mean"]))
     # else:
@@ -75,6 +84,7 @@ def main() -> int:
     print(f"   MAE     = {mae:.6f}")
     print(f"   RMSE    = {rmse:.6f}")
     print(f"   Bias    = {bias:.6f}  (pdr_mean - condition 평균)")
+    print(f"   |err|<{tol:.4f} 비율 = {within_ratio*100:5.1f}% ({int(df['within_tol'].sum())}/{n})")
     # print(f"   Pearson = {pearson:.6f}")
 
     return 0
