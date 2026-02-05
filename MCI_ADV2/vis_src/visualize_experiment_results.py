@@ -233,10 +233,13 @@ def parse_stat_file(filepath: Path) -> Optional[Dict[str, Dict[str, float]]]:
             if i < len(lines):
                 parts = lines[i].strip().split()
                 if len(parts) >= 3:
+                    mean_val = float(parts[-3])
+                    std_val = float(parts[-2])
+                    ci_val = float(parts[-1])
                     metrics[metric_name] = {
-                        "mean": float(parts[-3]),
-                        "std": float(parts[-2]),
-                        "ci_half": float(parts[-1]),
+                        "mean": mean_val if np.isfinite(mean_val) else np.nan,
+                        "std": std_val if np.isfinite(std_val) else np.nan,
+                        "ci_half": ci_val if np.isfinite(ci_val) else np.nan,
                     }
         return metrics
     except Exception:
@@ -308,22 +311,31 @@ def _safe_float(value, default=None):
 
 
 def _metric_range(values: pd.Series) -> Optional[tuple]:
-    vals = values.dropna()
+    vals = pd.to_numeric(values, errors="coerce")
+    vals = vals[np.isfinite(vals)]
     if len(vals) == 0:
         return None
     vmin = float(vals.quantile(0.05))
     vmax = float(vals.quantile(0.95))
+    if not np.isfinite(vmin) or not np.isfinite(vmax):
+        return None
     if vmin == vmax:
         vmax = vmin + 1e-6
     return vmin, vmax
 
 
 def _metric_color(value, vmin: Optional[float], vmax: Optional[float], invert: bool, default: str = "#2b8cbe") -> str:
-    if value is None or (isinstance(value, float) and np.isnan(value)):
+    if value is None:
+        return default
+    try:
+        val = float(value)
+    except Exception:
+        return default
+    if not np.isfinite(val):
         return default
     if vmin is None or vmax is None or vmax == vmin:
         return default
-    t = (float(value) - vmin) / (vmax - vmin)
+    t = (val - vmin) / (vmax - vmin)
     t = max(0.0, min(1.0, t))
     if invert:
         t = 1.0 - t
@@ -808,16 +820,17 @@ def create_map(
         df[smooth_col] = np.nan
         if metric_col not in df.columns:
             continue
-        mask = (df["status"] == "success") & df[metric_col].notna()
+        metric_vals = pd.to_numeric(df[metric_col], errors="coerce")
+        mask = (df["status"] == "success") & np.isfinite(metric_vals)
         if mask.sum() == 0:
             continue
         if mask.sum() < 3:
-            df.loc[mask, smooth_col] = df.loc[mask, metric_col]
+            df.loc[mask, smooth_col] = metric_vals.loc[mask]
             continue
         smooth_vals = _smooth_metric_values(
             df.loc[mask, "latitude"].to_numpy(),
             df.loc[mask, "longitude"].to_numpy(),
-            df.loc[mask, metric_col].to_numpy(),
+            metric_vals.loc[mask].to_numpy(),
         )
         df.loc[mask, smooth_col] = smooth_vals
 

@@ -220,7 +220,12 @@ class BatchExperimentOrchestrator:
 
             id_col = self.id_col
             metadata["experiment_id"] = self.exp_id
-            metadata["incident_size"] = self.config_template["entity_info"]["patient"]["incident_size"]
+            default_incident_size = int(self.config_template["entity_info"]["patient"]["incident_size"])
+            if "N" in metadata.columns:
+                n_values = pd.to_numeric(metadata["N"], errors="coerce")
+                metadata["incident_size"] = n_values.fillna(default_incident_size).astype(int)
+            else:
+                metadata["incident_size"] = default_incident_size
             metadata["amb_velocity"] = self.config_template["entity_info"]["ambulance"]["velocity"]
             metadata["uav_velocity"] = self.config_template["entity_info"]["uav"]["velocity"]
             metadata["total_samples"] = self.config_template["run_setting"]["totalSamples"]
@@ -307,6 +312,13 @@ class BatchExperimentOrchestrator:
             snap_dist = None
             if self.snap_dist_col and self.snap_dist_col in row:
                 snap_dist = row[self.snap_dist_col]
+            default_incident_size = int(self.config_template["entity_info"]["patient"]["incident_size"])
+            incident_size = default_incident_size
+            if "N" in row and not pd.isna(row["N"]):
+                try:
+                    incident_size = int(float(row["N"]))
+                except Exception:
+                    incident_size = default_incident_size
 
             try:
                 coord_label = f"({lat:.6f}, {lon:.6f})"
@@ -316,7 +328,7 @@ class BatchExperimentOrchestrator:
                 self.logger.info(
                     f"[{self.completed_points + 1}/{self.total_points}] 좌표 {site_id} 처리 시작: {coord_label}"
                 )
-                self.process_site(site_id, lat, lon)
+                self.process_site(site_id, lat, lon, incident_size)
                 self.completed_points += 1
                 progress_pct = (self.completed_points / self.total_points) * 100
                 self.logger.info(
@@ -351,13 +363,14 @@ class BatchExperimentOrchestrator:
         self.logger.info("\n[종료] 성능 메트릭 포함 메타데이터 저장 중...")
         self.save_experiment_metadata(include_performance=True)
 
-    def process_site(self, site_id, latitude, longitude):
+    def process_site(self, site_id, latitude, longitude, incident_size):
         """
         단일 좌표 처리
         Args:
             site_id: 좌표 ID
             latitude: 사고 위도
             longitude: 사고 경도
+            incident_size: 환자 수 (N 열)
         """
         import time
 
@@ -370,7 +383,6 @@ class BatchExperimentOrchestrator:
             experiment_id=self.exp_id,
         )
 
-        incident_size = self.config_template["entity_info"]["patient"]["incident_size"]
         amb_velocity = self.config_template["entity_info"]["ambulance"]["velocity"]
         uav_velocity = self.config_template["entity_info"]["uav"]["velocity"]
         total_samples = self.config_template["run_setting"]["totalSamples"]
@@ -483,7 +495,7 @@ def main():
         required=True,
         help="random_metadata.csv 경로",
     )
-    parser.add_argument("--config_template", default="config.yaml", help="config 템플릿 경로")
+    parser.add_argument("--config_template", default="sim_src/config.yaml", help="config 템플릿 경로")
     parser.add_argument(
         "--only_indices",
         default=None,
