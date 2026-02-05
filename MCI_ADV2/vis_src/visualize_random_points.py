@@ -230,7 +230,18 @@ def visualize_metadata(
         axes[1, 1].set_title("스냅 경도")
         axes[2, 0].hist(df["snap_distance_m"], bins=30, color="#c0c0c0", edgecolor="black")
         axes[2, 0].set_title("스냅 거리(m)")
-        axes[2, 1].axis("off")
+        if "N" in df.columns:
+            n_values = pd.to_numeric(df["N"], errors="coerce").dropna()
+            if not n_values.empty:
+                n_min = int(n_values.min())
+                n_max = int(n_values.max())
+                n_bins = range(n_min, n_max + 2)
+                axes[2, 1].hist(n_values, bins=n_bins, color="#f4a460", edgecolor="black", align="left")
+                axes[2, 1].set_title("사고 규모 N")
+            else:
+                axes[2, 1].axis("off")
+        else:
+            axes[2, 1].axis("off")
     else:
         col_lat = "latitude" if "latitude" in df.columns else None
         col_lon = "longitude" if "longitude" in df.columns else None

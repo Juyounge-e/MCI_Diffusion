@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import geopandas as gpd
 import pandas as pd
@@ -189,7 +189,9 @@ class RandomCoordinateGenerator:
         osrm_base: str = DEFAULT_OSRM,
         overpass_url: Optional[str] = None,
         profile: str = "driving",
-        radius_m: float = 500.0,
+        radius_m: float = 250.0,
+        incident_size_min: int = 10,
+        incident_size_max: int = 50,
         seed: Optional[int] = None,
         rate_limit_delay: float = 0.3,
         allow_overpass_failure: bool = True,
@@ -199,6 +201,10 @@ class RandomCoordinateGenerator:
         self.overpass_url = overpass_url or ""
         self.profile = profile
         self.radius_m = radius_m
+        self.incident_size_min = int(incident_size_min)
+        self.incident_size_max = int(incident_size_max)
+        if self.incident_size_min > self.incident_size_max:
+            raise ValueError("incident_size_min은 incident_size_max보다 클 수 없습니다.")
         self.rate_limit_delay = rate_limit_delay
         self.allow_overpass_failure = allow_overpass_failure
         self._rng = random.Random(seed)
@@ -224,6 +230,13 @@ class RandomCoordinateGenerator:
             if self._region_geom.contains(Point(lon, lat)):
                 return lat, lon
         raise RuntimeError("행정구역 폴리곤 내부에서 좌표 샘플링에 실패했습니다.")
+
+    def _sample_incident_size(self) -> int:
+        return int(self._rng.randint(self.incident_size_min, self.incident_size_max))
+
+    @staticmethod
+    def _snapped_key(lat: float, lon: float, precision: int = 7) -> Tuple[float, float]:
+        return (round(float(lat), precision), round(float(lon), precision))
 
     def _overpass_has_way(self, node_ids: List[int], lat: float, lon: float) -> Optional[bool]:
         if not self.overpass_url:
@@ -310,6 +323,7 @@ class RandomCoordinateGenerator:
                 "snapped_latitude": snapped_lat,
                 "snapped_longitude": snapped_lon,
                 "snap_distance_m": dist_m,
+                "N": self._sample_incident_size(),
                 "region": self._region_key,
                 "is_valid": True,
             }
@@ -327,6 +341,18 @@ class RandomCoordinateGenerator:
         points: List[Dict[str, Any]] = []
         attempts = 0
         start_ts = time.time()
+
+        def _build_point(rand_lat: float, rand_lon: float, snapped_lat: float, snapped_lon: float, dist_m: float) -> Dict[str, Any]:
+            return {
+                "index": len(points) + 1,
+                "random_latitude": rand_lat,
+                "random_longitude": rand_lon,
+                "snapped_latitude": snapped_lat,
+                "snapped_longitude": snapped_lon,
+                "snap_distance_m": dist_m,
+                "N": self._sample_incident_size(),
+            }
+
         while len(points) < target_count and attempts < max_attempts:
             attempts += 1
             rand_lat, rand_lon = self._random_point_in_region()
@@ -334,16 +360,7 @@ class RandomCoordinateGenerator:
             if not snapped:
                 continue
             snapped_lat, snapped_lon, dist_m = snapped
-            points.append(
-                {
-                    "index": len(points) + 1,
-                    "random_latitude": rand_lat,
-                    "random_longitude": rand_lon,
-                    "snapped_latitude": snapped_lat,
-                    "snapped_longitude": snapped_lon,
-                    "snap_distance_m": dist_m,
-                }
-            )
+            points.append(_build_point(rand_lat, rand_lon, snapped_lat, snapped_lon, dist_m))
             if progress_every and len(points) % progress_every == 0:
                 elapsed = time.time() - start_ts
                 success_rate = (len(points) / attempts * 100.0) if attempts else 0.0
@@ -359,6 +376,50 @@ class RandomCoordinateGenerator:
             raise RuntimeError(
                 f"스냅 좌표 {target_count}개 생성 실패 (성공 {len(points)}개, 시도 {attempts}회)"
             )
+
+        print("[검토] 스냅 좌표 중복 검사 시작...")
+        seen_keys: Set[Tuple[float, float]] = set()
+        dedup_points: List[Dict[str, Any]] = []
+        duplicate_count = 0
+        for point in points:
+            key = self._snapped_key(point["snapped_latitude"], point["snapped_longitude"])
+            if key in seen_keys:
+                duplicate_count += 1
+                continue
+            seen_keys.add(key)
+            dedup_points.append(point)
+        points = dedup_points
+
+        if duplicate_count:
+            print(f"[검토] 스냅 좌표 중복 {duplicate_count}건 발견 -> 후순위 데이터 삭제 후 재생성")
+            while len(points) < target_count and attempts < max_attempts:
+                attempts += 1
+                rand_lat, rand_lon = self._random_point_in_region()
+                snapped = self.snap_point(rand_lat, rand_lon)
+                if not snapped:
+                    continue
+                snapped_lat, snapped_lon, dist_m = snapped
+                key = self._snapped_key(snapped_lat, snapped_lon)
+                if key in seen_keys:
+                    continue
+                seen_keys.add(key)
+                points.append(_build_point(rand_lat, rand_lon, snapped_lat, snapped_lon, dist_m))
+                if save_path and save_every and len(points) % save_every == 0:
+                    export_random_metadata(points, Path(save_path))
+                    print(f"[저장] 중간 저장 완료: {save_path} ({len(points)}개)")
+
+            if len(points) < target_count:
+                raise RuntimeError(
+                    f"중복 제거 후 스냅 좌표 재생성 실패 (필요 {target_count}, 성공 {len(points)}, 시도 {attempts}회)"
+                )
+
+        for idx, point in enumerate(points, start=1):
+            point["index"] = idx
+
+        print(
+            f"[검토] 중복 검사 완료: 최종 {len(points)}개 "
+            f"(중복 제거 {duplicate_count}건, 총 시도 {attempts}회)"
+        )
         return points
 
 
@@ -366,6 +427,19 @@ def export_random_metadata(points: List[Dict[str, Any]], output_path: Path) -> N
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(points)
+    ordered_cols = [
+        "index",
+        "random_latitude",
+        "random_longitude",
+        "snapped_latitude",
+        "snapped_longitude",
+        "snap_distance_m",
+        "N",
+    ]
+    existing_ordered = [col for col in ordered_cols if col in df.columns]
+    remain_cols = [col for col in df.columns if col not in existing_ordered]
+    if existing_ordered:
+        df = df[existing_ordered + remain_cols]
     df.to_csv(output_path, index=False, encoding="utf-8-sig")
 
 
@@ -373,7 +447,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="OSRM/Overpass 기반 랜덤 좌표 생성기")
     parser.add_argument("--region", default="daejeon", help="지역 키워드 (기본: daejeon)")
     parser.add_argument("--exp-id", dest="exp_id", default=None, help="실험 ID (기본: exp_YYYYMMDD_HHMMSS)")
-    parser.add_argument("--num-points", type=int, default=100, help="생성할 스냅 좌표 개수")
+    parser.add_argument("--num-points", "--num_points", dest="num_points", type=int, default=100, help="생성할 스냅 좌표 개수")
+    parser.add_argument("--incident-size-min", "--incident_size_min", dest="incident_size_min", type=int, default=10, help="N(사고규모) 최소값 (기본: 10)")
+    parser.add_argument("--incident-size-max", "--incident_size_max", dest="incident_size_max", type=int, default=50, help="N(사고규모) 최대값 (기본: 50)")
     parser.add_argument("--radius-m", type=float, default=250.0, help="OSRM 스냅 반경(미터)")
     parser.add_argument("--shp", default="scenarios/ctprvn.shp", help="Shapefile 경로")
     parser.add_argument("--osrm", default=DEFAULT_OSRM, help="OSRM 기본 URL")
@@ -394,6 +470,7 @@ def main() -> int:
     print(f"지역: {args.region}")
     print(f"실험 ID: {exp_id}")
     print(f"목표 개수: {args.num_points}")
+    print(f"N 범위: {args.incident_size_min} ~ {args.incident_size_max}")
     print(f"스냅 반경: {args.radius_m} m")
 
     shp_path = str(_resolve_path(args.shp))
@@ -404,6 +481,8 @@ def main() -> int:
         overpass_url=args.overpass,
         profile=args.profile,
         radius_m=args.radius_m,
+        incident_size_min=args.incident_size_min,
+        incident_size_max=args.incident_size_max,
         seed=args.seed,
         rate_limit_delay=args.rate_limit_delay,
     )
@@ -430,6 +509,8 @@ def main() -> int:
         f"- 스냅 거리(m): min={df['snap_distance_m'].min():.2f}, "
         f"max={df['snap_distance_m'].max():.2f}, mean={df['snap_distance_m'].mean():.2f}"
     )
+    if "N" in df.columns:
+        print(f"- 사고 규모 N: min={int(df['N'].min())}, max={int(df['N'].max())}, mean={df['N'].mean():.2f}")
 
     print("\n출력:")
     print(f"- {output_path}")
