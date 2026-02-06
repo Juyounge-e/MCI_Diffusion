@@ -68,6 +68,7 @@ def _snap_rows(
     lat_col: str,
     lon_col: str,
     generator,
+    n_values: Optional[pd.Series] = None,
 ) -> Tuple[pd.DataFrame, int]:
     snapped_lat: List[Optional[float]] = []
     snapped_lon: List[Optional[float]] = []
@@ -97,6 +98,8 @@ def _snap_rows(
         }
     )
     out.insert(0, "grid_id", range(1, len(out) + 1))
+    if n_values is not None:
+        out["N"] = pd.to_numeric(n_values, errors="coerce")
     return out, failed
 
 
@@ -106,7 +109,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     mci_adv2_dir = repo_root / "MCI_ADV2"
 
-    parser = argparse.ArgumentParser(description="0203 샘플 좌표를 snap_point()로 스냅하여 random_metadata.csv 생성")
+    parser = argparse.ArgumentParser(description="샘플 좌표를 snap_point()로 스냅하여 random_metadata.csv 생성")
     parser.add_argument(
         "--inputs",
         nargs="+",
@@ -116,7 +119,7 @@ def main() -> None:
     parser.add_argument(
         "--out_dir",
         type=str,
-        default=str(repo_root / "eval" / "snapped"),
+        default=str(repo_root / "eval" / "0206"),
         help="출력 디렉토리",
     )
     parser.add_argument(
@@ -140,6 +143,12 @@ def main() -> None:
     parser.add_argument("--lat_col", type=str, default="lat", help="입력 위도 컬럼명")
     parser.add_argument("--lon_col", type=str, default="lon", help="입력 경도 컬럼명")
     parser.add_argument(
+        "--N",
+        type=int,
+        default=None,
+        help="사고규모 N (입력 CSV에 N/incident_size 컬럼이 없을 때 N으로 채움)",
+    )
+    parser.add_argument(
         "--keep_failed",
         action="store_true",
         help="스냅 실패한 행도 NaN으로 유지 (기본은 제거)",
@@ -158,7 +167,7 @@ def main() -> None:
         overpass_url=str(args.overpass or ""),
         profile=str(args.profile),
         radius_m=float(args.radius_m),
-        seed=int(args.seed),
+        seed=args.seed,
         rate_limit_delay=float(args.delay),
         allow_overpass_failure=True,
     )
@@ -184,8 +193,17 @@ def main() -> None:
                 f"입력 CSV에 '{args.lat_col}', '{args.lon_col}' 컬럼이 필요합니다. 실제 컬럼: {list(df.columns)}"
             )
 
+        n_values: Optional[pd.Series] = None
+        if "N" in df.columns:
+            n_values = df["N"]
+        elif "incident_size" in df.columns:
+            # 과거 산출물 호환: incident_size가 있으면 N으로 사용
+            n_values = df["incident_size"]
+        elif args.N is not None:
+            n_values = pd.Series([args.N] * len(df))
+
         print(f"\n- input: {in_path_p} (n={len(df)})")
-        out_df, failed = _snap_rows(df, args.lat_col, args.lon_col, gen)
+        out_df, failed = _snap_rows(df, args.lat_col, args.lon_col, gen, n_values=n_values)
         if not args.keep_failed:
             before = len(out_df)
             out_df = out_df.dropna(subset=["snapped_latitude", "snapped_longitude"]).reset_index(drop=True)
