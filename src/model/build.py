@@ -46,12 +46,14 @@ def build_mlp_diffusion(cfg: MLPDiffusionConfig) -> nn.Module:
         "d_layers": cfg.d_layers,
         "dropout": cfg.dropout,
     }
+    d_y_cond = getattr(cfg, "cond_dim", 1)
     model = MLPDiffusion(
         d_in=cfg.x_dim,
         num_classes=0,
         is_y_cond=True,
         rtdl_params=rtdl_params,
         dim_t=cfg.dim_t,
+        d_y_cond=d_y_cond,
     )
     return model.to(cfg.device)
 
