@@ -66,17 +66,27 @@ def parse_util_map(text: str):
 class ScenarioGenerator:
     """동적 파라미터 기반 시나리오 생성 클래스 (크로스 환경 호환)"""
 
-    def __init__(self, base_path, experiment_id=None, kakao_api_key=None, departure_time=None):
+    def __init__(
+        self,
+        base_path,
+        experiment_id=None,
+        kakao_api_key=None,
+        departure_time=None,
+        auto_prefix_exp: bool = True,
+    ):
         # 프로젝트 경로 절대화
         self.base_path = os.path.abspath(base_path)
 
         # experiment_id 생성: exp_YYYYMMDD_HHMMSS 형식 (통일)
         if experiment_id:
-            # 이미 exp_ 접두사가 있으면 그대로 사용
-            if experiment_id.startswith("exp_") or "_exp_" in experiment_id:
-                self.experiment_id = experiment_id
+            if auto_prefix_exp:
+                # 이미 exp_ 접두사가 있으면 그대로 사용
+                if experiment_id.startswith("exp_") or "_exp_" in experiment_id:
+                    self.experiment_id = experiment_id
+                else:
+                    self.experiment_id = f"exp_{experiment_id}"
             else:
-                self.experiment_id = f"exp_{experiment_id}"
+                self.experiment_id = str(experiment_id)
         else:
             # 기본 형식: exp_YYYYMMDD_HHMMSS
             self.experiment_id = f"exp_{datetime.now().strftime('%Y%m%d_%H%M%S')}"

@@ -1,8 +1,8 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-랜덤 메타데이터 기반 배치 실험 오케스트레이터.
-- random_metadata.csv의 snapped_latitude/snapped_longitude를 사고 좌표로 사용
+메타데이터 기반 배치 실험 오케스트레이터.
+- random/custom 메타데이터의 스냅 좌표를 사고 좌표로 사용
 - experiment_metadata.csv에서 bbox 관련 열 제거
 - snap_distance_m을 사고 좌표 옆에 기록
 """
@@ -70,14 +70,14 @@ def _parse_indices(text):
 
 
 class BatchExperimentOrchestrator:
-    """랜덤 메타데이터 기반 배치 실험 오케스트레이터."""
+    """메타데이터 기반 배치 실험 오케스트레이터."""
 
     def __init__(self, base_path, metadata_path, config_template_path, only_indices=None):
         """
         초기화
         Args:
             base_path: 프로젝트 루트 경로
-            metadata_path: random_metadata.csv 경로
+            metadata_path: 메타데이터 CSV 경로
             config_template_path: config.yaml 템플릿 경로
         """
         self.base_path = Path(base_path).resolve()
@@ -173,9 +173,13 @@ class BatchExperimentOrchestrator:
         if "snapped_latitude" in columns and "snapped_longitude" in columns:
             lat_col = "snapped_latitude"
             lon_col = "snapped_longitude"
+        elif "snap_latitude" in columns and "snap_longitude" in columns:
+            lat_col = "snap_latitude"
+            lon_col = "snap_longitude"
         else:
             raise ValueError(
-                "random_metadata.csv에는 snapped_latitude / snapped_longitude가 있어야 합니다."
+                "메타데이터에는 snapped_latitude/snapped_longitude "
+                "또는 snap_latitude/snap_longitude가 있어야 합니다."
             )
 
         snap_dist_col = "snap_distance_m" if "snap_distance_m" in columns else None
@@ -305,7 +309,7 @@ class BatchExperimentOrchestrator:
             self.save_experiment_metadata()
 
         # 좌표별 처리
-        for idx, row in self.run_metadata.iterrows():
+        for process_idx, (_, row) in enumerate(self.run_metadata.iterrows(), start=1):
             site_id = row[self.id_col]
             lat = row[self.lat_col]
             lon = row[self.lon_col]
@@ -320,19 +324,33 @@ class BatchExperimentOrchestrator:
                 except Exception:
                     incident_size = default_incident_size
 
+            if pd.isna(lat) or pd.isna(lon):
+                error_str = "스냅 좌표 누락: metadata의 snap 좌표가 비어 있습니다."
+                self.failed_points.append((site_id, lat, lon, error_str))
+                self.performance_metrics[site_id] = {
+                    "scenario_gen_time_sec": None,
+                    "simulation_time_sec": None,
+                    "api_call_count": None,
+                    "status": "failed",
+                    "failure_reason": error_str,
+                }
+                self.logger.warning(f"[{process_idx}/{self.total_points}] 좌표 {site_id} 스킵: {error_str}")
+                continue
+
             try:
                 coord_label = f"({lat:.6f}, {lon:.6f})"
                 if snap_dist is not None and not pd.isna(snap_dist):
                     coord_label += f", snap_distance_m={float(snap_dist):.1f}"
 
                 self.logger.info(
-                    f"[{self.completed_points + 1}/{self.total_points}] 좌표 {site_id} 처리 시작: {coord_label}"
+                    f"[{process_idx}/{self.total_points}] 좌표 {site_id} 처리 시작: {coord_label}"
                 )
                 self.process_site(site_id, lat, lon, incident_size)
                 self.completed_points += 1
-                progress_pct = (self.completed_points / self.total_points) * 100
+                success_pct = (self.completed_points / self.total_points) * 100
                 self.logger.info(
-                    f"좌표 {site_id} 완료 ({self.completed_points}/{self.total_points}, {progress_pct:.1f}%)"
+                    f"좌표 {site_id} 완료 (처리 {process_idx}/{self.total_points}, "
+                    f"성공 {self.completed_points}, 실패 {len(self.failed_points)}, 성공률 {success_pct:.1f}%)"
                 )
             except Exception as e:
                 error_str = str(e)
@@ -356,7 +374,9 @@ class BatchExperimentOrchestrator:
                     "status": "failed",
                     "failure_reason": f"{failure_type}: {error_str[:200]}",
                 }
-                self.logger.error(f"좌표 {site_id} 실패 [{failure_type}]: {error_str}")
+                self.logger.error(
+                    f"[{process_idx}/{self.total_points}] 좌표 {site_id} 실패 [{failure_type}]: {error_str}"
+                )
                 continue
 
         self.print_summary()
@@ -381,6 +401,7 @@ class BatchExperimentOrchestrator:
         generator = ScenarioGenerator(
             base_path=str(self.base_path),
             experiment_id=self.exp_id,
+            auto_prefix_exp=False,
         )
 
         amb_velocity = self.config_template["entity_info"]["ambulance"]["velocity"]
@@ -493,7 +514,7 @@ def main():
         "--random_metadata",
         dest="metadata_path",
         required=True,
-        help="random_metadata.csv 경로",
+        help="메타데이터 CSV 경로 (random_metadata/custom_metadata)",
     )
     parser.add_argument("--config_template", default="sim_src/config.yaml", help="config 템플릿 경로")
     parser.add_argument(
