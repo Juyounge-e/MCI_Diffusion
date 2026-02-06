@@ -21,10 +21,11 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0203_samples_994_q3.csv"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_samples_984_q3.csv"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "scalers.pkl"))
-    parser.add_argument("--n", type=int, default=20)
-    parser.add_argument("--cond", type=float, default=0.0, help="pdr_mean 값")
+    parser.add_argument("--sample_num", type=int, default=20)
+    parser.add_argument("--cond", type=float, default=0.057456, help="pdr_mean 값")
+    parser.add_argument("--N", type=int, default=30, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
 
@@ -47,14 +48,21 @@ def main():
     c_scaler = scalers.c_scaler
 
     # 조건 준비(스케일링)
-    cond_np = np.array([[args.cond]], dtype=np.float32)
+    cond_dim = getattr(cfg, "cond_dim", 1)
+    N_val = getattr(args, "N", 30)
+    if cond_dim == 2:
+        cond_np = np.array([[args.cond, float(N_val)]], dtype=np.float32)
+    else:
+        cond_np = np.array([[args.cond]], dtype=np.float32)
     if c_scaler is not None:
         cond_np = c_scaler.transform(cond_np)
-    cond = torch.from_numpy(cond_np).float().to(device)  # (1,1)
-    cond = cond.repeat(args.n, 1)  # (N,1)
+        
+    cond = torch.from_numpy(cond_np).float().to(device)  # (1, cond_dim)
+    n_samples = args.sample_num
+    cond = cond.repeat(n_samples, 1)  # (n, cond_dim)
 
     # 샘플링 초기화
-    N = args.n
+    N = n_samples
     T = args.timesteps
     x = torch.randn((N, cfg.x_dim), device=device, dtype=torch.float32)
     scheduler = TabDDPMGaussianScheduler(
