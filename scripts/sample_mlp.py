@@ -21,11 +21,11 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_samples_984_q3.csv"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_20_samples_100_q3.csv"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=20)
     parser.add_argument("--cond", type=float, default=0.057456, help="pdr_mean 값")
-    parser.add_argument("--N", type=int, default=30, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
+    parser.add_argument("--N", type=int, default=20, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
 
@@ -88,8 +88,11 @@ def main():
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["lat", "lon"])
-        writer.writerows(x_np.tolist())
+        writer.writerow(["lat", "lon", "N"])
+        for i in range(len(x_np)):
+            row = [float(x_np[i, 0]), float(x_np[i, 1])]
+            row.append(N_val if cond_dim == 2 else "")
+            writer.writerow(row)
     print(f"Saved: {args.out} ({len(x_np)} rows)")
 
 
