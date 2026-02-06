@@ -24,7 +24,7 @@ def main() -> int:
     parser.add_argument(
         "--out",
         type=str,
-        default=str(Path("simul4eval_with_metrics.csv")),
+        default=str(Path("eval_with_metrics.csv")),
         help="cond 및 오차 컬럼이 추가된 결과 CSV 경로",
     )
     parser.add_argument(
@@ -46,7 +46,7 @@ def main() -> int:
         return 1
 
     # cond 설정: CSV에 있으면 사용, 없으면 --cond로 채움
-    if "cond" in df.columns:
+    if "" in df.columns:
         if args.cond is not None:
             df["cond"] = float(args.cond)
     else:

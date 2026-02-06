@@ -28,6 +28,7 @@ except Exception:
             pass
 
 import numpy as np
+import pandas as pd
 from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders
 from src.model.build import MLPDiffusionConfig, build_model_and_optimizer
 from src.diffusion.scheduler import TabDDPMGaussianScheduler
@@ -43,8 +44,8 @@ def main():
     parser.add_argument(
         "--csv",
         type=str,
-        default=os.path.join("src", "data", "snaped_dataset.csv"),
-        help="학습용 CSV 경로",
+        default=os.path.join("src", "data", "dataset.csv"),
+        help="학습용 CSV 경로 (lat, lon, pdr_mean, [N] 필요)",
     )
     parser.add_argument(
         "--max_train",
@@ -60,14 +61,23 @@ def main():
     seed = args.seed
 
     # ----------------
-    # Config
+    # Config (CSV에 N 있으면 항상 사용)
     # ----------------
     x_cols = ["lat", "lon"]
-    c_cols = ["pdr_mean"]
+    _df = pd.read_csv(csv_path, nrows=1)
+    has_N = "N" in _df.columns
+    if has_N:
+        c_cols = ["pdr_mean", "N"]
+        cond_dim = 2
+    else:
+        c_cols = ["pdr_mean"]
+        cond_dim = 1
+        print("  [WARN] CSV에 N 컬럼 없음. pdr_mean만 사용.")
+    print(f"  cond_cols = {c_cols} (cond_dim={cond_dim})")
 
     cfg = MLPDiffusionConfig(
         x_dim=2,
-        cond_dim=1,
+        cond_dim=cond_dim,
         dim_t=128,
         d_layers=[128, 128, 128],
         dropout=0.1,
@@ -103,7 +113,7 @@ def main():
 
     print(f"  train n = {len(train[0])}")
     train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=False)
-    train_loader, val_loader, _ = make_loaders(train_s, val_s, test_s, batch_size=256, num_workers=0)
+    train_loader, val_loader, _ = make_loaders(train_s, val_s, test_s, batch_size=128, num_workers=0)
 
     # ----------------
     # Model / Optim

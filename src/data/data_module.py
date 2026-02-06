@@ -1,4 +1,8 @@
-# src/data/data_module.py
+"""
+입력 데이터 형식: lat, lon, pdr_mean, pdr_std, N, source_folder, stat_file
+- X (생성 대상): lat, lon
+- Condition: pdr_mean, N (사고규모)
+"""
 import os
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -9,6 +13,11 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+
+# ---------- 고정 칼럼 정의 ----------
+X_COLS = ["lat", "lon"]
+COND_COLS = ["pdr_mean", "N"]
 
 
 @dataclass
@@ -26,22 +35,28 @@ class LatLonCondDataset(Dataset):
         return self.x.shape[0]
 
     def __getitem__(self, idx):
-        # diffusion 학습용: x (target), c (condition)
         return self.x[idx], self.c[idx]
 
 
 def load_csv(
     csv_path: str,
-    x_cols: List[str],
-    c_cols: List[str],
+    x_cols: Optional[List[str]] = None,
+    c_cols: Optional[List[str]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    df = pd.read_csv(csv_path)
 
+    x_cols = x_cols or X_COLS
+    c_cols = c_cols or COND_COLS
+
+    df = pd.read_csv(csv_path)
     use_cols = x_cols + c_cols
     df = df[use_cols].dropna()
 
     x = df[x_cols].to_numpy(dtype=np.float32)
     c = df[c_cols].to_numpy(dtype=np.float32)
+
+    if "N" in c_cols:
+        n_idx = c_cols.index("N")
+        c[:, n_idx] = c[:, n_idx] / 50.0  # 필요 시 50은 실험 설정에 맞게 조정 가능
 
     return x, c
 
@@ -55,15 +70,12 @@ def make_splits(
 ):
     total_ratio = val_ratio + test_ratio
     if total_ratio <= 0:
-        # val/test 없이 전체를 train으로
         return (x, c), (np.zeros((0, x.shape[1]), np.float32), np.zeros((0, c.shape[1]), np.float32)), (np.zeros((0, x.shape[1]), np.float32), np.zeros((0, c.shape[1]), np.float32))
 
-    # 1) train vs temp
     x_train, x_temp, c_train, c_temp = train_test_split(
         x, c, test_size=total_ratio, random_state=seed
     )
 
-    # 2) val vs test
     if test_ratio == 0:
         x_val, c_val = x_temp, c_temp
         x_test, c_test = np.zeros((0, x.shape[1]), np.float32), np.zeros((0, c.shape[1]), np.float32)
@@ -116,7 +128,6 @@ def make_loaders(
     val_ds = LatLonCondDataset(*val)
     test_ds = LatLonCondDataset(*test) if len(test[0]) else None
 
-    # train 샘플 수 < batch_size 이면 drop_last=False (배치가 0개 되는 것 방지)
     n_train = len(train_ds)
     drop_train = drop_last and (n_train > batch_size)
 
@@ -129,15 +140,11 @@ def make_loaders(
 
 if __name__ == "__main__":
     csv_path = os.path.join("src", "data", "dataset.csv")
-    x_cols = ["lat", "lon"]
-    c_cols = ["pdr_mean"]  # or ["pdr_mean", "pdr_std"]
-
-    x, c = load_csv(csv_path, x_cols, c_cols)
+    x, c = load_csv(csv_path)
     train, val, test = make_splits(x, c, val_ratio=0.1, test_ratio=0.1, seed=42)
     train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=True)
-
     train_loader, val_loader, test_loader = make_loaders(train_s, val_s, test_s, batch_size=128)
 
     xb, cb = next(iter(train_loader))
-    print("x batch:", xb.shape, xb.mean().item(), xb.std().item())
-    print("c batch:", cb.shape, cb.mean().item(), cb.std().item())  
+    print("x batch:", xb.shape)
+    print("c batch:", cb.shape, "(pdr_mean, N)")
