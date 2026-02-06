@@ -493,22 +493,26 @@ class RandomCoordinateGenerator:
                 failed_lines.append(idx + 1)  # CSV line number (header=1)
                 points.append(
                     {
+                        "index": idx,
                         "custom_latitude": custom_lat,
                         "custom_longitude": custom_lon,
                         "snapped_latitude": None,
                         "snapped_longitude": None,
+                        "snap_distance_m": None,
                         "N": incident_size,
                     }
                 )
             else:
-                snap_lat, snap_lon, _ = snapped
+                snap_lat, snap_lon, snap_dist_m = snapped
                 success_count += 1
                 points.append(
                     {
+                        "index": idx,
                         "custom_latitude": custom_lat,
                         "custom_longitude": custom_lon,
                         "snapped_latitude": float(snap_lat),
                         "snapped_longitude": float(snap_lon),
+                        "snap_distance_m": float(snap_dist_m),
                         "N": incident_size,
                     }
                 )
@@ -561,10 +565,12 @@ def export_custom_metadata(points: List[Dict[str, Any]], output_path: Path) -> N
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(points)
     ordered_cols = [
+        "index",
         "custom_latitude",
         "custom_longitude",
         "snapped_latitude",
         "snapped_longitude",
+        "snap_distance_m",
         "N",
     ]
     existing_ordered = [col for col in ordered_cols if col in df.columns]
@@ -650,9 +656,15 @@ def main() -> int:
         if success_count > 0:
             print(f"- snap 위도 범위: {snap_lat_series.min():.6f} ~ {snap_lat_series.max():.6f}")
             print(f"- snap 경도 범위: {snap_lon_series.min():.6f} ~ {snap_lon_series.max():.6f}")
+            snap_dist_series = pd.to_numeric(df["snap_distance_m"], errors="coerce")
+            print(
+                f"- 스냅 거리(m): min={snap_dist_series.min():.2f}, "
+                f"max={snap_dist_series.max():.2f}, mean={snap_dist_series.mean():.2f}"
+            )
         else:
             print("- snap 위도 범위: N/A (모든 좌표 스냅 실패)")
             print("- snap 경도 범위: N/A (모든 좌표 스냅 실패)")
+            print("- 스냅 거리(m): N/A (모든 좌표 스냅 실패)")
         print(f"- 사고 규모 N: min={int(df['N'].min())}, max={int(df['N'].max())}, mean={df['N'].mean():.2f}")
 
         print("\n출력:")
