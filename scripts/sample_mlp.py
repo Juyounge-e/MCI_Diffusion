@@ -21,7 +21,7 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_20_samples_100_q3.csv"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_20_samples_984_q3.csv"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=20)
     parser.add_argument("--cond", type=float, default=0.057456, help="pdr_mean 값")
@@ -51,7 +51,10 @@ def main():
     cond_dim = getattr(cfg, "cond_dim", 1)
     N_val = getattr(args, "N", 30)
     if cond_dim == 2:
-        cond_np = np.array([[args.cond, float(N_val)]], dtype=np.float32)
+        # 학습 시 N은 data_module.load_csv에서 N/50.0으로 스케일링되므로,
+        # 샘플링 시에도 동일하게 N을 50으로 나눈 값을 사용한다.
+        N_scaled = float(N_val) / 50.0
+        cond_np = np.array([[args.cond, N_scaled]], dtype=np.float32)
     else:
         cond_np = np.array([[args.cond]], dtype=np.float32)
     if c_scaler is not None:

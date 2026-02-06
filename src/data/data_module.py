@@ -54,6 +54,10 @@ def load_csv(
     x = df[x_cols].to_numpy(dtype=np.float32)
     c = df[c_cols].to_numpy(dtype=np.float32)
 
+    if "N" in c_cols:
+        n_idx = c_cols.index("N")
+        c[:, n_idx] = c[:, n_idx] / 50.0  # 필요 시 50은 실험 설정에 맞게 조정 가능
+
     return x, c
 
 
