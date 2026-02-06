@@ -6,7 +6,6 @@ OSRM + Overpass를 이용한 랜덤 좌표 생성기.
 """
 
 import argparse
-import os
 import random
 import sys
 import time
@@ -65,6 +64,52 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 def _resolve_path(path_str: str) -> Path:
     path = Path(path_str)
     return path if path.is_absolute() else BASE_DIR / path
+
+
+def load_custom_coordinate_csv(csv_path: str) -> pd.DataFrame:
+    input_path = _resolve_path(csv_path)
+    if not input_path.exists():
+        raise FileNotFoundError(f"custom CSV 파일을 찾을 수 없습니다: {input_path}")
+
+    df = pd.read_csv(input_path)
+    if df.empty:
+        raise ValueError(f"custom CSV가 비어 있습니다: {input_path}")
+
+    col_map = {str(col).strip().lower(): col for col in df.columns}
+    lat_col = col_map.get("lat")
+    lon_col = col_map.get("lon")
+    n_col = col_map.get("n")
+
+    missing = []
+    if lat_col is None:
+        missing.append("lat")
+    if lon_col is None:
+        missing.append("lon")
+    if n_col is None:
+        missing.append("N")
+    if missing:
+        raise ValueError(
+            f"custom CSV에는 다음 컬럼이 필요합니다: lat, lon, N (누락: {', '.join(missing)})"
+        )
+
+    out_df = df[[lat_col, lon_col, n_col]].copy()
+    out_df.columns = ["lat", "lon", "N"]
+    out_df["lat"] = pd.to_numeric(out_df["lat"], errors="coerce")
+    out_df["lon"] = pd.to_numeric(out_df["lon"], errors="coerce")
+    out_df["N"] = pd.to_numeric(out_df["N"], errors="coerce")
+
+    invalid_mask = out_df[["lat", "lon", "N"]].isna().any(axis=1)
+    if invalid_mask.any():
+        invalid_lines = (out_df.index[invalid_mask] + 2).tolist()  # CSV line number (header=1)
+        preview = ", ".join(str(v) for v in invalid_lines[:10])
+        suffix = " ..." if len(invalid_lines) > 10 else ""
+        raise ValueError(
+            "custom CSV에 숫자로 해석할 수 없는 값이 있습니다. "
+            f"(line: {preview}{suffix})"
+        )
+
+    out_df["N"] = out_df["N"].astype(int)
+    return out_df
 
 
 def _osrm_nearest(
@@ -184,7 +229,7 @@ def load_region_boundary(shp_path: str, region_keyword: str) -> Tuple[Any, str]:
 class RandomCoordinateGenerator:
     def __init__(
         self,
-        shp_path: str,
+        shp_path: Optional[str],
         region: str = "daejeon",
         osrm_base: str = DEFAULT_OSRM,
         overpass_url: Optional[str] = None,
@@ -196,7 +241,7 @@ class RandomCoordinateGenerator:
         rate_limit_delay: float = 0.3,
         allow_overpass_failure: bool = True,
     ) -> None:
-        self.shp_path = shp_path
+        self.shp_path = shp_path or ""
         self.osrm_base = osrm_base
         self.overpass_url = overpass_url or ""
         self.profile = profile
@@ -213,9 +258,12 @@ class RandomCoordinateGenerator:
 
         self._region_key = None
         self._region_geom = None
-        self.set_region(region)
+        if self.shp_path:
+            self.set_region(region)
 
     def set_region(self, region_keyword: str) -> None:
+        if not self.shp_path:
+            raise ValueError("랜덤 모드를 사용하려면 shapefile 경로(--shp)가 필요합니다.")
         self._region_geom, self._region_key = load_region_boundary(self.shp_path, region_keyword)
 
     @property
@@ -422,6 +470,75 @@ class RandomCoordinateGenerator:
         )
         return points
 
+    def generate_snapped_points_from_custom(
+        self,
+        custom_df: pd.DataFrame,
+        progress_every: int = 50,
+        save_path: Optional[Path] = None,
+        save_every: int = 50,
+    ) -> List[Dict[str, Any]]:
+        points: List[Dict[str, Any]] = []
+        failed_lines: List[int] = []
+        success_count = 0
+        start_ts = time.time()
+        total = len(custom_df)
+
+        for idx, row in enumerate(custom_df.itertuples(index=False), start=1):
+            custom_lat = float(row.lat)
+            custom_lon = float(row.lon)
+            incident_size = int(row.N)
+
+            snapped = self.snap_point(custom_lat, custom_lon)
+            if not snapped:
+                failed_lines.append(idx + 1)  # CSV line number (header=1)
+                points.append(
+                    {
+                        "index": idx,
+                        "custom_latitude": custom_lat,
+                        "custom_longitude": custom_lon,
+                        "snapped_latitude": None,
+                        "snapped_longitude": None,
+                        "snap_distance_m": None,
+                        "N": incident_size,
+                    }
+                )
+            else:
+                snap_lat, snap_lon, snap_dist_m = snapped
+                success_count += 1
+                points.append(
+                    {
+                        "index": idx,
+                        "custom_latitude": custom_lat,
+                        "custom_longitude": custom_lon,
+                        "snapped_latitude": float(snap_lat),
+                        "snapped_longitude": float(snap_lon),
+                        "snap_distance_m": float(snap_dist_m),
+                        "N": incident_size,
+                    }
+                )
+
+            if progress_every and idx % progress_every == 0:
+                elapsed = time.time() - start_ts
+                success_rate = (success_count / idx * 100.0) if idx else 0.0
+                print(
+                    f"[진행] {idx}/{total}개 처리 "
+                    f"(성공 {success_count}개, 실패 {idx - success_count}개, 성공률 {success_rate:.1f}%, 경과 {elapsed:.1f}s)"
+                )
+
+            if save_path and save_every and idx % save_every == 0:
+                export_custom_metadata(points, Path(save_path))
+                print(f"[저장] 중간 저장 완료: {save_path} ({len(points)}개)")
+
+        if failed_lines:
+            preview = ", ".join(str(v) for v in failed_lines[:10])
+            suffix = " ..." if len(failed_lines) > 10 else ""
+            print(
+                "[경고] custom 좌표 스냅 실패가 있습니다. "
+                f"{len(failed_lines)}건 (실패 line: {preview}{suffix}) - snapped 좌표는 공백으로 저장됩니다."
+            )
+
+        return points
+
 
 def export_random_metadata(points: List[Dict[str, Any]], output_path: Path) -> None:
     output_path = Path(output_path)
@@ -443,10 +560,32 @@ def export_random_metadata(points: List[Dict[str, Any]], output_path: Path) -> N
     df.to_csv(output_path, index=False, encoding="utf-8-sig")
 
 
+def export_custom_metadata(points: List[Dict[str, Any]], output_path: Path) -> None:
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(points)
+    ordered_cols = [
+        "index",
+        "custom_latitude",
+        "custom_longitude",
+        "snapped_latitude",
+        "snapped_longitude",
+        "snap_distance_m",
+        "N",
+    ]
+    existing_ordered = [col for col in ordered_cols if col in df.columns]
+    remain_cols = [col for col in df.columns if col not in existing_ordered]
+    if existing_ordered:
+        df = df[existing_ordered + remain_cols]
+    df.to_csv(output_path, index=False, encoding="utf-8-sig")
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="OSRM/Overpass 기반 랜덤 좌표 생성기")
+    parser = argparse.ArgumentParser(description="OSRM/Overpass 기반 좌표 스냅 생성기")
+    parser.add_argument("--mode", choices=["random", "custom"], default="random", help="실행 모드 (random/custom)")
     parser.add_argument("--region", default="daejeon", help="지역 키워드 (기본: daejeon)")
     parser.add_argument("--exp-id", dest="exp_id", default=None, help="실험 ID (기본: exp_YYYYMMDD_HHMMSS)")
+    parser.add_argument("--custom-csv", dest="custom_csv", default="", help="custom 모드 입력 CSV 경로 (lat, lon, N)")
     parser.add_argument("--num-points", "--num_points", dest="num_points", type=int, default=100, help="생성할 스냅 좌표 개수")
     parser.add_argument("--incident-size-min", "--incident_size_min", dest="incident_size_min", type=int, default=10, help="N(사고규모) 최소값 (기본: 10)")
     parser.add_argument("--incident-size-max", "--incident_size_max", dest="incident_size_max", type=int, default=50, help="N(사고규모) 최대값 (기본: 50)")
@@ -463,6 +602,83 @@ def main() -> int:
     args = parser.parse_args()
 
     exp_id = args.exp_id or f"exp_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    if args.mode == "custom":
+        if not args.custom_csv:
+            raise ValueError("custom 모드에서는 --custom-csv를 반드시 지정해야 합니다.")
+
+        print("=" * 70)
+        print("커스텀 좌표 스냅 생성")
+        print("=" * 70)
+        print(f"실험 ID: {exp_id}")
+        print(f"입력 CSV: {str(_resolve_path(args.custom_csv))}")
+        print(f"스냅 반경: {args.radius_m} m")
+
+        custom_df = load_custom_coordinate_csv(args.custom_csv)
+        print(f"입력 좌표 개수: {len(custom_df)}")
+
+        generator = RandomCoordinateGenerator(
+            shp_path=None,
+            region=args.region,
+            osrm_base=args.osrm,
+            overpass_url=args.overpass,
+            profile=args.profile,
+            radius_m=args.radius_m,
+            incident_size_min=args.incident_size_min,
+            incident_size_max=args.incident_size_max,
+            seed=args.seed,
+            rate_limit_delay=args.rate_limit_delay,
+        )
+
+        output_dir = BASE_DIR / "scenarios" / f"custom_{exp_id}"
+        output_path = output_dir / "custom_metadata.csv"
+        points = generator.generate_snapped_points_from_custom(
+            custom_df,
+            progress_every=args.progress_every,
+            save_path=output_path,
+            save_every=args.save_every,
+        )
+        export_custom_metadata(points, output_path)
+
+        df = pd.DataFrame(points)
+        snap_lat_series = pd.to_numeric(df["snapped_latitude"], errors="coerce")
+        snap_lon_series = pd.to_numeric(df["snapped_longitude"], errors="coerce")
+        success_mask = snap_lat_series.notna() & snap_lon_series.notna()
+        success_count = int(success_mask.sum())
+        failed_count = int(len(df) - success_count)
+
+        print("\n요약")
+        print(f"- 생성 개수: {len(df)}")
+        print(f"- 스냅 성공: {success_count}개")
+        print(f"- 스냅 실패: {failed_count}개")
+        print(f"- custom 위도 범위: {df['custom_latitude'].min():.6f} ~ {df['custom_latitude'].max():.6f}")
+        print(f"- custom 경도 범위: {df['custom_longitude'].min():.6f} ~ {df['custom_longitude'].max():.6f}")
+        if success_count > 0:
+            print(f"- snap 위도 범위: {snap_lat_series.min():.6f} ~ {snap_lat_series.max():.6f}")
+            print(f"- snap 경도 범위: {snap_lon_series.min():.6f} ~ {snap_lon_series.max():.6f}")
+            snap_dist_series = pd.to_numeric(df["snap_distance_m"], errors="coerce")
+            print(
+                f"- 스냅 거리(m): min={snap_dist_series.min():.2f}, "
+                f"max={snap_dist_series.max():.2f}, mean={snap_dist_series.mean():.2f}"
+            )
+        else:
+            print("- snap 위도 범위: N/A (모든 좌표 스냅 실패)")
+            print("- snap 경도 범위: N/A (모든 좌표 스냅 실패)")
+            print("- 스냅 거리(m): N/A (모든 좌표 스냅 실패)")
+        print(f"- 사고 규모 N: min={int(df['N'].min())}, max={int(df['N'].max())}, mean={df['N'].mean():.2f}")
+
+        print("\n출력:")
+        print(f"- {output_path}")
+        print("\n다음 단계:")
+        print(
+            f"1. python MCI_ADV2\\vis_src\\custom_visualize.py --csv {output_path} "
+            f"--output {output_dir / 'custom_visualization.png'} --shp {str(_resolve_path(args.shp))} --region {args.region}"
+        )
+        print(
+            f"2. python MCI_ADV2\\sce_src\\batch_experiment.py --base_path {BASE_DIR} "
+            f"--random_metadata {output_path} --config_template {BASE_DIR / 'sim_src' / 'config.yaml'}"
+        )
+        return 0
 
     print("=" * 70)
     print("랜덤 좌표 생성")
@@ -520,8 +736,8 @@ def main() -> int:
         f"--output {output_dir / 'random_visualization.png'} --shp {shp_path} --region {args.region}"
     )
     print(
-        f"2. python MCI_ADV2\\sim_src\\batch_experiment.py --base_path {BASE_DIR} "
-        f"--grid_metadata {output_path} --config_template {BASE_DIR / 'sim_src' / 'config.yaml'}"
+        f"2. python MCI_ADV2\\sce_src\\batch_experiment.py --base_path {BASE_DIR} "
+        f"--random_metadata {output_path} --config_template {BASE_DIR / 'sim_src' / 'config.yaml'}"
     )
     return 0
 
