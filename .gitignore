@@ -18,5 +18,8 @@ MCI_ADV2/visualizations/
 #ddpm 실험 결과
 experiment/
 
-# 실험 결과 임시 파일 
-eval/snapped/
+# 실험 결과 파일 
+eval/eval_results/
+
+# evaluation을 취한 데이터셋 
+src/data/dataset4eval/
