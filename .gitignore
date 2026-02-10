@@ -22,4 +22,4 @@ experiment/
 eval/eval_results/
 
 # evaluation을 취한 데이터셋 
-src/data/dataset/dataset4eval/
+src/data/dataset4eval/
