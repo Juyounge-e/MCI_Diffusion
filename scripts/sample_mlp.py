@@ -20,9 +20,9 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 @torch.no_grad()
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "0206_20_samples_984_q3.csv"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "scalers.pkl"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "max", "model_last.pt"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "10_samples_max_q1.csv"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion","max", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=20)
     parser.add_argument("--cond", type=float, default=0.057456, help="pdr_mean 값")
     parser.add_argument("--N", type=int, default=20, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
@@ -35,7 +35,8 @@ def main():
     if cfg_dict is None:
         raise RuntimeError("Checkpoint에 cfg가 없습니다.")
     cfg = MLPDiffusionConfig(**cfg_dict)
-    device = cfg.device
+    device = torch.device(cfg.device)
+    device_str = f"{device.type}:{device.index}" if device.index is not None else device.type
 
     model = build_mlp_diffusion(cfg)
     model.load_state_dict(ckpt["model"])
@@ -51,10 +52,9 @@ def main():
     cond_dim = getattr(cfg, "cond_dim", 1)
     N_val = getattr(args, "N", 30)
     if cond_dim == 2:
-        # 학습 시 N은 data_module.load_csv에서 N/50.0으로 스케일링되므로,
-        # 샘플링 시에도 동일하게 N을 50으로 나눈 값을 사용한다.
-        N_scaled = float(N_val) / 50.0
-        cond_np = np.array([[args.cond, N_scaled]], dtype=np.float32)
+        # 학습 시 load_csv에서 N을 N/50으로 사용하므로 샘플링 입력도 동일하게 맞춘다.
+        n_for_model = float(N_val) / 50.0
+        cond_np = np.array([[args.cond, n_for_model]], dtype=np.float32)
     else:
         cond_np = np.array([[args.cond]], dtype=np.float32)
     if c_scaler is not None:
@@ -75,7 +75,7 @@ def main():
         num_timesteps=cfg.num_timesteps,
         gaussian_loss_type='mse',
         scheduler='cosine',
-        device=device
+        device=device_str
     )
 
     # 역확산 루프
@@ -93,8 +93,11 @@ def main():
         writer = csv.writer(f)
         writer.writerow(["lat", "lon", "N"])
         for i in range(len(x_np)):
-            row = [float(x_np[i, 0]), float(x_np[i, 1])]
-            row.append(N_val if cond_dim == 2 else "")
+            row = (
+                [float(x_np[i, 0]), float(x_np[i, 1]), float(N_val)]
+                if cond_dim == 2
+                else [float(x_np[i, 0]), float(x_np[i, 1]), ""]
+            )
             writer.writerow(row)
     print(f"Saved: {args.out} ({len(x_np)} rows)")
 

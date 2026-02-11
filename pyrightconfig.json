@@ -1,0 +1,14 @@
+{
+  "include": [
+    "benchmarks",
+    "src",
+    "scripts"
+  ],
+  "reportIncompatibleMethodOverride": "none",
+  "extraPaths": [
+    ".",
+    "tab-ddpm",
+    "tab-ddpm/CTGAN",
+    "tab-ddpm/CTGAN/CTGAN"
+  ]
+}
