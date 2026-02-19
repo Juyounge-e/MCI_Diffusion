@@ -63,7 +63,8 @@ def sample_cvae(
     if len(cond_list) != 2:
         raise ValueError("cond는 [pdr_mean, N] 2개 필수")
     n_val = cond_list[1]
-    cond_for_model = [cond_list[0], n_val / 50.0]
+    # cond_for_model = [cond_list[0], n_val / 50.0]  # N/50 주석 처리, condition은 scaler로 스케일링
+    cond_for_model = cond_list
     cond_np = np.array([cond_for_model], dtype=np.float32)
     if cond_np.shape[1] != cond_dim:
         raise ValueError(f"cond dim {cond_np.shape[1]} != cond_dim {cond_dim}")

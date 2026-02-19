@@ -88,7 +88,7 @@ def main():
     )
     device = cfg.device
 
-    out_dir = os.path.join("outputs", "mlp_diffusion")
+    out_dir = os.path.join("outputs", "mlp_diffusion", "1500_all_scale")
     os.makedirs(out_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
 
@@ -112,7 +112,7 @@ def main():
             print(f"  train 샘플링: {n_train} -> {max_train_samples}")
 
     print(f"  train n = {len(train[0])}")
-    train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=False)
+    train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=True)
     train_loader, val_loader, _ = make_loaders(train_s, val_s, test_s, batch_size=128, num_workers=0)
 
     # ----------------

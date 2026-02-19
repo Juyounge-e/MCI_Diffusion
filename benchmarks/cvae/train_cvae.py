@@ -47,7 +47,7 @@ def train_cvae(
     x, c = load_csv(csv_path, x_cols, c_cols)
     train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
     (x_train_s, c_train_s), _, _, scalers = fit_transform_scalers(
-        train, val, test, scale_condition=False
+        train, val, test, scale_condition=True
     )
 
     x_dim = x_train_s.shape[1]
