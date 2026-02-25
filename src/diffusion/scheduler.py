@@ -49,4 +49,11 @@ class TabDDPMGaussianScheduler:
         sample = self.ddpm.gaussian_p_sample(model_out, xt, t)["sample"]
         # float64 -> float32 변환 (dtype 불일치 방지)
         return sample.float() if sample.dtype == torch.float64 else sample
+
+    def gaussian_ddim_step(self, model_out, xt, t, eta=0.0):
+        """DDIM reverse step: xt -> x_{t-1}"""
+        sample = self.ddpm.gaussian_ddim_step(model_out, xt, t, eta=eta)
+        return sample.float() if sample.dtype == torch.float64 else sample
+
+
     

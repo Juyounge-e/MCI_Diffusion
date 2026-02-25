@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--cond", type=float, default=0.057271, help="pdr_mean 값")
     parser.add_argument("--N", type=int, default=30, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
     parser.add_argument("--timesteps", type=int, default=1000)
+    parser.add_argument("--eta", type=float, default=0.0, help="DDIM eta (0이면 결정론적)")
     args = parser.parse_args()
 
     # 로드: cfg, 모델 가중치
@@ -78,12 +79,13 @@ def main():
     )
 
     # 역확산 루프
-    for t_ in reversed(range(T)):
-        t = torch.full((N,), t_, device=device, dtype=torch.long)
-        eps = model(x, t, y=cond)
-        x = scheduler.gaussian_p_sample(eps, x, t)
+    x = scheduler.ddpm.gaussian_ddim_sample(
+        noise=x,
+        T=T,
+        out_dict=dict(y=cond),
+        eta=args.eta,
+    )
 
-    # 역스케일 변환
     x_np = x.detach().cpu().numpy()
     x_np = x_scaler.inverse_transform(x_np)
 
