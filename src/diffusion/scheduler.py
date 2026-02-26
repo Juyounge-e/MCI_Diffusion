@@ -43,10 +43,21 @@ class TabDDPMGaussianScheduler:
     def gaussian_loss(self, model_out, x0, xt, t, noise):
         """Gaussian loss 계산"""
         return self.ddpm._gaussian_loss(model_out, x0, xt, t, noise)
-
-    def gaussian_p_sample(self, model_out, xt, t):
+    
+    def gaussian_p_sample(self, model_out, xt, t, temperature=0.7):
         """Reverse sampling: xt -> x_{t-1}"""
-        sample = self.ddpm.gaussian_p_sample(model_out, xt, t)["sample"]
+        out = self.ddpm.gaussian_p_mean_variance(
+            model_out,
+            xt,
+            t,
+        )
+
+        noise = torch.randn_like(xt)
+
+        nonzero_mask = (
+            (t != 0).float().view(-1, *([1] * (len(xt.shape) - 1)))
+        )
+
+        sample = out["mean"] + nonzero_mask * torch.exp(0.5 * out["log_variance"]) * noise * temperature
         # float64 -> float32 변환 (dtype 불일치 방지)
         return sample.float() if sample.dtype == torch.float64 else sample
-    
