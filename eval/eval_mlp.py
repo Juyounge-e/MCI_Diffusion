@@ -129,7 +129,7 @@ def main() -> int:
     parser.add_argument(
         "--simul_csv",
         type=str,
-        default=str(Path("simul4eval_dataset.csv")),
+        default=str(Path("dataset4eval_dataset.csv")),
         help="MCI 시뮬레이션 결과 CSV (lat, lon, pdr_mean, ...)",
     )
     parser.add_argument(
@@ -156,12 +156,12 @@ def main() -> int:
         default=None,
         help="실제 vs 생성 분포 비교 그림 경로 (기본: --out과 동일 stem + _distribution.png)",
     )
-    # parser.add_argument(
-    #     "--tol",
-    #     type=float,
-    #     default=0.0075,
-    #     help="허용 오차(|pdr_mean - cond| < tol) 기준값 (default: 0.005)",
-    # )
+    parser.add_argument(
+        "--tol",
+        type=float,
+        default=0.0075,
+        help="허용 오차(|pdr_mean - cond| < tol) 기준값 (default: 0.005)",
+    )
     args = parser.parse_args()
 
     simul_path = Path(args.simul_csv).resolve()
@@ -178,6 +178,16 @@ def main() -> int:
     if "cond" not in df.columns:
         df["cond"] = float(args.cond)
 
+    # nrmse 계산을 위한 pdr 범위 (IQR 기반 이상치 제외 범위)
+    train_df = pd.read_csv("src/data/dataset.csv")
+    Q1 = train_df["pdr_mean"].quantile(0.25)  
+    Q3 = train_df["pdr_mean"].quantile(0.75)  
+    IQR = Q3 - Q1
+
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+
+    pdr_range = upper - lower  # 0.103480 고정값
     # 오차 컬럼
     df["err"] = df["pdr_mean"] - df["cond"]
     df["abs_err"] = df["err"].abs()
@@ -188,7 +198,6 @@ def main() -> int:
     n = df.shape[0]
     mae = float(df["abs_err"].mean()) if n > 0 else np.nan
     rmse = float(np.sqrt(df["sq_err"].mean())) if n > 0 else np.nan
-    pdr_range = float(df["pdr_mean"].max() - df["pdr_mean"].min()) if n > 0 and df["pdr_mean"].max() > df["pdr_mean"].min() else np.nan
     nrmse = float(rmse / pdr_range) if n > 0 and not np.isnan(pdr_range) and pdr_range > 0 else np.nan
     bias = float(df["err"].mean()) if n > 0 else np.nan
     within_ratio = float(df["within_tol"].mean()) if n > 0 else np.nan
@@ -214,13 +223,11 @@ def main() -> int:
         print(f"   cond 범위 = {df['cond'].min():.6f} ~ {df['cond'].max():.6f}")
     print(f"   MAE     = {mae:.6f}")
     print(f"   RMSE    = {rmse:.6f}")
-    # print(f"   NRMSE   = {nrmse:.6f}" if not np.isnan(nrmse) else "   NRMSE   = (pdr 범위 0이라 불가)")
+    print(f"   NRMSE   = {nrmse:.6f}" if not np.isnan(nrmse) else "   NRMSE   = (pdr 범위 0이라 불가)")
     print(f"   Bias    = {bias:.6f}  (pdr_mean - condition)")
     print(f"   |err|<{tol:.6f} 비율 = {within_ratio*100:5.1f}% ({int(df['within_tol'].sum())}/{n})")
     if n > 0 and not np.isnan(q1_abs):
         print(f"   |err| 분포 기준  Q1={q1_abs:.6f}  Q3={q3_abs:.6f}")
-        print(f"   |err|<Q1 비율 = {ratio_lt_q1:5.1f}% ({n_lt_q1}/{n})")
-        print(f"   |err|<Q3 비율 = {ratio_lt_q3:5.1f}% ({n_lt_q3}/{n})")
     # print(f"   Pearson = {pearson:.6f}")
 
     # 실제 vs 생성 분포 비교 그림 (--gen_csv 지정 시)
