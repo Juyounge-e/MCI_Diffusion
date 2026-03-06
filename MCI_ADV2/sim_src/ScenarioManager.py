@@ -76,6 +76,25 @@ class ScenarioManager():
         # std_logn = np.sqrt(np.log(1 + v / np.power(m, 2)))
         return mean_logn, std_logn # mean, std of underlying normal distribution
 
+    @staticmethod
+    def _extract_vector_distance_duration(df):
+        core = df.iloc[:, 1:].copy()
+        lower_cols = {str(c).strip().lower(): c for c in core.columns}
+
+        if 'distance' in lower_cols:
+            distance = core[lower_cols['distance']].to_numpy(dtype='float32')
+        else:
+            distance = core.iloc[:, 0].to_numpy(dtype='float32')
+
+        duration = None
+        if 'duration' in lower_cols:
+            duration = core[lower_cols['duration']].to_numpy(dtype='float32')
+        return distance, duration
+
+    @staticmethod
+    def _extract_matrix(df):
+        return df.iloc[:, 1:].to_numpy(dtype='float32')
+
     def setup_hospital(self, cfg_hospital):
         reg_prop ={} # hos_num, hos_max_capa, hos_tier, d_HtoH_euc, d_HtoH_road, d_HtoS_euc, d_HtoS_road
         # From data
@@ -93,14 +112,15 @@ class ScenarioManager():
                 reg_prop['hos_max_send'] = cfg_hospital['max_send_coeff'][0]*reg_prop['hos_max_capa'] \
                                            + cfg_hospital['max_send_coeff'][1]*reg_prop['hos_max_queue']
                 # 거리 정보
-                d_HtoH_euc = pd.read_csv(cfg_hospital['dist_Hos2Hos_euc_info']).iloc[:, 1:]
-                reg_prop['d_HtoH_euc'] = d_HtoH_euc.to_numpy(dtype='float32')
-                d_HtoH_road = pd.read_csv(cfg_hospital['dist_Hos2Hos_road_info']).iloc[:, 1:]
-                reg_prop['d_HtoH_road'] = d_HtoH_road.to_numpy(dtype='float32')
+                d_HtoH_euc = pd.read_csv(cfg_hospital['dist_Hos2Hos_euc_info'])
+                reg_prop['d_HtoH_euc'] = self._extract_matrix(d_HtoH_euc)
+                d_HtoH_road = pd.read_csv(cfg_hospital['dist_Hos2Hos_road_info'])
+                reg_prop['d_HtoH_road'] = self._extract_matrix(d_HtoH_road)
+
                 d_HtoS_euc = pd.read_csv(cfg_hospital['dist_Hos2Site_euc_info']).iloc[:, 1:]
                 reg_prop['d_HtoS_euc'] = d_HtoS_euc.to_numpy(dtype='float32')[:,0]
-                d_HtoS_road = pd.read_csv(cfg_hospital['dist_Hos2Site_road_info']).iloc[:, 1:]
-                reg_prop['d_HtoS_road'] = d_HtoS_road.to_numpy(dtype='float32')[:,0]
+                d_HtoS_road = pd.read_csv(cfg_hospital['dist_Hos2Site_road_info'])
+                reg_prop['d_HtoS_road'], reg_prop['t_HtoS_road_api'] = self._extract_vector_distance_duration(d_HtoS_road)
             except FileNotFoundError:
                 print("병원 데이터 생성에 필요한 파일이 부족합니다.")
         else:
@@ -171,11 +191,17 @@ class ScenarioManager():
         response_mean_logn, response_std_logn = self.get_lognormal_param(response_mean)
         reg_prop['amb_response_t'] = (response_mean, response_mean_logn, response_std_logn)
         # 2. 병원-현장 이동 시간 parameter 저장
-        transport_HtoS_mean = self.en_manager.en_properties['hospital']['d_HtoS_road'] * 60 / reg_prop['amb_v'] # unit: minutes
+        hospital_prop = self.en_manager.en_properties['hospital']
+        if use_api_time and hospital_prop.get('t_HtoS_road_api') is not None:
+            transport_HtoS_mean = hospital_prop['t_HtoS_road_api'] * duration_coeff  # unit: minutes
+        else:
+            if use_api_time and hospital_prop.get('t_HtoS_road_api') is None:
+                print("  Warning: distance_Hos2Site_road.csv has no duration column. Use distance/speed for hospital-to-site.")
+            transport_HtoS_mean = hospital_prop['d_HtoS_road'] * 60 / reg_prop['amb_v'] # unit: minutes
         transport_HtoS_mean_logn, transport_HtoS_std_logn = self.get_lognormal_param(transport_HtoS_mean)
         reg_prop['amb_HtoS_t'] = (transport_HtoS_mean, transport_HtoS_mean_logn, transport_HtoS_std_logn)
         # 3. 병원-병원 이동 시간 parameter 저장
-        transport_HtoH_mean = self.en_manager.en_properties['hospital']['d_HtoH_road'] * 60 / reg_prop['amb_v'] # unit: minutes
+        transport_HtoH_mean = hospital_prop['d_HtoH_road'] * 60 / reg_prop['amb_v'] # unit: minutes
         transport_HtoH_mean_logn, transport_HtoH_std_logn = self.get_lognormal_param(transport_HtoH_mean)
         reg_prop['amb_HtoH_t'] = (transport_HtoH_mean, transport_HtoH_mean_logn, transport_HtoH_std_logn)
         # 4.병원 사이 이동 거리 중 최대값 저장
