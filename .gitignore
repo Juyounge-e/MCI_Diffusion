@@ -23,3 +23,7 @@ eval/eval_results/
 
 # evaluation을 취한 데이터셋 
 src/data/dataset4eval/
+
+# pylance 관련
+basedpyrightconfig.json
+pyrightconfig.json
