@@ -29,6 +29,7 @@ except Exception:
 
 import numpy as np
 import pandas as pd
+import random
 from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders
 from src.model.build import MLPDiffusionConfig, build_model_and_optimizer
 from src.diffusion.scheduler import TabDDPMGaussianScheduler
@@ -59,6 +60,10 @@ def main():
     csv_path = args.csv
     max_train_samples = args.max_train
     seed = args.seed
+    
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
     # ----------------
     # Config (CSV에 N 있으면 항상 사용)
@@ -78,8 +83,8 @@ def main():
     cfg = MLPDiffusionConfig(
         x_dim=2,
         cond_dim=cond_dim,
-        dim_t=128,
-        d_layers=[128, 128, 128],
+        dim_t=256,
+        d_layers=[256, 256, 256],
         dropout=0.1,
         num_timesteps=1000,
         lr=1e-3,
@@ -88,7 +93,7 @@ def main():
     )
     device = cfg.device
 
-    out_dir = os.path.join("outputs", "mlp_diffusion", "1500_all_scale")
+    out_dir = os.path.join("outputs", "mlp_diffusion", "1575")
     os.makedirs(out_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
 
@@ -96,6 +101,7 @@ def main():
     # Data
     # ----------------
     print(f"  data: {csv_path}")
+    print(f"  saved outputs to: {out_dir}")
     x, c = load_csv(csv_path, x_cols, c_cols)
     train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
 
