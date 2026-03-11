@@ -30,25 +30,25 @@ def plot_real_vs_gen(df_real: pd.DataFrame, df_gen: pd.DataFrame, out_path: Path
         print("matplotlib 없음: 분포 비교 그림을 건너뜁니다.")
         return
     _set_korean_font()
-    fig, axes = plt.subplots(1, 3, figsize=(14, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-    # 1) 동일 위경도 — 색 = 시뮬 결과 pdr_mean (샘플은 이 위경도로 생성 후 시뮬 돌린 결과)
-    ax = axes[0]
-    if "pdr_mean" in df_real.columns:
-        sc = ax.scatter(
-            df_real["lon"], df_real["lat"],
-            s=10, alpha=0.8, c=df_real["pdr_mean"], cmap="viridis", edgecolors="none",
-        )
-        plt.colorbar(sc, ax=ax, label="pdr_mean (시뮬 결과)")
-    else:
-        ax.scatter(df_real["lon"], df_real["lat"], s=8, alpha=0.6, c="C0")
-    ax.set_xlabel("lon")
-    ax.set_ylabel("lat")
-    ax.set_title("시뮬 pdr_mean 위경도")
-    ax.set_aspect("equal", adjustable="box")
+    # # 1) 동일 위경도 — 색 = 시뮬 결과 pdr_mean (샘플은 이 위경도로 생성 후 시뮬 돌린 결과)
+    # ax = axes[0]
+    # if "pdr_mean" in df_real.columns:
+    #     sc = ax.scatter(
+    #         df_real["lon"], df_real["lat"],
+    #         s=10, alpha=0.8, c=df_real["pdr_mean"], cmap="viridis", edgecolors="none",
+    #     )
+    #     plt.colorbar(sc, ax=ax, label="pdr_mean (시뮬 결과)")
+    # else:
+    #     ax.scatter(df_real["lon"], df_real["lat"], s=8, alpha=0.6, c="C0")
+    # ax.set_xlabel("lon")
+    # ax.set_ylabel("lat")
+    # ax.set_title("시뮬 pdr_mean 위경도")
+    # ax.set_aspect("equal", adjustable="box")
 
     # 2) pdr 분포: 시뮬 결과 pdr_mean strip + box, 생성 조건(cond) 수평선
-    ax = axes[1]
+    ax = axes[0]
     if "pdr_mean" in df_real.columns:
         pdr = df_real["pdr_mean"].dropna()
         if len(pdr) > 0:
@@ -82,7 +82,7 @@ def plot_real_vs_gen(df_real: pd.DataFrame, df_gen: pd.DataFrame, out_path: Path
     ax.legend(loc="best", fontsize=7)
 
     # 3) 절대 오차 분포: abs_err = |pdr_mean - cond|, strip plot + box plot
-    ax = axes[2]
+    ax = axes[1]
     if "abs_err" in df_real.columns:
         abs_err = df_real["abs_err"].dropna()
         if len(abs_err) > 0:
