@@ -20,11 +20,19 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 @torch.no_grad()
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "1500_all_scale", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "30_1500_q3_sample.csv"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion","1500_all_scale", "scalers.pkl"))
-    parser.add_argument("--sample_num", type=int, default=20)
-    parser.add_argument("--cond", type=float, default=0.057271, help="pdr_mean 값")
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "1575", "model_last.pt"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion",'resolution', "q10_0.042927.csv"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion","1575", "scalers.pkl"))
+    parser.add_argument("--sample_num", type=int, default=200, help="샘플링할 데이터 수")
+    parser.add_argument("--cond", type=float, default=0.042927, help="pdr_mean 값")
+    parser.add_argument(
+        "--normal",
+        nargs=2,
+        type=float,
+        default=None,
+        metavar=("mean", "std"),
+        help="pdr를 Normal(mean, std)에서 샘플링",
+    )
     parser.add_argument("--N", type=int, default=30, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
@@ -51,17 +59,25 @@ def main():
     # 조건 준비(스케일링)
     cond_dim = getattr(cfg, "cond_dim", 1)
     N_val = getattr(args, "N", 30)
-    if cond_dim == 2:
-        # n_for_model = float(N_val) / 50.0  # N/50 주석 처리, condition은 scaler로 스케일링
-        cond_np = np.array([[args.cond, float(N_val)]], dtype=np.float32)
+    n_samples = args.sample_num
+
+    if args.normal is not None:
+        mean, std = args.normal
+        if std < 0:
+            raise ValueError("--normal std는 0 이상이어야 합니다.")
+        pdr_samples = np.random.normal(loc=mean, scale=std, size=(n_samples, 1)).astype(np.float32)
     else:
-        cond_np = np.array([[args.cond]], dtype=np.float32)
+        pdr_samples = np.full((n_samples, 1), args.cond, dtype=np.float32)
+
+    if cond_dim == 2:
+        n_col = np.full((n_samples, 1), float(N_val), dtype=np.float32)
+        cond_np = np.concatenate([pdr_samples, n_col], axis=1)
+    else:
+        cond_np = pdr_samples
     if c_scaler is not None:
         cond_np = c_scaler.transform(cond_np)
-        
-    cond = torch.from_numpy(cond_np).float().to(device)  # (1, cond_dim)
-    n_samples = args.sample_num
-    cond = cond.repeat(n_samples, 1)  # (n, cond_dim)
+
+    cond = torch.from_numpy(cond_np).float().to(device)  # (n, cond_dim)
 
     # 샘플링 초기화
     N = n_samples
@@ -90,12 +106,12 @@ def main():
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["lat", "lon", "N"])
+        writer.writerow(["lat", "lon", "N", "pdr"])
         for i in range(len(x_np)):
             row = (
-                [float(x_np[i, 0]), float(x_np[i, 1]), float(N_val)]
+                [float(x_np[i, 0]), float(x_np[i, 1]), float(N_val), round(float(pdr_samples[i, 0]), 6)]
                 if cond_dim == 2
-                else [float(x_np[i, 0]), float(x_np[i, 1]), ""]
+                else [float(x_np[i, 0]), float(x_np[i, 1]), "", round(float(pdr_samples[i, 0]), 6)]
             )
             writer.writerow(row)
     print(f"Saved: {args.out} ({len(x_np)} rows)")
