@@ -13,7 +13,6 @@ for f in csv_files:
     # 파일명에서 config 추출: 예) q3_10_100_eval_with_metrics -> ["q3", "10", "100", "eval", ...]
     stem_parts = f.stem.split("_")
     # q3_10_100_eval_with_metrics, q3_10_max_eval_with_metrics 모두 처리 가능하게
-    #   - "q3"는 고정, 그 다음 1~2개를 config로 사용 (10_100, 10_max, 50_500 등)
     if len(stem_parts) >= 3:
         config = f"{stem_parts[1]}_{stem_parts[2]}"
     else:
