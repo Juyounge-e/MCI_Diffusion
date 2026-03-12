@@ -20,6 +20,8 @@ experiment/
 
 # 실험 결과 파일 
 eval/eval_results/
+0305 results/
+0226 results/
 
 # evaluation을 취한 데이터셋 
 src/data/dataset4eval/
