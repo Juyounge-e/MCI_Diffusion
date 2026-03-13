@@ -25,14 +25,8 @@ def main():
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion","1575", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=200, help="샘플링할 데이터 수")
     parser.add_argument("--cond", type=float, default=0.042927, help="pdr_mean 값")
-    parser.add_argument(
-        "--normal",
-        nargs=2,
-        type=float,
-        default=None,
-        metavar=("mean", "std"),
-        help="pdr를 Normal(mean, std)에서 샘플링",
-    )
+    parser.add_argument("--normal", nargs=2, type=float, default=None,  metavar=("mean", "std"), help="pdr를 Normal(mean, std)에서 샘플링")
+    parser.add_argument("--uniform", nargs=2, type=float, default=None,  metavar=("min", "max"), help="pdr를 Uniform(min, max)에서 샘플링")
     parser.add_argument("--N", type=int, default=30, help="N 값 (cond_dim=2일 때 사용, 미지정 시 30)")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
@@ -61,7 +55,13 @@ def main():
     N_val = getattr(args, "N", 30)
     n_samples = args.sample_num
 
-    if args.normal is not None:
+    # 샘플링 방식 (uniform, normal, fixed)          
+    if args.uniform is not None:
+        low, high = args.uniform
+        if low >= high:
+            raise ValueError("--uniform low는 high보다 작아야 합니다.")
+        pdr_samples = np.random.uniform(low=low, high=high, size=(n_samples, 1)).astype(np.float32)
+    elif args.normal is not None:
         mean, std = args.normal
         if std < 0:
             raise ValueError("--normal std는 0 이상이어야 합니다.")
