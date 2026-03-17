@@ -1,7 +1,6 @@
 import argparse
 import yaml
 import os
-from pathlib import Path
 import random
 import numpy as np
 import time
@@ -15,6 +14,7 @@ from MCIEnvironment_gymnasium import MCIEnvironment_gym
 parser = argparse.ArgumentParser(description='Run MCI_simulation')
 parser.add_argument('--config_path', default="./config.yaml", help='configuration file(.yaml) 경로')
 args = parser.parse_args()
+
 
 class RunManager():
     def __init__(self, args):
