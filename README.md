@@ -28,6 +28,7 @@
     conda activate tddpm
 
     pip install torch==1.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+    git submodule update --init --recursive
     pip install -r requirements.txt(MCI_DIFFUSION/requirments.txt)
 ```
 
