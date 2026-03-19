@@ -35,7 +35,9 @@ benchmarks/
 ```bash
 # CVAE 학습 & 샘플링
 python benchmarks/cvae/train_cvae.py --csv src/data/snapped_dataset.csv --out outputs/cvae
-python benchmarks/cvae/sample_cvae.py --ckpt outputs/cvae/cvae.pt --cond 0.052282 --n 20
+  
+  
+python benchmarks/cvae/sample_cvae.py --ckpt outputs/cvae/cvae.pt --cond 0.052282 30 --n 20
 ```
 
 ## 공통 평가(구현 전)
