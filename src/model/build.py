@@ -25,8 +25,8 @@ def get_device(prefer_cuda: bool = True) -> torch.device:
 @dataclass
 class MLPDiffusionConfig:
     x_dim: int = 2
-    cond_dim: int = 1
-    dim_t: int = 128
+    cond_dim: int = 2
+    dim_t: int = 256
     d_layers: List[int] = None
     dropout: float = 0.1
     num_timesteps: int = 1000
