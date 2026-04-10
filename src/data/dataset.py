@@ -5,13 +5,18 @@ from glob import glob
 from typing import Dict, Tuple, Optional
 
 # 새 실험 결과/메타데이터 경로
-RESULTS_ROOT = r"./MCI_ADV2/results/daejeon_exp_20260205_164436"
-METADATA_CSV = r"./MCI_ADV2/scenarios/daejeon_exp_20260205_164436/random_metadata.csv"
+RESULTS_ROOT = r"./MCI_ADV2/results/daejeon_3000_random"
+METADATA_CSV = r"./MCI_ADV2/scenarios/daejeon_3000_random/experiment_metadata.csv"
 
-OUT_CSV = "src/data/0206_dataset.csv"
+OUT_CSV = "src/data/test.csv"
 
 PDR_LINE_INDEX = 2
 PDR_WoG_LINE_INDEX = 4
+
+RED_LINE_INDEX = 5
+YELLOW_LINE_INDEX = 6
+GREEN_LINE_INDEX = 7
+BLACK_LINE_INDEX = 8
 
 # 결과 폴더명에서 위도/경도 파싱용
 FOLDER_RE = re.compile(r"lat(?P<lat>-?\d+(\.\d+)?)_lon(?P<lon>-?\d+(\.\d+)?)")
@@ -94,6 +99,12 @@ for folder in subfolders:
     # 좌표를 소수 6자리로 맞춰서 metadata의 snapped_lat/lon 과 매칭
     key = (round(lat, 6), round(lon, 6))
     N_val: Optional[int] = latlon_to_N.get(key)
+    
+    red_mean = parse_stat_line(lines[RED_LINE_INDEX])[0] if RED_LINE_INDEX < len(lines) else None
+    yellow_mean = parse_stat_line(lines[YELLOW_LINE_INDEX])[0] if YELLOW_LINE_INDEX < len(lines) else None
+    green_mean = parse_stat_line(lines[GREEN_LINE_INDEX])[0] if GREEN_LINE_INDEX < len(lines) else None
+    black_mean = parse_stat_line(lines[BLACK_LINE_INDEX])[0] if BLACK_LINE_INDEX < len(lines) else None
+
 
     rows.append(
         {
@@ -102,13 +113,30 @@ for folder in subfolders:
             "pdr_mean": pdr_mean,
             "pdr_std": pdr_std,
             "N": N_val,
+            "red": red_mean,
+            "yellow": yellow_mean,
+            "green": green_mean,
+            "black": black_mean,
             "source_folder": os.path.basename(folder),
             "stat_file": os.path.basename(stat_path),
         }
     )
 
 # 저장
-fieldnames = ["lat", "lon", "pdr_mean", "pdr_std", "N", "source_folder", "stat_file"]
+fieldnames = [
+    "lat",
+    "lon",
+    "pdr_mean",
+    "pdr_std",
+    "N",
+    "red",
+    "yellow",
+    "green",
+    "black",
+    "source_folder",
+    "stat_file",
+]
+
 with open(OUT_CSV, "w", newline="", encoding="utf-8") as f:
     w = csv.DictWriter(f, fieldnames=fieldnames)
     w.writeheader()
