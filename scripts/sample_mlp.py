@@ -38,24 +38,18 @@ def sample_ratio_from_bank(ratio_bank, n_val, tol, rng):
 @torch.no_grad()
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "3000_aug", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "O", "samples.csv"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "3000_aug", "scalers.pkl"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "model_last.pt"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "samples_n_only.csv"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=50, help="샘플링할 데이터 수")
     parser.add_argument("--pdr", type=float, default=0.042927, help="pdr_mean 값")
     parser.add_argument("--normal", nargs=2, type=float, default=None, metavar=("mean", "std"), help="pdr를 Normal(mean, std)에서 샘플링")
     parser.add_argument("--uniform", nargs=2, type=float, default=None, metavar=("min", "max"), help="pdr를 Uniform(min, max)에서 샘플링")
     parser.add_argument("--N_only", type=int, default=30, help="N-only 입력값")
     parser.add_argument(
-        "--rygb",
-        nargs=4,
-        type=int,
-        default=None,
-        metavar=("RED", "YELLOW", "GREEN", "BLACK"),
-        help="red/yellow/green/black count 직접 입력",
-    )
-    parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "3000_30runs", "ratio_bank.pkl"))
-    parser.add_argument("--n_tol", type=int, default=3, help="N-only에서 ratio 검색 허용 범위")
+        "--rygb", nargs=4, type=int, default=None, metavar=("RED", "YELLOW", "GREEN", "BLACK"), help="red/yellow/green/black count 직접 입력")
+    parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "ratio_bank.pkl"))
+    parser.add_argument("--n_tol", type=int, default=2, help="N-only에서 ratio 검색 허용 범 위")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
 
@@ -89,6 +83,10 @@ def main():
         if min(red, yellow, green, black) < 0:
             raise ValueError("rygb는 음수일 수 없습니다.")
         N_val = red + yellow + green + black
+        rygb_cols = np.tile(
+            np.array([red, yellow, green, black], dtype=np.float32),
+            (n_samples, 1),
+        )
     else:
         N_val = args.N_only
         if N_val <= 0:
@@ -97,8 +95,13 @@ def main():
         with open(args.ratio_bank, "rb") as f:
             ratio_bank = pickle.load(f)
 
-        ratio = sample_ratio_from_bank(ratio_bank, N_val, args.n_tol, rng)
-        red, yellow, green, black = rng.multinomial(N_val, ratio).tolist()
+        rygb_list = []
+        for _ in range(n_samples):
+            ratio = sample_ratio_from_bank(ratio_bank, N_val, args.n_tol, rng)
+            red, yellow, green, black = rng.multinomial(N_val, ratio).tolist()
+            rygb_list.append([red, yellow, green, black])
+
+        rygb_cols = np.array(rygb_list, dtype=np.float32)
 
     if args.uniform is not None:
         low, high = args.uniform
@@ -112,11 +115,7 @@ def main():
         pdr_samples = np.random.normal(loc=mean, scale=std, size=(n_samples, 1)).astype(np.float32)
     else:
         pdr_samples = np.full((n_samples, 1), args.pdr, dtype=np.float32)
-
-    rygb_cols = np.tile(
-        np.array([red, yellow, green, black], dtype=np.float32),
-        (n_samples, 1),
-    )
+    
     cond_np = np.concatenate([pdr_samples, rygb_cols], axis=1)
 
     if c_scaler is not None:
@@ -153,13 +152,14 @@ def main():
             writer.writerow([
                 float(x_np[i, 0]),
                 float(x_np[i, 1]),
-                int(N_val),
+                int(np.sum(rygb_cols[i])),
                 round(float(pdr_samples[i, 0]), 6),
-                int(red),
-                int(yellow),
-                int(green),
-                int(black),
+                int(rygb_cols[i, 0]),
+                int(rygb_cols[i, 1]),
+                int(rygb_cols[i, 2]),
+                int(rygb_cols[i, 3]),
             ])
+
     print(f"Saved: {args.out} ({len(x_np)} rows)")
 
 
