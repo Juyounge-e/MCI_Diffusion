@@ -47,7 +47,7 @@ def build_ratio_bank(df: pd.DataFrame):
         total = counts.sum()
         if total <= 0:
             continue
-        n_key = int(round(float(total)))
+        n_key = int(row['N']) 
         ratio = counts / total
         ratio_bank.setdefault(n_key, []).append(ratio)
     return ratio_bank
