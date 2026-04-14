@@ -1,7 +1,7 @@
 """
-입력 데이터 형식: lat, lon, pdr_mean, pdr_std, N, source_folder, stat_file
+입력 데이터 형식: lat, lon, pdr_mean, pdr_std, red, yellow, green, black,  source_folder, stat_file
 - X (생성 대상): lat, lon
-- Condition: pdr_mean, N (사고규모)
+- Condition: pdr_mean, red, yellow, green, black 
 """
 import os
 from dataclasses import dataclass
@@ -17,7 +17,7 @@ from sklearn.preprocessing import StandardScaler
 
 # ---------- 고정 칼럼 정의 ----------
 X_COLS = ["lat", "lon"]
-COND_COLS = ["pdr_mean", "N"]
+COND_COLS = ["pdr_mean", "red", "yellow", "green", "black"]
 
 
 @dataclass
@@ -49,14 +49,13 @@ def load_csv(
 
     df = pd.read_csv(csv_path)
     use_cols = x_cols + c_cols
+    missing_cols = [col for col in use_cols if col not in df.columns]
+    if missing_cols:
+        raise KeyError(f"Dataset CSV에 필요한 컬럼이 없습니다: {missing_cols}")
     df = df[use_cols].dropna()
 
     x = df[x_cols].to_numpy(dtype=np.float32)
     c = df[c_cols].to_numpy(dtype=np.float32)
-
-    # if "N" in c_cols:
-    #     n_idx = c_cols.index("N")
-    #     c[:, n_idx] = c[:, n_idx] / 50.0  # N/50 주석 처리, condition은 scaler로 스케일링
 
     return x, c
 
@@ -147,4 +146,4 @@ if __name__ == "__main__":
 
     xb, cb = next(iter(train_loader))
     print("x batch:", xb.shape)
-    print("c batch:", cb.shape, "(pdr_mean, N)")
+    print("c batch:", cb.shape, "(pdr_mean, red, yellow, green, black)")
