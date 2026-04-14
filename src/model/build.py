@@ -25,7 +25,7 @@ def get_device(prefer_cuda: bool = True) -> torch.device:
 @dataclass
 class MLPDiffusionConfig:
     x_dim: int = 2
-    cond_dim: int = 2
+    cond_dim: int = 5 # pdr_mean, red, yellow, green, black 
     dim_t: int = 256
     d_layers: List[int] = None
     dropout: float = 0.1
@@ -46,7 +46,7 @@ def build_mlp_diffusion(cfg: MLPDiffusionConfig) -> nn.Module:
         "d_layers": cfg.d_layers,
         "dropout": cfg.dropout,
     }
-    d_y_cond = getattr(cfg, "cond_dim", 1)
+    d_y_cond = cfg.cond_dim
     model = MLPDiffusion(
         d_in=cfg.x_dim,
         num_classes=0,
