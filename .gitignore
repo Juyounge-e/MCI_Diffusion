@@ -6,6 +6,7 @@ simul_data/
 
 *__pycache__/
 *.pyc
+*.csv
 
 MCI_ADV2/results/
 MCI_ADV2/experiment_logs/
