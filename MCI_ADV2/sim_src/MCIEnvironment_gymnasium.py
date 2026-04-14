@@ -54,7 +54,7 @@ class MCIEnvironment_gym(gym.Env):
         # 자원 초기화
         self.en_manager.init_en_status()
         # EventManager 초기화
-        init_log = self.ev_manager.start()
+        init_log, terminated = self.ev_manager.start()
         self.preventable = self.computePreventable(init_log)
         # observation 생성
         if self.rule_test:
@@ -62,6 +62,8 @@ class MCIEnvironment_gym(gym.Env):
         else:
             obs = self.en_manager.get_obs()
         obs['time'] = self.ev_manager.time
+        if terminated:
+            info['terminated'] = True
         return obs, info
 
     def computePreventable(self, log):

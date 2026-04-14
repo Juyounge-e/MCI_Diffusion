@@ -351,7 +351,7 @@ class ScenarioGenerator:
             - duration: seconds → minutes 변환
         """
         # OSRM API URL (lon, lat 순서 주의!)
-        url = f"http://router.project-osrm.org/route/v1/driving/{start[1]},{start[0]};{end[1]},{end[0]}"
+        url = f"http://localhost:5001/route/v1/driving/{start[1]},{start[0]};{end[1]},{end[0]}"
         # radiuses 파라미터: 각 좌표당 최대 스냅핑 거리 (미터)
         params = {
             "overview": "full" if save_json_dir else "false",

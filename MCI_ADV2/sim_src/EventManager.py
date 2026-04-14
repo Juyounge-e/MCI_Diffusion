@@ -26,8 +26,8 @@ class EventManager():
         init_log = {}
         init_log, _ = self.ev_onset(init_log, None)
         # 첫 decision epoch까지 실행
-        self.run_next(action=None)
-        return init_log
+        _, terminated =self.run_next(action=None)
+        return init_log, terminated
 
     def run_next(self, action=None):
         log = {'p_admit':[]} # 시뮬레이션 수행하면서 기록할 지표
@@ -61,14 +61,17 @@ class EventManager():
             time_interval = c_event[0] - self.time
             self.time = c_event[0]
             # 시간 경과에 따른 상태 업데이트
-            self.status['ambulance']['amb_states'][:,1] -= time_interval
-            np.maximum(self.status['ambulance']['amb_states'][:,1], 0, out=self.status['ambulance']['amb_states'][:,1])
-            self.status['uav']['uav_states'][:,1] -= time_interval
-            np.maximum(self.status['uav']['uav_states'][:,1], 0, out=self.status['uav']['uav_states'][:,1])
+            # print(self.status['ambulance']['amb_states'])
+            self.status['ambulance']['amb_states'][:,-1] -= time_interval
+            np.maximum(self.status['ambulance']['amb_states'][:,-1], 0, out=self.status['ambulance']['amb_states'][:,-1])
+            # print(self.status['ambulance']['amb_states'])
+            self.status['uav']['uav_states'][:,-1] -= time_interval
+            np.maximum(self.status['uav']['uav_states'][:,-1], 0, out=self.status['uav']['uav_states'][:,-1])
             log, stop_condition = getattr(self, "ev_" + c_event[2])(log, c_event[3])
             if stop_condition: # 2. decision 내려야하는 시점까지 진행
                 break
             terminated = self.check_termination() # 3. 더 이상 의사결정 필요 없으면 남은 시뮬레이션 진행 후 종료
+            print("terminated:", terminated)
             if terminated:
                 break
         return log, terminated
@@ -212,7 +215,7 @@ class EventManager():
 
     def default_transportation_GB(self, mode):
         # Rule1: Ver250724
-        # 1. 1등급 병원은 제외
+        # 1. Tier3(상급종합) 병원은 제외
         # 2. 가까운 순서대로 이송 (현장에서부터 거리순으로 hospital index 지정됨을 가정)
         # 3. max_send - p_sent > 0인 경우에만 이송 (최대 보내려고 생각했던 환자 수 - 실제 보낸 환자 수)
         # 4. 만족되는 병원 없으면 등급 상관 없이 가장 가까운 병원으로 이송
@@ -247,6 +250,8 @@ class EventManager():
         destination = None
         idle_capa = self.properties['hospital']['hos_max_send'] - self.status['patient']['p_sent']
         helipad_idx = self.properties['hospital'].get('hos_helipad_idx', np.array([]))
+        max_capa_arr = self.properties['hospital']['hos_max_capa'] + self.properties['hospital']['hos_max_queue']
+        n_occupied_arr = self.status['hospital']['h_states'][:, -1]
 
         sorted_h = np.argsort(d_to_H)
         for h_idx in sorted_h:
@@ -254,7 +259,7 @@ class EventManager():
                 continue
             h_tier = self.properties['hospital']['hos_tier'][h_idx]
             can_admit = (pass_to_tier1 and h_tier==1) or (pass_to_tier2 and h_tier==2)
-            if can_admit and idle_capa[h_idx] > 0:
+            if can_admit and idle_capa[h_idx] > 0 and n_occupied_arr[h_idx] < max_capa_arr[h_idx]:
                 destination = h_idx + 1
                 break
         if destination is None: # 전원 가능 병원 없음
@@ -305,13 +310,13 @@ class EventManager():
         time_amb = self.rng.lognormal(amb_response_param[1], amb_response_param[2])
         for a_idx, t in enumerate(time_amb):
             self.add_event(elapsed_time=t, ev_name='amb_arrival_site', entity_idx=(a_idx,))
-        self.status['ambulance']['amb_states'][:,1] = time_amb
+        self.status['ambulance']['amb_states'][:,-1] = time_amb
         # 3. uav 현장 도착 (출동) 이벤트 생성
         uav_response_param = self.properties['uav']['uav_response_t']
         time_uav = self.rng.lognormal(uav_response_param[1], uav_response_param[2])
         for u_idx, t in enumerate(time_uav):
             self.add_event(elapsed_time=t, ev_name='uav_arrival_site', entity_idx=(u_idx,))
-        self.status['uav']['uav_states'][:,1] = time_uav
+        self.status['uav']['uav_states'][:,-1] = time_uav
 
         log = {'rescue_times': rescue_times}
         return log, False
@@ -351,8 +356,9 @@ class EventManager():
         :return:
         """
         a_idx = entity_idx[0]
+        # print(self.status['ambulance']['amb_wait'][0])
         self.status['ambulance']['amb_wait'][0].append(a_idx)
-
+        # print(self.status['ambulance']['amb_wait'][0])
         hasRY = bool(self.status['patient']['p_wait'][0][0] or self.status['patient']['p_wait'][1][0])
         if hasRY: # 1. Red나 Yellow 환자가 현장에 있으면 decision
             return log, True

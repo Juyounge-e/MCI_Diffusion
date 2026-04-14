@@ -127,7 +127,7 @@ class ScenarioManager():
             # call generator
             raise NotImplementedError("시나리오 생성 모듈 불러오기 기능 추가 전입니다.")
         # Modify & Add
-        reg_prop['hos_tier'] = np.where(reg_prop['hos_tier']==1, 1, 2) # 1 = 상급종합, 2 = 나머지
+        reg_prop['hos_tier'] = np.where(reg_prop['hos_tier']==1, 1, 2) # 3 = 상급종합(Tier3), 2 = 나머지(Tier2)
         reg_prop['hos_tier1_idx'] = hos_info.index[hos_info['종별코드'] == 1].to_numpy()
         reg_prop['hos_tier2_idx'] = hos_info.index[hos_info['종별코드'] != 1].to_numpy()
         reg_prop['hos_closest_second'] = reg_prop['hos_tier2_idx'][
@@ -137,7 +137,7 @@ class ScenarioManager():
 
         HtoH_road = reg_prop['d_HtoH_road'].copy()
         np.fill_diagonal(HtoH_road, np.inf)
-        reg_prop['hos_closest_first_fromH'] = reg_prop['hos_tier1_idx'][np.argmin(HtoH_road[:,reg_prop['hos_tier1_idx']], axis=1)]
+        reg_prop['hos_closest_third_fromH'] = reg_prop['hos_tier1_idx'][np.argmin(HtoH_road[:,reg_prop['hos_tier1_idx']], axis=1)]
         reg_prop['hos_closest_second_fromH'] = reg_prop['hos_tier2_idx'][np.argmin(HtoH_road[:, reg_prop['hos_tier2_idx']], axis=1)]
 
         # 헬기장 병원 인덱스 추출
