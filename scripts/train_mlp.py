@@ -57,7 +57,7 @@ def main():
     parser.add_argument(
         "--csv",
         type=str,
-        default=os.path.join("src", "data", "daejeon_3000_random_30runs_dataset.csv"),
+        default=os.path.join("src", "data", "test.csv"),
         help="학습용 CSV 경로 (lat, lon, pdr_mean, [r/y/g/b] 필요)",
     )
     parser.add_argument(
@@ -65,6 +65,12 @@ def main():
         type=int,
         default=0,
         help="학습에 사용할 최대 train 샘플 수. default=0이면 전체 사용.",
+    )
+    parser.add_argument(
+        "--out_dir",
+        type=str,
+        default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs"),
+        help="학습 결과를 저장할 디렉토리 경로",
     )
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
     args = parser.parse_args()
@@ -109,7 +115,7 @@ def main():
     )
     device = cfg.device
 
-    out_dir = os.path.join("outputs", "mlp_diffusion", "3000_30runs")
+    out_dir = args.out_dir
     os.makedirs(out_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
 
