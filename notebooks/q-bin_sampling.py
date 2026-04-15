@@ -37,13 +37,20 @@ def build_bin_stats(
                 f"(n_min={n_min}, n_max={n_max})"
             )
 
-    labels = [f"q{i + 1}" for i in range(num_bins)]
     df = df.copy()
-    df["q_bin"], bin_edges = pd.cut(
+    _, bin_edges = pd.qcut(
         df["pdr_mean"],
-        bins=num_bins,
+        q=num_bins,
         retbins=True,
+        duplicates="drop",
+    )
+
+    labels = [f"q{i + 1}" for i in range(len(bin_edges) - 1)]
+    df["q_bin"] = pd.qcut(
+        df["pdr_mean"],
+        q=num_bins,
         labels=labels,
+        duplicates="drop",
     )
 
     bin_stats = (
@@ -96,11 +103,12 @@ def load_or_build_bin_stats(args: argparse.Namespace) -> pd.DataFrame:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--training_csv", type=str, default=None, help="학습 데이터 CSV")
-    parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "bin_stats_n30.csv"))
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_new30"))
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "2989", "model_last.pt"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "2989", "scalers.pkl"))
-    parser.add_argument("--N", type=int, default=30)
+    parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "30_runs_rygb_bin_stats_n30.csv"))
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "rygb_resolution_30runs"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
+    parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "ratio_bank.pkl"))
+    parser.add_argument("--N_only", type=int, default=30)
     parser.add_argument("--timesteps", type=int, default=1000)
     parser.add_argument("--total_samples", type=int, default=5000, help="bin 비율에 따라 분배할 총 샘플 수")
     parser.add_argument("--num_bins", type=int, default=10, help="q-bin 개수")
@@ -140,16 +148,18 @@ def main():
             args.scalers,
             "--out",
             out_csv,
+            "--ratio_bank",
+            args.ratio_bank,
             "--sample_num",
             str(n_samples),
-            "--N",
-            str(args.N),
+            "--N_only",
+            str(args.N_only),
             "--timesteps",
             str(args.timesteps),
         ]
 
         if bin_max is None or bin_min == bin_max:
-            cmd += ["--cond", str(pdr_mean)]
+            cmd += ["--pdr", str(pdr_mean)]
         else:
             cmd += ["--uniform", str(bin_min), str(bin_max)]
 
