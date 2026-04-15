@@ -1,54 +1,75 @@
+# MCI 가상환경에서 실행
+import re
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from pathlib import Path
-import os
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import geopandas as gpd
 
 # =============================================
 # 설정
 # =============================================
-GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\grid_compare.csv'
-GRID_META_PATH    = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
-DATA_PATH         = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\dataset.csv')
-SHP_PATH          = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
+GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\grid_compare_rygb_.csv'
+GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
+SHP_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
+SUMMARY_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\pdr_summary.csv'
 
 # =============================================
 # 데이터 로드
 # =============================================
-df           = pd.read_csv(DATA_PATH)
 grid_compare = pd.read_csv(GRID_COMPARE_PATH)
-grid_meta    = pd.read_csv(GRID_META_PATH)
+grid_meta = pd.read_csv(GRID_META_PATH)
+summary_df = pd.read_csv(SUMMARY_PATH)
 
-print(f"학습 데이터: {len(df)}개")
 print(f"grid_compare: {len(grid_compare)}개")
 print(f"grid_meta: {len(grid_meta)}개")
+print(f"summary_df: {len(summary_df)}개")
 
 # =============================================
-# Step 1. 전체 df 기준 q_edges 계산 (colorbar 기준)
+# Step 1. pdr_summary.csv 기준 q_edges 계산
 # =============================================
-_, q_edges = pd.qcut(
-    df['pdr_mean'],
-    q=10,
-    labels=False,
-    retbins=True,
-    duplicates='drop'
-)
-nq = len(q_edges) - 1
-tick_labels = [f"Q{i+1} [{q_edges[i]:.4f}, {q_edges[i+1]:.4f}]" for i in range(nq)]
+def parse_interval(s):
+    nums = re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", str(s))
+    return float(nums[0]), float(nums[1])
+
+intervals = summary_df["pdr_q"].apply(parse_interval)
+
+left_edges = [x[0] for x in intervals]
+right_edges = [x[1] for x in intervals]
+
+q_edges = np.array([left_edges[0]] + right_edges, dtype=float)
+q_edges = np.unique(q_edges)
+q_edges.sort()
+
+tick_labels = summary_df["pdr_q"].tolist()
+nq = len(tick_labels)
+
+if nq < 1:
+    raise ValueError("유효한 q-bin을 만들 수 없습니다.")
+
+print(f"pdr_summary.csv 기준 q_edges: {nq}개 구간")
+print("q_edges:", q_edges)
 
 def pdr_to_q_idx(pdr_val, q_edges, nq):
-    """단일 pdr 값을 q_idx로 변환"""
-    if np.isnan(pdr_val):
+    if pd.isna(pdr_val):
         return np.nan
-    for i in range(nq):
-        if q_edges[i] <= pdr_val <= q_edges[i+1]:
-            return float(i)
-    if pdr_val < q_edges[0]:
-        return 0.0
-    return float(nq - 1)
+
+    q_idx = pd.cut(
+        pd.Series([float(pdr_val)]),
+        bins=q_edges,
+        labels=False,
+        include_lowest=True,
+        right=True
+    ).iloc[0]
+
+    if pd.isna(q_idx):
+        if pdr_val < q_edges[0]:
+            return 0.0
+        return float(nq - 1)
+
+    return float(q_idx)
 
 # grid_compare에 q_idx 추가
 grid_compare['sim_q_idx'] = grid_compare['sim_mean_pdr'].apply(
@@ -58,14 +79,12 @@ grid_compare['gen_q_idx'] = grid_compare['gen_mean_pdr'].apply(
     lambda x: pdr_to_q_idx(x, q_edges, nq)
 )
 
-# grid_meta와 merge (bbox 정보 필요)
+# bbox 정보 merge
 grid_plot = pd.merge(grid_compare, grid_meta, on='grid_id', how='left')
 
 # =============================================
 # 공통 설정
 # =============================================
-import geopandas as gpd
-
 def overlay_daejeon_boundary(ax):
     try:
         gdf = gpd.read_file(SHP_PATH, encoding='cp949')
@@ -88,10 +107,9 @@ def add_colorbar(fig, ax, label):
     return cbar
 
 def draw_grid_heatmap(ax, grid_plot, q_idx_col, title):
-    """그리드 셀을 q_idx 색으로 채우기"""
     for _, row in grid_plot.iterrows():
         q_idx = row[q_idx_col]
-        if np.isnan(q_idx):
+        if pd.isna(q_idx):
             facecolor = 'lightgray'
             alpha = 0.2
         else:
@@ -111,12 +129,12 @@ def draw_grid_heatmap(ax, grid_plot, q_idx_col, title):
         ax.add_patch(rect)
 
     overlay_daejeon_boundary(ax)
-    add_colorbar(plt.gcf(), ax, f'pdr_q bins (from entire df, n={len(df)})')
+    add_colorbar(plt.gcf(), ax, 'pdr_q bins (from pdr_summary.csv)')
 
-    ax.set_xlim(grid_meta['bbox_minlon'].min() - 0.01,
-                grid_meta['bbox_maxlon'].max() + 0.01)
-    ax.set_ylim(grid_meta['bbox_minlat'].min() - 0.01,
-                grid_meta['bbox_maxlat'].max() + 0.01)
+    ax.set_xlim(grid_plot['bbox_minlon'].min() - 0.01,
+                grid_plot['bbox_maxlon'].max() + 0.01)
+    ax.set_ylim(grid_plot['bbox_minlat'].min() - 0.01,
+                grid_plot['bbox_maxlat'].max() + 0.01)
     ax.set_title(title)
     ax.set_xlabel('lon')
     ax.set_ylabel('lat')
@@ -128,13 +146,15 @@ sim_covered = (grid_plot['sim_count'] > 0).sum()
 
 fig1, ax1 = plt.subplots(figsize=(11, 9))
 draw_grid_heatmap(
-    ax1, grid_plot, 'sim_q_idx',
+    ax1,
+    grid_plot,
+    'sim_q_idx',
     f"Grid Simulation Result (covered={sim_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/grid_sim_heatmap.png', dpi=150)
-plt.show()
-print("저장 완료: grid_sim_heatmap.png")
+plt.savefig('./notebooks/grid_compare/rygb_grid_sim_heatmap.png', dpi=150)
+plt.close(fig1)
+print("저장 완료: ./notebooks/grid_compare/rygb_grid_sim_heatmap.png")
 
 # =============================================
 # Figure 2: Diffusion 결과
@@ -143,10 +163,12 @@ gen_covered = (grid_plot['gen_count'] > 0).sum()
 
 fig2, ax2 = plt.subplots(figsize=(11, 9))
 draw_grid_heatmap(
-    ax2, grid_plot, 'gen_q_idx',
+    ax2,
+    grid_plot,
+    'gen_q_idx',
     f"Diffusion Generated Result (covered={gen_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/grid_gen_heatmap.png', dpi=150)
-plt.show()
-print("저장 완료: grid_gen_heatmap.png")
+plt.savefig('./notebooks/grid_compare/rygb_grid_gen_heatmap.png', dpi=150)
+plt.close(fig2)
+print("저장 완료: ./notebooks/grid_compare/rygb_grid_gen_heatmap.png")
