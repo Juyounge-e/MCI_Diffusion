@@ -203,9 +203,14 @@ class RunManager():
         outcomes_pdr = np.column_stack((rule_names, results_pdr))
         outcomes_rewWOG = np.column_stack((rule_names, results_rewWOG))
         outcomes_pdrWOG = np.column_stack((rule_names, results_pdrWOG))
+        outcomes_red = np.column_stack((rule_names, results_red))
+        outcomes_yellow = np.column_stack((rule_names, results_yellow))
+        outcomes_green = np.column_stack((rule_names, results_green))
+        outcomes_black = np.column_stack((rule_names, results_black))
+
         # outcomes_preventable = np.column_stack((rule_names, results_preventable))
 
-        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG), axis=0)
+        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG, outcomes_red, outcomes_yellow, outcomes_green, outcomes_black,), axis=0)
         output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG, stat_print_red, stat_print_yellow, stat_print_green, stat_print_black), axis=0)
 
         return output, output_stat
