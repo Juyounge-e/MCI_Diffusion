@@ -26,7 +26,11 @@ class RunManager():
         # 1. Run setting
         cfg_run = configs['run_setting']
         totalSamples = 30 # cfg_run['totalSamples']  # number of samples
-        self.init_random_seed = cfg_run['random_seed']
+        
+        # 0416 (시뮬레이션기준으로 성능 평가할때 필요한 라인 )
+        # self.init_random_seed =  cfg_run['random_seed'] 
+        self.init_random_seed =  None # trainingdata뽑을때 seed 고정하지 않기 위함
+      
         if self.init_random_seed is not None:
             random.seed(self.init_random_seed) # python random seed 고정
             np.random.seed(self.init_random_seed) # numpy random seed 고정
@@ -64,7 +68,9 @@ class RunManager():
         np.savetxt(os.path.join(output_path, "results_{0}_stat.txt".format(exp_indicator)), output_stat, fmt='%s', delimiter="  ")
 
     def set_random_seed(self, seed):
-        seed += self.init_random_seed
+        if self.init_random_seed is not None:
+            seed = seed + self.init_random_seed
+            
         random.seed(seed)  # python random seed 고정
         np.random.seed(seed)  # numpy random seed 고정
         rng = np.random.default_rng(seed)  # numpy random number generator seed 고정 및 사용

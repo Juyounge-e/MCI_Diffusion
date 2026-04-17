@@ -288,8 +288,8 @@ class EventManager():
         # 1. 환자 구조 이벤트 생성
         p_param = self.properties['patient']
         p_num = self.rng.multinomial(p_param['incident_size'],
-                                     pvals=p_param['patient_info']['ratio'])
-        self.status['patient']['p_states'][:,0] = np.repeat([0,1,2,3], p_num)
+                                     pvals=p_param['patient_info']['ratio']) 
+        self.status['patient']['p_states'][:,0] = np.repeat([0,1,2,3], p_num) # 성능 평가할때 p_num에 환자 비율 하드코딩 
 
         rescue_max_time = 60
 
