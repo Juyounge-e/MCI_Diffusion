@@ -12,12 +12,12 @@ import pandas as pd
 sample_dir = r'C:\Users\user00\Desktop\MCI_Diffusion\outputs\mlp_diffusion\rygb_resolution_30runs'
 SAMPLE_CSVS = sorted(glob.glob(os.path.join(sample_dir, '*.csv')))
 
-DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_grid_dataset_30runs.csv')
+DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\daejeon_grid_dataset_30runs_15idx.csv')
 GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 SUMMARY_PATH = r"C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\30_test_drop_pdr_summary.csv"
 
-OUT_COMPARE = './notebooks/grid_compare/new_grid_compare_rygb_30runs.csv'
-OUT_VALID = './notebooks/grid_compare/new_grid_compare_rygb_30runs_valid.csv'
+OUT_COMPARE = './notebooks/grid_compare/new_grid_compare_rygb_30runs_15idx.csv'
+OUT_VALID = './notebooks/grid_compare/new_grid_compare_rygb_30runs_15_idx_valid.csv'
 
 # =============================================
 # 데이터 로드

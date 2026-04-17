@@ -11,10 +11,10 @@ import geopandas as gpd
 # =============================================
 # 설정
 # =============================================
-GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\grid_compare_rygb_.csv'
+GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\new_grid_compare_rygb_30runs_15idx.csv'
 GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 SHP_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
-SUMMARY_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\pdr_summary.csv'
+SUMMARY_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\30_test_drop_pdr_summary.csv'
 
 # =============================================
 # 데이터 로드
@@ -152,9 +152,9 @@ draw_grid_heatmap(
     f"Grid Simulation Result (covered={sim_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/rygb_grid_sim_heatmap.png', dpi=150)
+plt.savefig('./notebooks/grid_compare/15_idx_rygb_grid_sim_heatmap.png', dpi=150)
 plt.close(fig1)
-print("저장 완료: ./notebooks/grid_compare/rygb_grid_sim_heatmap.png")
+print("저장 완료: ./notebooks/grid_compare/15_idx_rygb_grid_sim_heatmap.png")
 
 # =============================================
 # Figure 2: Diffusion 결과
@@ -169,6 +169,6 @@ draw_grid_heatmap(
     f"Diffusion Generated Result (covered={gen_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/rygb_grid_gen_heatmap.png', dpi=150)
+plt.savefig('./notebooks/grid_compare/15_idx_rygb_grid_gen_heatmap.png', dpi=150)
 plt.close(fig2)
-print("저장 완료: ./notebooks/grid_compare/rygb_grid_gen_heatmap.png")
+print("저장 완료: ./notebooks/grid_compare/15_idx_rygb_grid_gen_heatmap.png")
