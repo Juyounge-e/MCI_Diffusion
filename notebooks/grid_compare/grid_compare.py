@@ -16,8 +16,8 @@ DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\daejeon_grid_datas
 GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 SUMMARY_PATH = r"C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\30_test_drop_pdr_summary.csv"
 
-OUT_COMPARE = './notebooks/grid_compare/new_grid_compare_rygb_30runs_15idx.csv'
-OUT_VALID = './notebooks/grid_compare/new_grid_compare_rygb_30runs_15_idx_valid.csv'
+OUT_COMPARE = './notebooks/grid_compare/csv/new_grid_compare_rygb_30runs_15idx.csv'
+OUT_VALID = './notebooks/grid_compare/csv/new_grid_compare_rygb_30runs_15_idx_valid.csv'
 
 # =============================================
 # 데이터 로드
@@ -200,7 +200,7 @@ else:
 # =============================================
 # Step 9. 저장
 # =============================================
-os.makedirs('./notebooks/grid_compare', exist_ok=True)
+os.makedirs('./notebooks/grid_compare/csv', exist_ok=True)
 grid_compare.to_csv(OUT_COMPARE, index=False)
 valid.to_csv(OUT_VALID, index=False)
 print(f"\n저장 완료: {OUT_COMPARE} ({len(grid_compare)}행), {OUT_VALID} ({len(valid)}행)")

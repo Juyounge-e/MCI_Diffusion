@@ -7,6 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import geopandas as gpd
+from pathlib import Path
 
 # =============================================
 # 설정
@@ -22,6 +23,7 @@ SUMMARY_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysi
 grid_compare = pd.read_csv(GRID_COMPARE_PATH)
 grid_meta = pd.read_csv(GRID_META_PATH)
 summary_df = pd.read_csv(SUMMARY_PATH)
+grid_compare_stem = Path(GRID_COMPARE_PATH).stem
 
 print(f"grid_compare: {len(grid_compare)}개")
 print(f"grid_meta: {len(grid_meta)}개")
@@ -152,9 +154,10 @@ draw_grid_heatmap(
     f"Grid Simulation Result (covered={sim_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/15_idx_rygb_grid_sim_heatmap.png', dpi=150)
+plt.savefig(f'./notebooks/grid_compare/visualization/{grid_compare_stem}_grid_sim_heatmap.png', dpi=150)
+
 plt.close(fig1)
-print("저장 완료: ./notebooks/grid_compare/15_idx_rygb_grid_sim_heatmap.png")
+print(f"저장 완료: ./notebooks/grid_compare/visualization/{grid_compare_stem}_grid_sim_heatmap.png")
 
 # =============================================
 # Figure 2: Diffusion 결과
@@ -169,6 +172,6 @@ draw_grid_heatmap(
     f"Diffusion Generated Result (covered={gen_covered}/{len(grid_plot)})"
 )
 plt.tight_layout()
-plt.savefig('./notebooks/grid_compare/15_idx_rygb_grid_gen_heatmap.png', dpi=150)
+plt.savefig(f'./notebooks/grid_compare/visualization/{grid_compare_stem}_grid_gen_heatmap.png', dpi=150)
 plt.close(fig2)
-print("저장 완료: ./notebooks/grid_compare/15_idx_rygb_grid_gen_heatmap.png")
+print(f"저장 완료: ./notebooks/grid_compare/visualization/{grid_compare_stem}_grid_gen_heatmap.png")
