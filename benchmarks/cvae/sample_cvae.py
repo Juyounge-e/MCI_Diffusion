@@ -45,7 +45,7 @@ def sample_cvae(
     embedding_dim = ckpt["embedding_dim"]
     decompress_dims = ckpt["decompress_dims"]
     cond_emb_dim = ckpt.get("cond_emb_dim", embedding_dim)
-    split_cond_embed = ckpt.get("split_cond_embed", False)
+    split_cond_embed = ckpt.get("split_cond_embed", True)
 
     decoder = CondDecoder(
         embedding_dim,
@@ -73,8 +73,10 @@ def sample_cvae(
     cond_t = torch.from_numpy(cond_np).float().to(device)
     cond_t = cond_t.repeat(n, 1)
 
+    # temperature 반영 
     if temp <= 0:
         raise ValueError("temp는 0보다 커야 합니다.")
+    
     z = torch.randn(n, embedding_dim, device=device) * temp
     rec, _ = decoder(z, cond_t)
     x_np = rec.cpu().numpy()
@@ -109,13 +111,13 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--out",
-        default=os.path.join(_ROOT, "benchmarks","cvae", "outputs",  "samples.csv"),
+        default=os.path.join(_ROOT, "benchmarks","cvae", "outputs",  "samples_1.csv"),
     )
     parser.add_argument(
         "--cond",
         nargs=2,
         type=float,
-        default=[0.057456, 30],
+        default=[0.057271, 30],
         metavar=("pdr_mean", "N"),
         help="조건 [pdr_mean, N] 필수. 예: --cond 0.05 10",
     )
