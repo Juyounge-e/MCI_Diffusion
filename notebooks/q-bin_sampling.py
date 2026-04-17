@@ -104,7 +104,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--training_csv", type=str, default=None, help="학습 데이터 CSV")
     parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "30_runs_rygb_bin_stats_n30.csv"))
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "rygb_resolution_30runs"))
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "samples", "rygb_resolution_30runs"))
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
     parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "ratio_bank.pkl"))
