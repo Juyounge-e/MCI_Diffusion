@@ -29,3 +29,5 @@ src/data/dataset4eval/
 # pylance 관련
 basedpyrightconfig.json
 pyrightconfig.json
+
+*csv
