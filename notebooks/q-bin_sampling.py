@@ -108,7 +108,17 @@ def main():
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
     parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "ratio_bank.pkl"))
-    parser.add_argument("--N_only", type=int, default=30)
+
+    parser.add_argument("--N_only", type=int, default=30, help="N-only 샘플링 조건")
+    parser.add_argument(
+        "--rygb",
+        nargs=4,
+        type=int,
+        default=None,
+        metavar=("RED", "YELLOW", "GREEN", "BLACK"),
+        help="직접 입력할 red yellow green black count",
+    )
+
     parser.add_argument("--timesteps", type=int, default=1000)
     parser.add_argument("--total_samples", type=int, default=5000, help="bin 비율에 따라 분배할 총 샘플 수")
     parser.add_argument("--num_bins", type=int, default=10, help="q-bin 개수")
@@ -116,6 +126,9 @@ def main():
     parser.add_argument("--n_max", type=int, default=33, help="학습 데이터에서 사용할 최대 N")
     parser.add_argument("--python_bin", type=str, default="python", help="sample_mlp.py 실행에 사용할 파이썬")
     args = parser.parse_args()
+
+    if args.rygb is not None and min(args.rygb) < 0:
+        raise ValueError("--rygb 값은 음수일 수 없습니다.")
 
     os.makedirs(args.out_dir, exist_ok=True)
     bin_stats = load_or_build_bin_stats(args)
@@ -126,6 +139,11 @@ def main():
     if args.bin_stats:
         print(f"\n저장 완료: {args.bin_stats} ({len(bin_stats)}행)")
     print(f"총 샘플링 개수: {bin_stats['sample_num'].sum()}개\n")
+
+    if args.rygb is not None:
+        print(f"샘플링 조건: RYGB 직접 입력 = {args.rygb}")
+    else:
+        print(f"샘플링 조건: N_only = {args.N_only}")
 
     for _, row in bin_stats.iterrows():
         q_bin = row["q_bin"]
@@ -152,11 +170,14 @@ def main():
             args.ratio_bank,
             "--sample_num",
             str(n_samples),
-            "--N_only",
-            str(args.N_only),
             "--timesteps",
             str(args.timesteps),
         ]
+
+        if args.rygb is not None:
+            cmd += ["--rygb"] + [str(v) for v in args.rygb]
+        else:
+            cmd += ["--N_only", str(args.N_only)]
 
         if bin_max is None or bin_min == bin_max:
             cmd += ["--pdr", str(pdr_mean)]
