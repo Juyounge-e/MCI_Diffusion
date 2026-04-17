@@ -26,7 +26,11 @@ class RunManager():
         # 1. Run setting
         cfg_run = configs['run_setting']
         totalSamples = 30 # cfg_run['totalSamples']  # number of samples
-        self.init_random_seed = cfg_run['random_seed']
+        
+        # 0416 (시뮬레이션기준으로 성능 평가할때 필요한 라인 )
+        # self.init_random_seed =  cfg_run['random_seed'] 
+        self.init_random_seed =  None # trainingdata뽑을때 seed 고정하지 않기 위함
+      
         if self.init_random_seed is not None:
             random.seed(self.init_random_seed) # python random seed 고정
             np.random.seed(self.init_random_seed) # numpy random seed 고정
@@ -64,7 +68,9 @@ class RunManager():
         np.savetxt(os.path.join(output_path, "results_{0}_stat.txt".format(exp_indicator)), output_stat, fmt='%s', delimiter="  ")
 
     def set_random_seed(self, seed):
-        seed += self.init_random_seed
+        if self.init_random_seed is not None:
+            seed = seed + self.init_random_seed
+            
         random.seed(seed)  # python random seed 고정
         np.random.seed(seed)  # numpy random seed 고정
         rng = np.random.default_rng(seed)  # numpy random number generator seed 고정 및 사용
@@ -203,9 +209,14 @@ class RunManager():
         outcomes_pdr = np.column_stack((rule_names, results_pdr))
         outcomes_rewWOG = np.column_stack((rule_names, results_rewWOG))
         outcomes_pdrWOG = np.column_stack((rule_names, results_pdrWOG))
+        outcomes_red = np.column_stack((rule_names, results_red))
+        outcomes_yellow = np.column_stack((rule_names, results_yellow))
+        outcomes_green = np.column_stack((rule_names, results_green))
+        outcomes_black = np.column_stack((rule_names, results_black))
+
         # outcomes_preventable = np.column_stack((rule_names, results_preventable))
 
-        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG), axis=0)
+        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG, outcomes_red, outcomes_yellow, outcomes_green, outcomes_black,), axis=0)
         output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG, stat_print_red, stat_print_yellow, stat_print_green, stat_print_black), axis=0)
 
         return output, output_stat

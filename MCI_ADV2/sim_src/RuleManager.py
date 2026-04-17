@@ -68,8 +68,8 @@ class Rule:
         self.expected_Y = en_properties['patient']['incident_size'] * en_properties['patient']['patient_info']['ratio'][1]
 
         self.hos_num = en_properties['hospital']['hos_num']
-        self.tier1_idx = en_properties['hospital']['hos_tier1_idx'] # 기존과 tier1, tier2 정의 바뀐 것 주의
-        self.tier2_idx = en_properties['hospital']['hos_tier2_idx'] # 기존과 tier1, tier2 정의 바뀐 것 주의
+        self.tier1_idx = en_properties['hospital']['hos_tier1_idx'] # tier1 = 상급종합병원, Tier2 = 나머지
+        self.tier2_idx = en_properties['hospital']['hos_tier2_idx'] # tier1 = 상급종합병원, Tier2 = 나머지
         self.helipad_idx = en_properties['hospital'].get('hos_helipad_idx', np.array([]))
 
         self.hos_max_send = en_properties['hospital']['hos_max_send'] # 최대 보낼 수 있는 환자수 (목표치)
@@ -332,7 +332,7 @@ class Universal_Rule(Rule):
             #         r = self.rng.random()
             #         if r > 0.5: # Send to tier2
             #             for i in range(self.hos_num):
-            #                 if i in self.tier1_idx:  # Tier1 skip → Tier2만 사용
+            #                 if i in self.tier1_idx:  # tier1 skip → Tier2만 사용
             #                     continue
             #                 # ★ 헬기장 체크 추가 (UAV 선택 시)
             #                 if action[2] == 1 and i not in self.helipad_idx:
@@ -341,7 +341,7 @@ class Universal_Rule(Rule):
             #                     action[1] = i + 1
             #                     break
             #         else: # Send to tier1
-            #             for i in self.tier1_idx:  # Tier1만 사용
+            #             for i in self.tier1_idx:  # tier1만 사용
             #                 # ★ 헬기장 체크 추가 (UAV 선택 시)
             #                 if action[2] == 1 and i not in self.helipad_idx:
             #                     continue
