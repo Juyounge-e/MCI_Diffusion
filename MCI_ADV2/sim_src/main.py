@@ -70,10 +70,11 @@ class RunManager():
     def set_random_seed(self, seed):
         if self.init_random_seed is not None:
             seed = seed + self.init_random_seed
-            
-        random.seed(seed)  # python random seed 고정
-        np.random.seed(seed)  # numpy random seed 고정
-        rng = np.random.default_rng(seed)  # numpy random number generator seed 고정 및 사용
+            random.seed(seed) # python random seed 고정
+            np.random.seed(seed) # numpy random seed 고정
+            rng = np.random.default_rng(seed) # numpy random number generator seed 고정 및 사용
+        else:
+            rng = np.random.default_rng()
 
         self.s_manager.set_seed(rng) # self.s_manager.scenario.ev_manager.set_seed(rng)
         for r in self.rules:
