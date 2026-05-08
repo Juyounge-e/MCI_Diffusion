@@ -73,10 +73,12 @@ def main():
         help="학습 결과를 저장할 디렉토리 경로",
     )
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
+    
     args = parser.parse_args()
 
     csv_path = args.csv
     max_train_samples = args.max_train
+    out_dir = args.out_dir
     seed = args.seed
     
     random.seed(seed)

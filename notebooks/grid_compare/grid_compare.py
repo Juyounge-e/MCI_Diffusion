@@ -9,10 +9,10 @@ import pandas as pd
 # =============================================
 # 설정
 # =============================================
-sample_dir = r'C:\Users\user00\Desktop\MCI_Diffusion\outputs\mlp_diffusion\rygb_resolution_30runs'
-SAMPLE_CSVS = sorted(glob.glob(os.path.join(sample_dir, '*.csv')))
-
-DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\daejeon_grid_dataset_30runs_15idx.csv')
+sample_dir = r'C:\Users\user00\Desktop\MCI_Diffusion\outputs\mlp_diffusion\resolution_seed_free_30runs30'
+SAMPLE_CSVS  = sorted(glob.glob(os.path.join(sample_dir, '*.csv')))
+DATA_PATH    = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_3000_seed_free_30runs.csv')
+DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\dataset4run_idx_fix\daejeon_grid_dataset.csv')
 GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 SUMMARY_PATH = r"C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\30_test_drop_pdr_summary.csv"
 
