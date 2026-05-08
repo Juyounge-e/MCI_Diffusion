@@ -54,11 +54,15 @@ def main():
         default=0,
         help="학습에 사용할 최대 train 샘플 수. 0이면 전체 사용.",
     )
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "2898_30runs"), help="모델과 로그 저장 디렉토리")
+    
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
+    
     args = parser.parse_args()
 
     csv_path = args.csv
     max_train_samples = args.max_train
+    out_dir = args.out_dir
     seed = args.seed
     
     random.seed(seed)
@@ -93,7 +97,6 @@ def main():
     )
     device = cfg.device
 
-    out_dir = os.path.join("outputs", "mlp_diffusion", "1575")
     os.makedirs(out_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
 

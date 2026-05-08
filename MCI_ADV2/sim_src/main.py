@@ -25,8 +25,12 @@ class RunManager():
 
         # 1. Run setting
         cfg_run = configs['run_setting']
-        totalSamples = cfg_run['totalSamples']  # number of samples
-        self.init_random_seed = cfg_run['random_seed']
+        totalSamples = 30 # cfg_run['totalSamples']  # number of samples
+        
+        # 0416 (시뮬레이션기준으로 성능 평가할때 필요한 라인 )
+        # self.init_random_seed =  cfg_run['random_seed'] 
+        self.init_random_seed =  None # trainingdata뽑을때 seed 고정하지 않기 위함
+      
         if self.init_random_seed is not None:
             random.seed(self.init_random_seed) # python random seed 고정
             np.random.seed(self.init_random_seed) # numpy random seed 고정
@@ -64,10 +68,13 @@ class RunManager():
         np.savetxt(os.path.join(output_path, "results_{0}_stat.txt".format(exp_indicator)), output_stat, fmt='%s', delimiter="  ")
 
     def set_random_seed(self, seed):
-        seed += self.init_random_seed
-        random.seed(seed)  # python random seed 고정
-        np.random.seed(seed)  # numpy random seed 고정
-        rng = np.random.default_rng(seed)  # numpy random number generator seed 고정 및 사용
+        if self.init_random_seed is not None:
+            seed = seed + self.init_random_seed
+            random.seed(seed) # python random seed 고정
+            np.random.seed(seed) # numpy random seed 고정
+            rng = np.random.default_rng(seed) # numpy random number generator seed 고정 및 사용
+        else:
+            rng = np.random.default_rng()
 
         self.s_manager.set_seed(rng) # self.s_manager.scenario.ev_manager.set_seed(rng)
         for r in self.rules:
@@ -75,6 +82,13 @@ class RunManager():
         self.env.set_seed(rng)
 
     def run(self, env, rules, totalSamples):
+        # red, yello, green, black 환자 수 기록
+        results_red = np.zeros((len(rules), totalSamples), dtype=float)
+        results_yellow = np.zeros((len(rules), totalSamples), dtype=float)
+        results_green = np.zeros((len(rules), totalSamples), dtype=float)
+        results_black = np.zeros((len(rules), totalSamples), dtype=float)
+
+        
         results_rew = np.zeros((len(rules), totalSamples), dtype=float)
         results_time = np.zeros((len(rules), totalSamples), dtype=float)
         results_pdr = np.zeros((len(rules), totalSamples), dtype=float)
@@ -85,15 +99,24 @@ class RunManager():
         rule_names = np.array([rule.rule_name for rule in rules])
 
         action_logs = []
+        
         for iter in range(1, totalSamples + 1):
             print("Iter :", iter)
             action_log = {'red_uav': 0, 'red_amb': 0, 'yellow_uav': 0, 'yellow_amb': 0, 'green': 0}
             for r_idx in range(len(rules)):
                 print(rules[r_idx].rule_name)
                 self.set_random_seed(iter)
-                obs, _ = env.reset()
+                
+                obs, init_info = env.reset()
+                total_Red = (obs['p_states'][:, 0] == 0).sum()
+                total_Yellow = (obs['p_states'][:, 0] == 1).sum()
                 total_Green = (obs['p_states'][:, 0] == 2).sum()
+                total_Black = (obs['p_states'][:, 0] == 3).sum()
                 done = False
+                # if init_info.get('terminated', False):
+                #     done = False
+                # else:
+                #     done = True
                 cumul_reward = 0
                 count = 0
                 while not done:
@@ -130,6 +153,11 @@ class RunManager():
                 action_logs.append(action_log)
                 # print("전체 생존율 합: ", cumul_reward, "MCI 종료 시각", info['time'])
                 # print("{}-{}번째 시뮬레이션 끝".format(iter,r_idx))
+                results_red[r_idx, iter - 1] = total_Red
+                results_yellow[r_idx, iter - 1] = total_Yellow
+                results_green[r_idx, iter - 1] = total_Green
+                results_black[r_idx, iter - 1] = total_Black
+
                 results_rew[r_idx, iter - 1] = cumul_reward
                 results_time[r_idx, iter - 1] = info['time']
                 results_pdr[r_idx, iter - 1] = 1 - cumul_reward / env.preventable
@@ -142,6 +170,11 @@ class RunManager():
         stat_pdr = np.zeros((len(rules), 3), dtype=float)
         stat_rewWOG = np.zeros((len(rules), 3), dtype=float)
         stat_pdrWOG = np.zeros((len(rules), 3), dtype=float)
+        stat_red = np.zeros((len(rules), 3), dtype=float)
+        stat_yellow = np.zeros((len(rules), 3), dtype=float)
+        stat_green = np.zeros((len(rules), 3), dtype=float)
+        stat_black = np.zeros((len(rules), 3), dtype=float)
+
         def get_CI(data):
             n_sample = len(data)
             mean = np.mean(data)
@@ -156,21 +189,36 @@ class RunManager():
             stat_pdr[r_idx][:] = get_CI(results_pdr[r_idx])
             stat_rewWOG[r_idx][:] = get_CI(results_rewWOG[r_idx])
             stat_pdrWOG[r_idx][:] = get_CI(results_pdrWOG[r_idx])
+            stat_red[r_idx][:] = get_CI(results_red[r_idx])
+            stat_yellow[r_idx][:] = get_CI(results_yellow[r_idx])
+            stat_green[r_idx][:] = get_CI(results_green[r_idx])
+            stat_black[r_idx][:] = get_CI(results_black[r_idx])
+            
         stat_print_rew = np.column_stack((rule_names, stat_rew))
         stat_print_time = np.column_stack((rule_names, stat_time))
         stat_print_pdr = np.column_stack((rule_names, stat_pdr))
         stat_print_rewWOG = np.column_stack((rule_names, stat_rewWOG))
         stat_print_pdrWOG = np.column_stack((rule_names, stat_pdrWOG))
+        
+        stat_print_red = np.column_stack((rule_names, stat_red))
+        stat_print_yellow = np.column_stack((rule_names, stat_yellow))
+        stat_print_green = np.column_stack((rule_names, stat_green))
+        stat_print_black = np.column_stack((rule_names, stat_black))
 
         outcomes_rew = np.column_stack((rule_names, results_rew))
         outcomes_time = np.column_stack((rule_names, results_time))
         outcomes_pdr = np.column_stack((rule_names, results_pdr))
         outcomes_rewWOG = np.column_stack((rule_names, results_rewWOG))
         outcomes_pdrWOG = np.column_stack((rule_names, results_pdrWOG))
+        outcomes_red = np.column_stack((rule_names, results_red))
+        outcomes_yellow = np.column_stack((rule_names, results_yellow))
+        outcomes_green = np.column_stack((rule_names, results_green))
+        outcomes_black = np.column_stack((rule_names, results_black))
+
         # outcomes_preventable = np.column_stack((rule_names, results_preventable))
 
-        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG), axis=0)
-        output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG), axis=0)
+        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG, outcomes_red, outcomes_yellow, outcomes_green, outcomes_black,), axis=0)
+        output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG, stat_print_red, stat_print_yellow, stat_print_green, stat_print_black), axis=0)
 
         return output, output_stat
 
