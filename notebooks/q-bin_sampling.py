@@ -34,7 +34,6 @@ def build_bin_stats(
 
     # =============================================
     # 2) 전체 학습 데이터 기준 q-bin 경계 생성
-    #    중요: 여기서는 N 필터링 전 full_df 사용
     # =============================================
     _, bin_edges = pd.qcut(
         full_df["pdr_mean"],
@@ -43,11 +42,9 @@ def build_bin_stats(
         duplicates="drop",
     )
 
-    # qcut에서 중복 제거될 경우 실제 bin 수가 줄어들 수 있음
     actual_bins = len(bin_edges) - 1
     labels = [f"q{i + 1}" for i in range(actual_bins)]
 
-    # 경계값 누락 방지
     bin_edges = bin_edges.astype(float)
     bin_edges[0] = -np.inf
     bin_edges[-1] = np.inf
@@ -102,10 +99,6 @@ def build_bin_stats(
         .reset_index()
     )
 
-    bin_stats["bin_min"] = bin_edges[:-1]
-    bin_stats["bin_max"] = bin_edges[1:]
-    bin_stats["bin_width"] = bin_stats["bin_max"] - bin_stats["bin_min"]
-
     # =============================================
     # 6) ratio 및 sample_num 계산
     # =============================================
@@ -118,11 +111,9 @@ def build_bin_stats(
 
     bin_stats["pdr_std"] = bin_stats["pdr_std"].fillna(0.0)
 
-    # 반올림 때문에 총합이 total_samples와 다를 수 있으므로 보정
+    # 반올림 보정
     diff = int(total_samples - bin_stats["sample_num"].sum())
-
     if diff != 0 and len(bin_stats) > 0:
-        # count가 가장 많은 bin에 차이 보정
         target_idx = bin_stats["count"].idxmax()
         bin_stats.loc[target_idx, "sample_num"] += diff
 
@@ -142,7 +133,6 @@ def load_or_build_bin_stats(args: argparse.Namespace) -> pd.DataFrame:
         if args.bin_stats:
             out_dir = os.path.dirname(os.path.abspath(args.bin_stats))
             os.makedirs(out_dir, exist_ok=True)
-
             bin_stats.to_csv(
                 args.bin_stats,
                 index=False,
@@ -159,52 +149,28 @@ def load_or_build_bin_stats(args: argparse.Namespace) -> pd.DataFrame:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--training_csv", type=str, default=None, help="학습 데이터 CSV")
-    parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "seed_free_30runs_bin_stats_n30.csv"))
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "samples", "rygb_resolution_seed_free_30runs"))
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "seed_free_rygb_30runs", "model_last.pt"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "seed_free_rygb_30runs", "scalers.pkl"))
-    parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "seed_free_rygb_30runs", "ratio_bank.pkl"))
 
-    parser.add_argument("--N_only", type=int, default=30, help="N-only 샘플링 조건")
-    parser.add_argument(
-        "--rygb",
-        nargs=4,
-        type=int,
-        default=None,
-        metavar=("RED", "YELLOW", "GREEN", "BLACK"),
-        help="직접 입력할 red yellow green black count",
-    )
-
+    parser.add_argument("--training_csv", type=str, default=None, help="전체 학습 데이터 CSV")
+    parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "30runs_bin_stats_n30.csv"))
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_seed_free_30runs30"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
+    parser.add_argument("--N", type=int, default=30)
     parser.add_argument("--timesteps", type=int, default=1000)
     parser.add_argument("--total_samples", type=int, default=5000)
     parser.add_argument("--num_bins", type=int, default=10)
-
-    parser.add_argument(
-        "--n_min",
-        type=int,
-        default=27,
-        help="ratio 계산에 사용할 최소 N",
-    )
-
-    parser.add_argument(
-        "--n_max",
-        type=int,
-        default=33,
-        help="ratio 계산에 사용할 최대 N",
-    )
-
-    parser.add_argument(
-        "--python_bin",
-        type=str,
-        default="python",
-        help="sample_mlp.py 실행에 사용할 파이썬",
-    )
+    parser.add_argument("--n_min", type=int, default=27)
+    parser.add_argument("--n_max", type=int, default=33)
+    parser.add_argument("--python_bin", type=str, default="python")
+    parser.add_argument("--rygb", nargs=4, type=int, default=None,
+                        metavar=("red", "yellow", "green", "black"),
+                        help="r/y/g/b 직접 입력 옵션")
+    parser.add_argument("--ratio_bank", type=str,
+                        default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "ratio_bank.pkl"))
+    parser.add_argument("--n_tol", type=int, default=3,
+                        help="N-only에서 ratio 검색 허용 범위")
 
     args = parser.parse_args()
-
-    if args.rygb is not None and min(args.rygb) < 0:
-        raise ValueError("--rygb 값은 음수일 수 없습니다.")
 
     os.makedirs(args.out_dir, exist_ok=True)
 
@@ -214,10 +180,6 @@ def main():
     # bin_stats 출력
     # =============================================
     print("\n========== bin_stats ==========")
-
-    if "bin_width" in bin_stats.columns:
-        print(f"평균 bin 간격: {bin_stats['bin_width'].replace([np.inf, -np.inf], np.nan).mean():.10f}")
-
     print(bin_stats.to_string(index=False))
 
     if args.bin_stats:
@@ -225,16 +187,12 @@ def main():
 
     print(f"총 샘플링 개수: {bin_stats['sample_num'].sum()}개\n")
 
-    if args.rygb is not None:
-        print(f"샘플링 조건: RYGB 직접 입력 = {args.rygb}")
-    else:
-        print(f"샘플링 조건: N_only = {args.N_only}")
-
+    # =============================================
+    # q-bin별 sample_mlp.py 실행
+    # =============================================
     for _, row in bin_stats.iterrows():
-        q_bin = row["q_bin"]
-        bin_min = float(row["bin_min"])
-        bin_max = float(row["bin_max"])
-        pdr_mean = float(row["pdr_mean"]) if not pd.isna(row["pdr_mean"]) else None
+        q_bin     = row["q_bin"]
+        pdr_mean  = float(row["pdr_mean"]) if not pd.isna(row["pdr_mean"]) else None
         n_samples = int(row["sample_num"])
 
         if n_samples <= 0:
@@ -250,34 +208,23 @@ def main():
         cmd = [
             args.python_bin,
             os.path.join("scripts", "sample_mlp.py"),
-            "--ckpt",
-            args.ckpt,
-            "--scalers",
-            args.scalers,
-            "--out",
-            out_csv,
-            "--ratio_bank",
-            args.ratio_bank,
-            "--sample_num",
-            str(n_samples),
-            "--timesteps",
-            str(args.timesteps),
+            "--ckpt",       args.ckpt,
+            "--scalers",    args.scalers,
+            "--out",        out_csv,
+            "--sample_num", str(n_samples),
+            "--N",          str(args.N),
+            "--timesteps",  str(args.timesteps),
+            "--ratio_bank", args.ratio_bank,
+            "--n_tol",      str(args.n_tol),
         ]
 
+        # rygb 직접 입력 옵션
         if args.rygb is not None:
             cmd += ["--rygb"] + [str(v) for v in args.rygb]
-        else:
-            cmd += ["--N_only", str(args.N_only)]
 
-        if bin_max is None or bin_min == bin_max:
-            cmd += ["--pdr", str(pdr_mean)]
-        else:
-            sample_min = bin_min
-
-        if np.isposinf(bin_max):
-            sample_max = float(row["pdr_max"])
-        else:
-            sample_max = bin_max
+        # df_30 실제 min/max 기준으로 샘플링
+        sample_min = float(row["pdr_min"]) if not pd.isna(row["pdr_min"]) else pdr_mean
+        sample_max = float(row["pdr_max"]) if not pd.isna(row["pdr_max"]) else pdr_mean
 
         if sample_min == sample_max:
             cmd += ["--cond", str(pdr_mean)]

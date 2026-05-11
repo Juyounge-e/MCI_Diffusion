@@ -14,7 +14,7 @@ import geopandas as gpd
 # =============================================
 # 설정
 # =============================================
-GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\grid_compare.csv'
+GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\csv\seed_free_compare_rygb_30runs.csv'
 GRID_META_PATH    = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 DATA_PATH         = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_3000_seed_free_30runs.csv')
 SHP_PATH          = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
