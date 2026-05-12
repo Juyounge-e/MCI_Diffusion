@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy import stats
 import glob
 import os
 
@@ -11,7 +12,7 @@ import os
 sample_dir = r'C:\Users\user00\Desktop\MCI_Diffusion\outputs\mlp_diffusion\resolution_seed_free_30runs30'
 SAMPLE_CSVS  = sorted(glob.glob(os.path.join(sample_dir, '*.csv')))
 DATA_PATH    = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_3000_seed_free_30runs.csv')
-DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\dataset4run_idx_fix\daejeon_grid_dataset.csv')
+DATA_PATH_GRID = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\output.csv')
 GRID_META_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 
 # =============================================
@@ -157,26 +158,58 @@ grid_compare['q_idx_diff'] = grid_compare['gen_mean_q_idx'] - grid_compare['sim_
 # =============================================
 # Step 8. 수치 비교 요약
 # =============================================
+from scipy import stats
+
 valid = grid_compare[
     (grid_compare['sim_count'] > 0) &
     (grid_compare['gen_count'] > 0)
 ].copy()
 
+sim_only = (grid_compare['sim_count'] > 0) & (grid_compare['gen_count'] == 0)
+gen_only = (grid_compare['sim_count'] == 0) & (grid_compare['gen_count'] > 0)
+sim_cells = (grid_compare['sim_count'] > 0).sum()
+
 print(f"\n{'='*50}")
 print(f"[비교 결과 요약]")
 print(f"{'='*50}")
 print(f"  전체 그리드 셀:     {len(grid_compare)}개")
-print(f"  sim 포인트 있는 셀: {(grid_compare['sim_count'] > 0).sum()}개")
+print(f"  sim 포인트 있는 셀: {sim_cells}개")
 print(f"  gen 포인트 있는 셀: {(grid_compare['gen_count'] > 0).sum()}개")
 print(f"  비교 가능한 셀:     {len(valid)}개")
-print(f"  sim만 있는 셀:      {((grid_compare['sim_count'] > 0) & (grid_compare['gen_count'] == 0)).sum()}개")
-print(f"  gen만 있는 셀:      {((grid_compare['sim_count'] == 0) & (grid_compare['gen_count'] > 0)).sum()}개")
+print(f"  sim만 있는 셀:      {sim_only.sum()}개")
+print(f"  gen만 있는 셀:      {gen_only.sum()}개")
+
+# Coverage
+coverage = len(valid) / sim_cells if sim_cells > 0 else 0.0
+print(f"\n[Coverage 분석]")
+print(f"  Sim 셀 커버리지: {len(valid)}/{sim_cells} ({coverage*100:.1f}%)")
+
+# Q-bin별 커버리지
+grid_compare['sim_q_bin'] = grid_compare['sim_mean_q_idx'].round().astype('Int64')
+for qb in sorted(grid_compare['sim_q_bin'].dropna().unique()):
+    qb_sim = ((grid_compare['sim_count'] > 0) & (grid_compare['sim_q_bin'] == qb)).sum()
+    qb_cov = ((grid_compare['sim_count'] > 0) & (grid_compare['gen_count'] > 0) & (grid_compare['sim_q_bin'] == qb)).sum()
+    label = tick_labels[int(qb)] if int(qb) < len(tick_labels) else f"Q{int(qb)+1}"
+    print(f"    {label}: {qb_cov}/{qb_sim} ({qb_cov/qb_sim*100:.1f}%)" if qb_sim > 0 else f"    {label}: -")
+
 print(f"\n[PDR 차이 통계 (gen - sim)]")
-print(f"  MAE:      {valid['pdr_diff'].abs().mean():.6f}")
-print(f"  RMSE:     {np.sqrt((valid['pdr_diff'] ** 2).mean()):.6f}")
-print(f" NRMSE:     {np.sqrt((valid['pdr_diff'] ** 2).mean()) / (valid['sim_mean_pdr'].max() - valid['sim_mean_pdr'].min()):.6f}")
-print(f"  Bias:     {valid['pdr_diff'].mean():.6f}")
-print(f"  Max diff: {valid['pdr_diff'].abs().max():.6f}")
+rmse = np.sqrt((valid['pdr_diff'] ** 2).mean())
+nrmse_range = rmse / (valid['sim_mean_pdr'].max() - valid['sim_mean_pdr'].min())
+cv_rmse = rmse / valid['sim_mean_pdr'].mean()
+r, p_val = stats.pearsonr(valid['sim_mean_pdr'], valid['gen_mean_pdr'])
+print(f"  MAE:        {valid['pdr_diff'].abs().mean():.6f}")
+print(f"  RMSE:       {rmse:.6f}")
+print(f"  NRMSE:      {nrmse_range:.6f}")
+# print(f"  CV-RMSE:    {cv_rmse:.6f}  (mean 정규화)")
+print(f"  Bias:       {valid['pdr_diff'].mean():.6f}")
+print(f"  Max diff:   {valid['pdr_diff'].abs().max():.6f}")
+print(f"  Pearson r:  {r:.4f}  (R²={r**2:.4f}, p={p_val:.4e})")
+
+# print(f"\n[Q-idx 차이 통계 (gen - sim)]")
+# print(f"  MAE:        {valid['q_idx_diff'].abs().mean():.4f}")
+# print(f"  RMSE:       {np.sqrt((valid['q_idx_diff'] ** 2).mean()):.4f}")
+# print(f"  Bias:       {valid['q_idx_diff'].mean():.4f}")
+# print(f"  Max diff:   {valid['q_idx_diff'].abs().max():.4f}")
 
 # =============================================
 # Step 9. 저장
