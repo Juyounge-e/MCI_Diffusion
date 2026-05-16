@@ -45,11 +45,12 @@ def main():
     parser.add_argument("--pdr", type=float, default=0.042927, help="pdr_mean 값")
     parser.add_argument("--normal", nargs=2, type=float, default=None, metavar=("mean", "std"), help="pdr를 Normal(mean, std)에서 샘플링")
     parser.add_argument("--uniform", nargs=2, type=float, default=None, metavar=("min", "max"), help="pdr를 Uniform(min, max)에서 샘플링")
-    parser.add_argument("--N_only", type=int, default=30, help="N-only 입력값")
+    parser.add_argument("--N", type=int, default=30, help="총 rygb 개수 (항상 입력)")
     parser.add_argument(
-        "--rygb", nargs=4, type=int, default=None, metavar=("RED", "YELLOW", "GREEN", "BLACK"), help="red/yellow/green/black count 직접 입력")
+        "--rygb", nargs=4, type=float, default=None, metavar=("RED", "YELLOW", "GREEN", "BLACK"),
+        help="red/yellow/green/black 비율 직접 입력 (합이 1이 되도록 자동 정규화). 생략 시 ratio_bank에서 샘플링.")
     parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "ratio_bank.pkl"))
-    parser.add_argument("--n_tol", type=int, default=2, help="N-only에서 ratio 검색 허용 범 위")
+    parser.add_argument("--n_tol", type=int, default=2, help="ratio_bank N 검색 허용 범위")
     parser.add_argument("--timesteps", type=int, default=1000)
     args = parser.parse_args()
 
@@ -71,37 +72,32 @@ def main():
     x_scaler = scalers.x_scaler
     c_scaler = scalers.c_scaler
 
-    cond_dim = getattr(cfg, "cond_dim", 5)
-    if cond_dim != 5:
-        raise ValueError(f"현재 sample_mlp.py는 cond_dim=5 전용입니다. 현재 cond_dim={cond_dim}")
+    cond_dim = getattr(cfg, "cond_dim", 6)
+    if cond_dim != 6:
+        raise ValueError(f"현재 sample_mlp.py는 cond_dim=6 전용입니다. 현재 cond_dim={cond_dim}")
 
     n_samples = args.sample_num
     rng = np.random.default_rng()
 
-    if args.rygb is not None:
-        red, yellow, green, black = args.rygb
-        if min(red, yellow, green, black) < 0:
-            raise ValueError("rygb는 음수일 수 없습니다.")
-        N_val = red + yellow + green + black
-        rygb_cols = np.tile(
-            np.array([red, yellow, green, black], dtype=np.float32),
-            (n_samples, 1),
-        )
-    else:
-        N_val = args.N_only
-        if N_val <= 0:
-            raise ValueError("N_only는 1 이상의 정수여야 합니다.")
+    N_val = args.N
+    if N_val <= 0:
+        raise ValueError("--N은 1 이상의 정수여야 합니다.")
 
+    if args.rygb is not None:
+        ratios = np.array(args.rygb, dtype=np.float32)
+        if np.any(ratios < 0):
+            raise ValueError("--rygb 값은 음수일 수 없습니다.")
+        ratios = ratios / ratios.sum()  # 합이 1이 되도록 정규화
+        rygb_ratios = np.tile(ratios, (n_samples, 1))
+    else:
         with open(args.ratio_bank, "rb") as f:
             ratio_bank = pickle.load(f)
+        rygb_ratios = np.array(
+            [sample_ratio_from_bank(ratio_bank, N_val, args.n_tol, rng) for _ in range(n_samples)],
+            dtype=np.float32,
+        )
 
-        rygb_list = []
-        for _ in range(n_samples):
-            ratio = sample_ratio_from_bank(ratio_bank, N_val, args.n_tol, rng)
-            red, yellow, green, black = rng.multinomial(N_val, ratio).tolist()
-            rygb_list.append([red, yellow, green, black])
-
-        rygb_cols = np.array(rygb_list, dtype=np.float32)
+    N_col = np.full((n_samples, 1), float(N_val), dtype=np.float32)
 
     if args.uniform is not None:
         low, high = args.uniform
@@ -116,7 +112,7 @@ def main():
     else:
         pdr_samples = np.full((n_samples, 1), args.pdr, dtype=np.float32)
     
-    cond_np = np.concatenate([pdr_samples, rygb_cols], axis=1)
+    cond_np = np.concatenate([pdr_samples, N_col, rygb_ratios], axis=1)  # (n_samples, 6)
 
     if c_scaler is not None:
         cond_np = c_scaler.transform(cond_np)
@@ -147,17 +143,17 @@ def main():
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["lat", "lon", "N", "pdr", "red", "yellow", "green", "black"])
+        writer.writerow(["lat", "lon", "N", "pdr", "r_ratio", "y_ratio", "g_ratio", "b_ratio"])
         for i in range(len(x_np)):
             writer.writerow([
                 float(x_np[i, 0]),
                 float(x_np[i, 1]),
-                int(np.sum(rygb_cols[i])),
+                N_val,
                 round(float(pdr_samples[i, 0]), 6),
-                int(rygb_cols[i, 0]),
-                int(rygb_cols[i, 1]),
-                int(rygb_cols[i, 2]),
-                int(rygb_cols[i, 3]),
+                round(float(rygb_ratios[i, 0]), 6),
+                round(float(rygb_ratios[i, 1]), 6),
+                round(float(rygb_ratios[i, 2]), 6),
+                round(float(rygb_ratios[i, 3]), 6),
             ])
 
     print(f"Saved: {args.out} ({len(x_np)} rows)")

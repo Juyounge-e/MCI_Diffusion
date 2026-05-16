@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 # =============================================
 # 설정
@@ -186,16 +187,38 @@ print(f"  gen만 있는 셀:      {((grid_compare['sim_count'] == 0) & (grid_com
 if len(valid) == 0:
     print("\n[WARN] 비교 가능한 셀이 없습니다.")
 else:
+    sim_cells = (grid_compare['sim_count'] > 0).sum()
+    coverage = len(valid) / sim_cells if sim_cells > 0 else 0.0
+
+    print(f"\n[Coverage 분석]")
+    print(f"  Sim 셀 커버리지: {len(valid)}/{sim_cells} ({coverage*100:.1f}%)")
+    q_bins = sorted(int(qb) for qb in grid_compare['sim_mean_q_idx'].dropna().round().unique())
+    for qb in q_bins:
+        qb_sim = ((grid_compare['sim_count'] > 0) & (grid_compare['sim_mean_q_idx'].round() == qb)).sum()
+        qb_cov = ((grid_compare['sim_count'] > 0) & (grid_compare['gen_count'] > 0) & (grid_compare['sim_mean_q_idx'].round() == qb)).sum()
+        label = tick_labels[qb] if qb < len(tick_labels) else f"Q{qb+1}"
+        print(f"    {label}: {qb_cov}/{qb_sim} ({qb_cov/qb_sim*100:.1f}%)" if qb_sim > 0 else f"    {label}: -")
+
     rmse = np.sqrt((valid['pdr_diff'] ** 2).mean())
     pdr_range = valid['sim_mean_pdr'].max() - valid['sim_mean_pdr'].min()
     nrmse = rmse / pdr_range if pdr_range > 0 else np.nan
+    cv_rmse = rmse / valid['sim_mean_pdr'].mean()
+    r, p_val = stats.pearsonr(valid['sim_mean_pdr'], valid['gen_mean_pdr'])
 
     print(f"\n[PDR 차이 통계 (gen - sim)]")
-    print(f"  MAE:      {valid['pdr_diff'].abs().mean():.6f}")
-    print(f"  RMSE:     {rmse:.6f}")
-    print(f"  NRMSE:    {nrmse:.6f}")
-    print(f"  Bias:     {valid['pdr_diff'].mean():.6f}")
-    print(f"  Max diff: {valid['pdr_diff'].abs().max():.6f}")
+    print(f"  MAE:        {valid['pdr_diff'].abs().mean():.6f}")
+    print(f"  RMSE:       {rmse:.6f}")
+    print(f"  NRMSE:      {nrmse:.6f}  (range 정규화)")
+    print(f"  CV-RMSE:    {cv_rmse:.6f}  (mean 정규화)")
+    print(f"  Bias:       {valid['pdr_diff'].mean():.6f}")
+    print(f"  Max diff:   {valid['pdr_diff'].abs().max():.6f}")
+    print(f"  Pearson r:  {r:.4f}  (R²={r**2:.4f}, p={p_val:.4e})")
+
+    print(f"\n[Q-idx 차이 통계 (gen - sim)]")
+    print(f"  MAE:        {valid['q_idx_diff'].abs().mean():.4f}")
+    print(f"  RMSE:       {np.sqrt((valid['q_idx_diff'] ** 2).mean()):.4f}")
+    print(f"  Bias:       {valid['q_idx_diff'].mean():.4f}")
+    print(f"  Max diff:   {valid['q_idx_diff'].abs().max():.4f}")
 
 # =============================================
 # Step 9. 저장

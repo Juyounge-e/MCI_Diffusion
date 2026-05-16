@@ -30,7 +30,7 @@ except Exception:
 import numpy as np
 import pandas as pd
 import random
-from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders
+from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders, counts_to_ratio_cond
 from src.model.build import MLPDiffusionConfig, build_model_and_optimizer
 from src.diffusion.scheduler import TabDDPMGaussianScheduler
 
@@ -94,15 +94,16 @@ def main():
     has_yellow = "yellow" in _df.columns
     has_green = "green" in _df.columns
     has_black = "black" in _df.columns
-    if has_red and has_yellow and has_green and has_black:
-        c_cols = ["pdr_mean", "red" , "yellow", "green", "black"]
-        cond_dim = 5
+    has_rygb = has_red and has_yellow and has_green and has_black
+    if has_rygb:
+        c_cols = ["pdr_mean", "red", "yellow", "green", "black"]
+        cond_dim = 6  # pdr, N, r_ratio, y_ratio, g_ratio, b_ratio
     else:
         c_cols = ["pdr_mean"]
         cond_dim = 1
         print("  [WARN] CSV에 r/y/g/b 컬럼 없음. pdr_mean만 사용.")
-        
-    print(f"  cond_cols = {c_cols} (cond_dim={cond_dim})")
+
+    print(f"  cond_cols = {c_cols} -> cond_dim={cond_dim} (rygb 있으면 비율+N으로 변환)")
 
     cfg = MLPDiffusionConfig(
         x_dim=2,
@@ -133,6 +134,8 @@ def main():
     print(f"  data: {csv_path}")
     print(f"  saved outputs to: {out_dir}")
     x, c = load_csv(csv_path, x_cols, c_cols)
+    if has_rygb:
+        c = counts_to_ratio_cond(c)  # [pdr, r, y, g, b] → [pdr, N, r/N, y/N, g/N, b/N]
     train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
 
     # 학습 데이터 랜덤 샘플링 
