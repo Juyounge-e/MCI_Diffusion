@@ -19,7 +19,7 @@ import requests
 from haversine import Unit, haversine
 from shapely.geometry import Point
 
-DEFAULT_OSRM = "https://router.project-osrm.org"
+DEFAULT_OSRM = "http://localhost:5001"
 DEFAULT_OVERPASS = "https://overpass-api.de/api/interpreter"
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -546,6 +546,7 @@ def export_random_metadata(points: List[Dict[str, Any]], output_path: Path) -> N
     df = pd.DataFrame(points)
     ordered_cols = [
         "index",
+        "region",
         "random_latitude",
         "random_longitude",
         "snapped_latitude",
@@ -583,7 +584,7 @@ def export_custom_metadata(points: List[Dict[str, Any]], output_path: Path) -> N
 def main() -> int:
     parser = argparse.ArgumentParser(description="OSRM/Overpass 기반 좌표 스냅 생성기")
     parser.add_argument("--mode", choices=["random", "custom"], default="random", help="실행 모드 (random/custom)")
-    parser.add_argument("--region", default="daejeon", help="지역 키워드 (기본: daejeon)")
+    parser.add_argument("--region", default="daejeon", help="지역 키워드 (기본: daejeon) 또는 'national'(전국 17개 시도)")
     parser.add_argument("--exp-id", dest="exp_id", default=None, help="실험 ID (기본: exp_YYYYMMDD_HHMMSS)")
     parser.add_argument("--custom-csv", dest="custom_csv", default="", help="custom 모드 입력 CSV 경로 (lat, lon, N)")
     parser.add_argument("--num-points", "--num_points", dest="num_points", type=int, default=100, help="생성할 스냅 좌표 개수")
@@ -595,7 +596,7 @@ def main() -> int:
     parser.add_argument("--overpass", default="", help="Overpass API URL (빈 문자열이면 비활성화)")
     parser.add_argument("--profile", default="driving", help="OSRM 프로파일")
     parser.add_argument("--seed", type=int, default=None, help="난수 시드")
-    parser.add_argument("--max-attempts", type=int, default=2000, help="최대 시도 횟수")
+    parser.add_argument("--max-attempts", type=int, default=600000, help="최대 시도 횟수")
     parser.add_argument("--rate-limit-delay", type=float, default=0.3, help="OSRM 호출 간 지연(초)")
     parser.add_argument("--progress-every", type=int, default=50, help="진행 로그 출력 간격(생성 개수 기준)")
     parser.add_argument("--save-every", type=int, default=50, help="중간 저장 간격(생성 개수 기준, 0이면 비활성)")
@@ -680,6 +681,96 @@ def main() -> int:
         )
         return 0
 
+    shp_path = str(_resolve_path(args.shp))
+
+    # ── national 모드: 17개 시도 순회 ──────────────────────────────────────
+    if args.region.lower() == "national":
+        print("=" * 70)
+        print("전국 랜덤 좌표 생성 (national mode)")
+        print("=" * 70)
+        print(f"실험 ID  : {exp_id}")
+        print(f"목표 개수: {args.num_points}")
+        print(f"N 범위   : {args.incident_size_min} ~ {args.incident_size_max}")
+        print(f"스냅 반경: {args.radius_m} m")
+
+        region_keys = list(REGION_MAP.keys())
+        n_regions = len(region_keys)
+        base_count = args.num_points // n_regions
+        remainder = args.num_points % n_regions
+
+        output_dir = BASE_DIR / "scenarios" / f"national_{exp_id}"
+        output_path = output_dir / "random_metadata.csv"
+
+        generator = RandomCoordinateGenerator(
+            shp_path=shp_path,
+            region=region_keys[0],
+            osrm_base=args.osrm,
+            overpass_url=args.overpass,
+            profile=args.profile,
+            radius_m=args.radius_m,
+            incident_size_min=args.incident_size_min,
+            incident_size_max=args.incident_size_max,
+            seed=args.seed,
+            rate_limit_delay=args.rate_limit_delay,
+        )
+
+        all_points: List[Dict[str, Any]] = []
+        failed_regions: List[str] = []
+
+        for i, region_key in enumerate(region_keys):
+            n_for_region = base_count + (1 if i < remainder else 0)
+            kor_name = REGION_MAP[region_key]["kor"]
+            print(f"\n[{i + 1}/{n_regions}] {region_key} ({kor_name}) — {n_for_region}개 목표")
+            try:
+                generator.set_region(region_key)
+                sido_save_path = output_dir / f"partial_{region_key}.csv"
+                points = generator.generate_snapped_points(
+                    n_for_region,
+                    max_attempts=args.max_attempts,
+                    progress_every=args.progress_every,
+                    save_path=sido_save_path,
+                    save_every=args.save_every,
+                )
+                for p in points:
+                    p["region"] = region_key
+                all_points.extend(points)
+                print(f"  -> {len(points)}개 완료")
+            except Exception as e:
+                print(f"  [경고] {region_key} 생성 실패: {e} — 건너뜀")
+                failed_regions.append(region_key)
+
+        for idx, p in enumerate(all_points, start=1):
+            p["index"] = idx
+
+        export_random_metadata(all_points, output_path)
+
+        df = pd.DataFrame(all_points)
+        print("\n전국 요약")
+        print(f"- 총 생성 개수: {len(df)}")
+        print("- 시도별 분포:")
+        for rk, grp in df.groupby("region"):
+            rk = str(rk)
+            print(f"    {rk:12s} ({REGION_MAP[rk]['kor']}): {len(grp)}개")
+        if failed_regions:
+            print(f"- 실패 시도: {', '.join(failed_regions)}")
+        print(f"- 스냅 위도 범위: {df['snapped_latitude'].min():.6f} ~ {df['snapped_latitude'].max():.6f}")
+        print(f"- 스냅 경도 범위: {df['snapped_longitude'].min():.6f} ~ {df['snapped_longitude'].max():.6f}")
+        print(
+            f"- 스냅 거리(m): min={df['snap_distance_m'].min():.2f}, "
+            f"max={df['snap_distance_m'].max():.2f}, mean={df['snap_distance_m'].mean():.2f}"
+        )
+        if "N" in df.columns:
+            print(f"- 사고 규모 N: min={int(df['N'].min())}, max={int(df['N'].max())}, mean={df['N'].mean():.2f}")
+        print("\n출력:")
+        print(f"- {output_path}")
+        print("\n다음 단계:")
+        print(
+            f"1. python MCI_ADV2\\sce_src\\batch_experiment.py --base_path {BASE_DIR} "
+            f"--random_metadata {output_path} --config_template {BASE_DIR / 'sim_src' / 'config.yaml'}"
+        )
+        return 0
+
+    # ── 단일 지역 random 모드 ───────────────────────────────────────────────
     print("=" * 70)
     print("랜덤 좌표 생성")
     print("=" * 70)
@@ -689,7 +780,6 @@ def main() -> int:
     print(f"N 범위: {args.incident_size_min} ~ {args.incident_size_max}")
     print(f"스냅 반경: {args.radius_m} m")
 
-    shp_path = str(_resolve_path(args.shp))
     generator = RandomCoordinateGenerator(
         shp_path=shp_path,
         region=args.region,
