@@ -1,6 +1,6 @@
 """
 CVAE 학습: (lat, lon) | pdr_mean, N
-- 데이터: src/data/snapped_dataset.csv
+- 데이터: src/data/dataset.csv
 - X: lat, lon / Condition: pdr_mean,N
 """
 import os

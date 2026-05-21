@@ -14,7 +14,7 @@ import geopandas as gpd
 # =============================================
 # 설정
 # =============================================
-GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\grid_compare.csv'
+GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\csv\seed_free_compare_rygb_30runs.csv'
 GRID_META_PATH    = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
 DATA_PATH         = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_3000_seed_free_30runs.csv')
 SHP_PATH          = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
@@ -25,12 +25,10 @@ PDR_SUMMARY_PATH  = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\an
 # =============================================
 # 데이터 로드
 # =============================================
-df           = pd.read_csv(DATA_PATH)
 grid_compare = pd.read_csv(GRID_COMPARE_PATH)
 grid_meta    = pd.read_csv(GRID_META_PATH)
 summary_df   = pd.read_csv(PDR_SUMMARY_PATH)
 
-print(f"학습 데이터: {len(df)}개")
 print(f"grid_compare: {len(grid_compare)}개")
 print(f"grid_meta: {len(grid_meta)}개")
 print(f"pdr_summary: {len(summary_df)}개")

@@ -30,7 +30,7 @@ except Exception:
 import numpy as np
 import pandas as pd
 import random
-from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders
+from src.data.data_module import load_csv, make_splits, fit_transform_scalers, make_loaders, counts_to_ratio_cond
 from src.model.build import MLPDiffusionConfig, build_model_and_optimizer
 from src.diffusion.scheduler import TabDDPMGaussianScheduler
 
@@ -39,23 +39,39 @@ def linear_warmdown(step: int, total_steps: int, base_lr: float) -> float:
     frac_done = step / max(1, total_steps)
     return base_lr * (1.0 - frac_done)
 
+# CSV에서 r/y/g/b 비율 계산 (N-only 옵션에서 활용)
+def build_ratio_bank(df: pd.DataFrame):
+    ratio_bank = {}
+    for _, row in df.iterrows():
+        counts = np.array([row["red"], row["yellow"], row["green"], row["black"]], dtype=np.float32)
+        total = counts.sum()
+        if total <= 0:
+            continue
+        n_key = int(row['N']) 
+        ratio = counts / total
+        ratio_bank.setdefault(n_key, []).append(ratio)
+    return ratio_bank
 
 def main():
     parser = argparse.ArgumentParser(description="MLP Diffusion 학습 (조건부 lat,lon 생성)")
     parser.add_argument(
         "--csv",
         type=str,
-        default=os.path.join("src", "data", "dataset.csv"),
-        help="학습용 CSV 경로 (lat, lon, pdr_mean, [N] 필요)",
+        default=os.path.join("src", "data", "test.csv"),
+        help="학습용 CSV 경로 (lat, lon, pdr_mean, [r/y/g/b] 필요)",
     )
     parser.add_argument(
         "--max_train",
         type=int,
         default=0,
-        help="학습에 사용할 최대 train 샘플 수. 0이면 전체 사용.",
+        help="학습에 사용할 최대 train 샘플 수. default=0이면 전체 사용.",
     )
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "2898_30runs"), help="모델과 로그 저장 디렉토리")
-    
+    parser.add_argument(
+        "--out_dir",
+        type=str,
+        default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs"),
+        help="학습 결과를 저장할 디렉토리 경로",
+    )
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
     
     args = parser.parse_args()
@@ -70,19 +86,24 @@ def main():
     torch.manual_seed(seed)
 
     # ----------------
-    # Config (CSV에 N 있으면 항상 사용)
+    # Config (CSV에 r/y/g/b 있으면 항상 사용)
     # ----------------
     x_cols = ["lat", "lon"]
     _df = pd.read_csv(csv_path, nrows=1)
-    has_N = "N" in _df.columns
-    if has_N:
-        c_cols = ["pdr_mean", "N"]
-        cond_dim = 2
+    has_red = "red" in _df.columns
+    has_yellow = "yellow" in _df.columns
+    has_green = "green" in _df.columns
+    has_black = "black" in _df.columns
+    has_rygb = has_red and has_yellow and has_green and has_black
+    if has_rygb:
+        c_cols = ["pdr_mean", "red", "yellow", "green", "black"]
+        cond_dim = 6  # pdr, N, r_ratio, y_ratio, g_ratio, b_ratio
     else:
         c_cols = ["pdr_mean"]
         cond_dim = 1
-        print("  [WARN] CSV에 N 컬럼 없음. pdr_mean만 사용.")
-    print(f"  cond_cols = {c_cols} (cond_dim={cond_dim})")
+        print("  [WARN] CSV에 r/y/g/b 컬럼 없음. pdr_mean만 사용.")
+
+    print(f"  cond_cols = {c_cols} -> cond_dim={cond_dim} (rygb 있으면 비율+N으로 변환)")
 
     cfg = MLPDiffusionConfig(
         x_dim=2,
@@ -97,8 +118,15 @@ def main():
     )
     device = cfg.device
 
+    out_dir = args.out_dir
     os.makedirs(out_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
+
+    # ---------------
+    # ratio bank 구축 (N-only 모델에서 활용)
+    # ---------------
+    df = pd.read_csv(csv_path)
+    ratio_bank = build_ratio_bank(df)
 
     # ----------------
     # Data
@@ -106,6 +134,8 @@ def main():
     print(f"  data: {csv_path}")
     print(f"  saved outputs to: {out_dir}")
     x, c = load_csv(csv_path, x_cols, c_cols)
+    if has_rygb:
+        c = counts_to_ratio_cond(c)  # [pdr, r, y, g, b] → [pdr, N, r/N, y/N, g/N, b/N]
     train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
 
     # 학습 데이터 랜덤 샘플링 
@@ -157,7 +187,7 @@ def main():
     while global_step < total_steps:
         for xb, cb in train_loader:
             xb = xb.to(device)  # (B, 2)
-            cb = cb.to(device)  # (B, 1)
+            cb = cb.to(device)  # (B, 5)
 
             # 타임스텝 샘플링
             b = xb.shape[0]
@@ -204,6 +234,9 @@ def main():
     with open(os.path.join(out_dir, "scalers.pkl"), "wb") as f:
         pickle.dump(scalers, f)
     writer.close()
+    #ratio_bank 저장 (N-only 모델에서 활용)
+    with open(os.path.join(out_dir, "ratio_bank.pkl"), "wb") as f:
+        pickle.dump(ratio_bank, f)
 
 
 if __name__ == "__main__":
