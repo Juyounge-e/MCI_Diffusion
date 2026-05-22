@@ -20,6 +20,7 @@ def build_bin_stats(
     n_min: Optional[int] = None,
     n_max: Optional[int] = None,
 ) -> pd.DataFrame:
+
     # =============================================
     # 1) 전체 학습 데이터 로드
     # =============================================
@@ -35,22 +36,30 @@ def build_bin_stats(
     # =============================================
     # 2) 전체 학습 데이터 기준 q-bin 경계 생성
     # =============================================
-    _, bin_edges = pd.qcut(
+    _, summary_bins = pd.qcut(
         full_df["pdr_mean"],
         q=num_bins,
         retbins=True,
         duplicates="drop",
     )
 
-    actual_bins = len(bin_edges) - 1
-    labels = [f"q{i + 1}" for i in range(actual_bins)]
+    summary_bins = summary_bins.astype(float)
+    summary_bins.sort()
 
-    bin_edges = bin_edges.astype(float)
-    bin_edges[0] = -np.inf
-    bin_edges[-1] = np.inf
+    labels = [
+    f"[q{i}: {summary_bins[i]:.10f}, {summary_bins[i+1]:.10f}]"
+    for i in range(len(summary_bins) - 1)]
 
     # =============================================
-    # 3) 목표 N 범위 필터링
+    # 3) pd.cut용 bins 생성
+    # =============================================
+    cut_bins = summary_bins.copy()
+
+    cut_bins[0] = -np.inf
+    cut_bins[-1] = np.inf
+
+    # =============================================
+    # 4) 목표 N 범위 필터링
     # =============================================
     df = full_df.copy()
 
@@ -69,53 +78,60 @@ def build_bin_stats(
         )
 
     # =============================================
-    # 4) 전체 학습 데이터 기준 bin을 N-filtered df에 적용
+    # 5) 전체 기준 q-bin 적용
     # =============================================
     df["q_bin"] = pd.cut(
         df["pdr_mean"],
-        bins=bin_edges,
-        labels=labels,
+        bins=cut_bins,
         include_lowest=True,
         right=True,
-    )
-
-    outside_count = df["q_bin"].isna().sum()
-    if outside_count > 0:
-        print(f"[경고] bin 밖 데이터 수: {outside_count}")
-        print(df[df["q_bin"].isna()][["pdr_mean", "N"]].head(20).to_string(index=False))
-
-    # =============================================
-    # 5) bin별 통계 계산
-    # =============================================
-    bin_stats = (
-        df.groupby("q_bin", observed=False)
-        .agg(
-            count=("pdr_mean", "count"),
-            pdr_mean=("pdr_mean", "mean"),
-            pdr_std=("pdr_mean", "std"),
-            pdr_min=("pdr_mean", "min"),
-            pdr_max=("pdr_mean", "max"),
-        )
-        .reset_index()
+        labels=labels
     )
 
     # =============================================
-    # 6) ratio 및 sample_num 계산
+    # 6) bin별 통계 계산
     # =============================================
-    total_count = bin_stats["count"].sum()
-    bin_stats["ratio"] = bin_stats["count"] / max(1, total_count)
+    bin_stats = df.groupby("q_bin",observed=False).agg(
+        count=("pdr_mean", "count"),
+        pdr_mean=("pdr_mean", "mean"),
+        pdr_std=("pdr_mean", "std"),
+        pdr_min=("pdr_mean", "min"),
+        pdr_max=("pdr_mean", "max")
+    ).reset_index()
 
+    # =============================================
+    # 7) pdr_summary 기준 경계 추가
+    # =============================================
+    bin_stats["bin_min"] = summary_bins[:-1]
+    bin_stats["bin_max"] = summary_bins[1:]
+    bin_stats["bin_width"] = (
+        bin_stats["bin_max"] -
+        bin_stats["bin_min"]
+    )
+
+    # =============================================
+    # 8) ratio 계산
+    # =============================================
+    bin_stats["ratio"] = (
+        bin_stats["count"] /
+        bin_stats["count"].sum()
+    )
+
+    # =============================================
+    # 9) sample_num 계산
+    # =============================================
     bin_stats["sample_num"] = (
-        bin_stats["ratio"] * total_samples
+        bin_stats["ratio"] *
+        total_samples
     ).round().astype(int)
 
-    bin_stats["pdr_std"] = bin_stats["pdr_std"].fillna(0.0)
-
-    # 반올림 보정
-    diff = int(total_samples - bin_stats["sample_num"].sum())
-    if diff != 0 and len(bin_stats) > 0:
-        target_idx = bin_stats["count"].idxmax()
-        bin_stats.loc[target_idx, "sample_num"] += diff
+    # =============================================
+    # 10) NaN 처리
+    # =============================================
+    bin_stats["pdr_std"] = (
+        bin_stats["pdr_std"]
+        .fillna(0)
+    )
 
     return bin_stats
 
@@ -151,7 +167,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--training_csv", type=str, default=None, help="전체 학습 데이터 CSV")
-    parser.add_argument("--bin_stats", type=str, default=os.path.join("notebooks", "30runs_bin_stats_n30.csv"))
+    parser.add_argument("--bin_stats", type=str, default= None)
     parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_seed_free_30runs30"))
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
