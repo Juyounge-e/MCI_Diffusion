@@ -5,10 +5,10 @@ from glob import glob
 from typing import Dict, Tuple, Optional
 
 # 새 실험 결과/메타데이터 경로
-RESULTS_ROOT = r"./MCI_ADV2/results/daejeon_3000_random"
-METADATA_CSV = r"./MCI_ADV2/scenarios/daejeon_3000_random/experiment_metadata.csv"
+RESULTS_ROOT = r"./MCI_ADV2/results/gyeongnam_exp_20260519_014658"
+METADATA_CSV = r"./MCI_ADV2/scenarios/gyeongnam_exp_20260519_014658/experiment_metadata.csv"
 
-OUT_CSV = "src/data/test.csv"
+OUT_CSV = "src/data/national/gyeongnam_random.csv"
 
 PDR_LINE_INDEX = 2
 PDR_WoG_LINE_INDEX = 4
@@ -74,7 +74,9 @@ latlon_to_N = load_metadata_N(METADATA_CSV)
 print("RUNNING:", __file__, flush=True)
 print("CWD:", os.getcwd(), flush=True)
 
-for folder in subfolders:
+for i, folder in enumerate(subfolders, 1):
+    if i % 1000 == 0:
+        print(f"진행 중: {i}/{len(subfolders)}", flush=True)
     m = FOLDER_RE.search(os.path.basename(folder))
     if not m:
         continue
