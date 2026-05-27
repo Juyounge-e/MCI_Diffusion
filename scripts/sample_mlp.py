@@ -72,9 +72,9 @@ def main():
     x_scaler = scalers.x_scaler
     c_scaler = scalers.c_scaler
 
-    cond_dim = getattr(cfg, "cond_dim", 6)
-    if cond_dim != 6:
-        raise ValueError(f"현재 sample_mlp.py는 cond_dim=6 전용입니다. 현재 cond_dim={cond_dim}")
+    cond_dim = getattr(cfg, "cond_dim", 5)
+    if cond_dim != 5:
+        raise ValueError(f"현재 sample_mlp.py는 cond_dim=5 전용입니다. 현재 cond_dim={cond_dim}")
 
     n_samples = args.sample_num
     rng = np.random.default_rng()
@@ -87,7 +87,7 @@ def main():
         ratios = np.array(args.rygb, dtype=np.float32)
         if np.any(ratios < 0):
             raise ValueError("--rygb 값은 음수일 수 없습니다.")
-        ratios = ratios / ratios.sum()  # 합이 1이 되도록 정규화
+        ratios = ratios / ratios.sum()
         rygb_ratios = np.tile(ratios, (n_samples, 1))
     else:
         with open(args.ratio_bank, "rb") as f:
@@ -97,7 +97,8 @@ def main():
             dtype=np.float32,
         )
 
-    N_col = np.full((n_samples, 1), float(N_val), dtype=np.float32)
+    # ratio → count (모델은 counts로 학습됨)
+    rygb_counts = rygb_ratios * float(N_val)
 
     if args.uniform is not None:
         low, high = args.uniform
@@ -112,7 +113,7 @@ def main():
     else:
         pdr_samples = np.full((n_samples, 1), args.pdr, dtype=np.float32)
     
-    cond_np = np.concatenate([pdr_samples, N_col, rygb_ratios], axis=1)  # (n_samples, 6)
+    cond_np = np.concatenate([pdr_samples, rygb_counts], axis=1)  # (n_samples, 5)
 
     if c_scaler is not None:
         cond_np = c_scaler.transform(cond_np)

@@ -47,7 +47,7 @@ def build_bin_stats(
     summary_bins.sort()
 
     labels = [
-    f"[q{i}: {summary_bins[i]:.10f}, {summary_bins[i+1]:.10f}]"
+    f"[q{i+1}: {summary_bins[i]:.10f}, {summary_bins[i+1]:.10f}]" 
     for i in range(len(summary_bins) - 1)]
 
     # =============================================
@@ -168,23 +168,20 @@ def main():
 
     parser.add_argument("--training_csv", type=str, default=None, help="전체 학습 데이터 CSV")
     parser.add_argument("--bin_stats", type=str, default= None)
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_seed_free_30runs30"))
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "model_last.pt"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "scalers.pkl"))
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_test_national"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_national", "model_last.pt"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_national", "scalers.pkl"))
+    parser.add_argument("--ratio_bank", type=str,default=os.path.join("outputs", "mlp_diffusion", "test_nationals", "ratio_bank.pkl"))
     parser.add_argument("--N", type=int, default=30)
     parser.add_argument("--timesteps", type=int, default=1000)
-    parser.add_argument("--total_samples", type=int, default=5000)
+    parser.add_argument("--total_samples", type=int, default=200000)
     parser.add_argument("--num_bins", type=int, default=10)
     parser.add_argument("--n_min", type=int, default=27)
     parser.add_argument("--n_max", type=int, default=33)
     parser.add_argument("--python_bin", type=str, default="python")
-    parser.add_argument("--rygb", nargs=4, type=int, default=None,
-                        metavar=("red", "yellow", "green", "black"),
-                        help="r/y/g/b 직접 입력 옵션")
-    parser.add_argument("--ratio_bank", type=str,
-                        default=os.path.join("outputs", "mlp_diffusion", "test_rygb_30runs", "ratio_bank.pkl"))
-    parser.add_argument("--n_tol", type=int, default=3,
-                        help="N-only에서 ratio 검색 허용 범위")
+    parser.add_argument("--rygb", nargs=4, type=float, default=None, metavar=("red", "yellow", "green", "black"),
+                        help="r/y/g/b 비율 직접 입력 옵션")
+    parser.add_argument("--n_tol", type=int, default=3, help="N-only에서 ratio 검색 허용 범위")
 
     args = parser.parse_args()
 
@@ -206,7 +203,7 @@ def main():
     # =============================================
     # q-bin별 sample_mlp.py 실행
     # =============================================
-    for _, row in bin_stats.iterrows():
+    for i, (_, row) in enumerate(bin_stats.iterrows()):
         q_bin     = row["q_bin"]
         pdr_mean  = float(row["pdr_mean"]) if not pd.isna(row["pdr_mean"]) else None
         n_samples = int(row["sample_num"])
@@ -219,7 +216,7 @@ def main():
             print(f"[{q_bin}] pdr_mean이 NaN이라 건너뜁니다.")
             continue
 
-        out_csv = os.path.join(args.out_dir, f"{q_bin}_{pdr_mean:.6f}.csv")
+        out_csv = os.path.join(args.out_dir, f"q{i+1}_{pdr_mean:.6f}.csv")
 
         cmd = [
             args.python_bin,
@@ -233,8 +230,6 @@ def main():
             "--ratio_bank", args.ratio_bank,
             "--n_tol",      str(args.n_tol),
         ]
-
-        # rygb 직접 입력 옵션
         if args.rygb is not None:
             cmd += ["--rygb"] + [str(v) for v in args.rygb]
 
@@ -243,8 +238,8 @@ def main():
         sample_max = float(row["pdr_max"]) if not pd.isna(row["pdr_max"]) else pdr_mean
 
         if sample_min == sample_max:
-            cmd += ["--cond", str(pdr_mean)]
-            print(f"[{q_bin}] n={n_samples}, cond={pdr_mean:.10f}")
+            cmd += ["--pdr", str(pdr_mean)]
+            print(f"[{q_bin}] n={n_samples}, pdr={pdr_mean:.10f}")
         else:
             cmd += ["--uniform", str(sample_min), str(sample_max)]
             print(f"[{q_bin}] n={n_samples}, range=[{sample_min:.10f}, {sample_max:.10f}]")

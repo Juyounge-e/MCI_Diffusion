@@ -25,7 +25,7 @@ def get_device(prefer_cuda: bool = True) -> torch.device:
 @dataclass
 class MLPDiffusionConfig:
     x_dim: int = 2
-    cond_dim: int = 6  # pdr_mean, N, r_ratio, y_ratio, g_ratio, b_ratio
+    cond_dim: int = 5  # pdr_mean, r, y, g, b
     dim_t: int = 256
     d_layers: List[int] = None
     dropout: float = 0.1

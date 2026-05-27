@@ -1,8 +1,7 @@
 """
 입력 데이터 형식: lat, lon, pdr_mean, pdr_std, red, yellow, green, black,  source_folder, stat_file
 - X (생성 대상): lat, lon
-- Condition: pdr_mean, N, r_ratio, y_ratio, g_ratio, b_ratio  (6-dim)
-  CSV에서 [pdr_mean, red, yellow, green, black] 로드 후 counts_to_ratio_cond() 로 변환
+- Condition: pdr_mean, r, y, g, b  (5-dim, raw counts, StandardScaler 적용)
 """
 import os
 from dataclasses import dataclass
@@ -19,16 +18,6 @@ from sklearn.preprocessing import StandardScaler
 # ---------- 고정 칼럼 정의 ----------
 X_COLS = ["lat", "lon"]
 COND_COLS = ["pdr_mean", "red", "yellow", "green", "black"]  # CSV 로드용 raw 컬럼
-
-
-def counts_to_ratio_cond(c: np.ndarray) -> np.ndarray:
-    """[pdr, r, y, g, b] (5-dim) → [pdr, N, r/N, y/N, g/N, b/N] (6-dim)"""
-    pdr = c[:, :1]
-    counts = c[:, 1:]
-    N = counts.sum(axis=1, keepdims=True)
-    safe_N = np.where(N > 0, N, 1.0)
-    ratios = counts / safe_N
-    return np.concatenate([pdr, N, ratios], axis=1)
 
 
 @dataclass
@@ -157,4 +146,4 @@ if __name__ == "__main__":
 
     xb, cb = next(iter(train_loader))
     print("x batch:", xb.shape)
-    print("c batch:", cb.shape, "(pdr_mean, N, r_ratio, y_ratio, g_ratio, b_ratio)")
+    print("c batch:", cb.shape, "(pdr_mean, r, y, g, b)")
