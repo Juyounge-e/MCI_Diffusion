@@ -73,7 +73,13 @@ def main():
         help="학습 결과를 저장할 디렉토리 경로",
     )
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")
-    
+    parser.add_argument(
+        "--mask_path",
+        type=str,
+        default=os.path.join("MCI_ADV2", "scenarios", "mask_cache.npz"),
+        help="사전 계산된 spatial mask npz 경로 (scripts/build_spatial_mask.py 로 생성)",
+    )
+
     args = parser.parse_args()
 
     csv_path = args.csv
@@ -115,6 +121,7 @@ def main():
         lr=1e-3,
         weight_decay=1e-4,
         device=torch.device("cpu"),  # CPU 강제 (GPU 비호환 회피)
+        mask_path=args.mask_path,   
     )
     device = cfg.device
 
@@ -156,6 +163,12 @@ def main():
     # Model / Optim
     # ----------------
     model, optim = build_model_and_optimizer(cfg)
+
+    model.spatial_emb.set_scaler(
+        mean=scalers.x_scaler.mean_,
+        std=scalers.x_scaler.scale_,
+    )
+
     model.train()
 
     # ----------------
