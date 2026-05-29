@@ -52,12 +52,17 @@ def main():
     parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "ratio_bank.pkl"))
     parser.add_argument("--n_tol", type=int, default=2, help="ratio_bank N 검색 허용 범위")
     parser.add_argument("--timesteps", type=int, default=1000)
+    parser.add_argument( "--mask_path",  type=str, default=os.path.join("MCI_ADV2", "scenarios", "mask_cache.npz"), help="사전 계산된 공간 마스크 npz 경로", )
     args = parser.parse_args()
 
     ckpt = torch.load(args.ckpt, map_location="cpu")
     cfg_dict = ckpt.get("cfg", None)
     if cfg_dict is None:
         raise RuntimeError("Checkpoint에 cfg가 없습니다.")
+
+    # 구버전 체크포인트(shp_path) 또는 mask_path 미포함 시 현재 경로로 보완
+    cfg_dict.pop("shp_path", None)
+    cfg_dict.setdefault("mask_path", args.mask_path)
 
     cfg = MLPDiffusionConfig(**cfg_dict)
     device = torch.device(cfg.device)
@@ -71,6 +76,9 @@ def main():
         scalers = pickle.load(f)
     x_scaler = scalers.x_scaler
     c_scaler = scalers.c_scaler
+
+    # 공간 임베딩 역변환용 스케일러 주입 (학습 때와 동일하게 설정)
+    model.spatial_emb.set_scaler(x_scaler.mean_, x_scaler.scale_)
 
     cond_dim = getattr(cfg, "cond_dim", 5)
     if cond_dim != 5:
