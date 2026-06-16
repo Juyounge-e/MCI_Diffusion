@@ -5,10 +5,10 @@ from glob import glob
 from typing import Dict, Tuple, Optional
 
 # 새 실험 결과/메타데이터 경로
-RESULTS_ROOT = r"./MCI_ADV2/results/gyeongnam_exp_20260519_014658"
-METADATA_CSV = r"./MCI_ADV2/scenarios/gyeongnam_exp_20260519_014658/experiment_metadata.csv"
+RESULTS_ROOT = r"./MCI_ADV2/results/gyeongbuk_exp_20260518_032552"
+METADATA_CSV = r"./MCI_ADV2/scenarios/gyeongbuk_exp_20260518_032552/experiment_metadata.csv"
 
-OUT_CSV = "src/data/national/gyeongnam_random.csv"
+OUT_CSV = "src/data/national/gyeongbuk_random.csv"
 
 PDR_LINE_INDEX = 2
 PDR_WoG_LINE_INDEX = 4

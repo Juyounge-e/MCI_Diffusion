@@ -14,13 +14,13 @@ import geopandas as gpd
 # =============================================
 # 설정
 # =============================================
-GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\csv\seed_free_compare_rygb_30runs.csv'
-GRID_META_PATH    = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\daejeon_daejeon_grid\grid_metadata.csv'
-DATA_PATH         = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\daejeon_3000_seed_free_30runs.csv')
+GRID_COMPARE_PATH = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\grid_compare\csv\daejeon_ratio_30runs.csv'
+GRID_META_PATH    = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\Daejeon\daejeon_daejeon_grid\grid_metadata.csv'
+DATA_PATH         = Path(r'C:\Users\user00\Desktop\MCI_Diffusion\src\data\national\daejeon_3000_seed_free_30runs.csv')
 SHP_PATH          = r'C:\Users\user00\Desktop\MCI_Diffusion\MCI_ADV2\scenarios\ctprvn.shp'
 
 # 전체 학습 데이터 기준 pdr_q 정보 CSV
-PDR_SUMMARY_PATH  = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\seed_free_30_30runs.csv'
+PDR_SUMMARY_PATH  = r'C:\Users\user00\Desktop\MCI_Diffusion\notebooks\outputs\analysis\daejeon_mean_summary.csv'
 
 # =============================================
 # 데이터 로드
@@ -281,7 +281,7 @@ draw_grid_heatmap(
 plt.tight_layout()
 
 plt.savefig(
-    "./notebooks/grid_compare/grid_sim_heatmap.png",
+    "./notebooks/grid_compare/ratio_30runs_grid_sim_heatmap.png",
     dpi=150
 )
 
@@ -311,7 +311,7 @@ draw_grid_heatmap(
 plt.tight_layout()
 
 plt.savefig(
-    "./notebooks/grid_compare/grid_gen_heatmap.png",
+    "./notebooks/grid_compare/ratio_30runs_grid_gen_heatmap.png",
     dpi=150
 )
 

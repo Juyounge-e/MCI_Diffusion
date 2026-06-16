@@ -76,7 +76,7 @@ def main():
     parser.add_argument(
         "--mask_path",
         type=str,
-        default=os.path.join("MCI_ADV2", "scenarios", "mask_cache.npz"),
+        default=os.path.join("MCI_ADV2", "scenarios", "mask_cache_0.005.npz"),
         help="사전 계산된 spatial mask npz 경로 (scripts/build_spatial_mask.py 로 생성)",
     )
 
