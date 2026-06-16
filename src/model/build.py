@@ -36,15 +36,17 @@ class MLPDiffusionConfig:
     weight_decay: float = 1e-4
     device: torch.device = None
     mask_path: Optional[str] = None   # build_spatial_mask.py 로 생성한 npz 경로
+    use_spatial_emb: bool = False     # 육지/바다 SpatialValidityEmbedding 사용 여부
+                                      # (기본 OFF — 도로망 후처리/제약으로 대체됨)
 
     def __post_init__(self):
         if self.d_layers is None:
             self.d_layers = [128, 128, 128]
         if self.device is None:
             self.device = get_device()
-        if self.mask_path is None:
+        if self.use_spatial_emb and self.mask_path is None:
             raise ValueError(
-                "mask_path 가 필요합니다.\n"
+                "use_spatial_emb=True 이면 mask_path 가 필요합니다.\n"
                 "먼저 scripts/build_spatial_mask.py 를 실행하여 mask_cache.npz 를 생성하세요."
             )
 
@@ -52,8 +54,13 @@ class MLPDiffusionConfig:
 class MLPDiffusionWithSpatial(MLPDiffusion):
     """
     tab_ddpm.MLPDiffusion 을 상속받아 forward 만 오버라이드.
-    SpatialValidityEmbedding 을 time_embed, label_emb 와
-    동일한 레벨(emb)에서 합산.
+
+    use_spatial_emb=True 일 때만 SpatialValidityEmbedding(육지/바다) 을
+    time_embed, label_emb 와 동일한 레벨(emb)에서 합산.
+
+    NOTE: 육지/바다 spatial_emb 는 (1) 노이즈 좌표 조회 (2) 육지-only 학습 데이터로
+    학습 신호 부재 라는 한계가 확인되어 기본 비활성화. 도로망 후처리/제약(거리 페널티)
+    으로 대체하는 방향. 기존 체크포인트 호환을 위해 플래그로만 보존.
     """
 
     def __init__(self, cfg: MLPDiffusionConfig):
@@ -69,11 +76,13 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
             d_y_cond=cfg.cond_dim,
         )
 
-        # Spatial Validity Embedding — npz 캐시로 초기화 (geopandas 불필요)
-        self.spatial_emb = SpatialValidityEmbedding(
-            mask_path=cfg.mask_path,
-            dim_t=cfg.dim_t,
-        )
+        self.use_spatial_emb = cfg.use_spatial_emb
+        if self.use_spatial_emb:
+            # Spatial Validity Embedding — npz 캐시로 초기화 (geopandas 불필요)
+            self.spatial_emb = SpatialValidityEmbedding(
+                mask_path=cfg.mask_path,
+                dim_t=cfg.dim_t,
+            )
 
     def forward(
         self,
@@ -81,7 +90,7 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
         timesteps: torch.Tensor,
         y: torch.Tensor = None,
     ) -> torch.Tensor:
-       
+
         emb = self.time_embed(timestep_embedding(timesteps, self.dim_t))
 
         # condition embedding
@@ -91,8 +100,9 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
                 y = y.unsqueeze(1)
             emb += F.silu(self.label_emb(y))
 
-        # spatial embedding: x[:, 0]=lat, x[:, 1]=lon (정규화된 값)
-        emb += self.spatial_emb(x[:, 0], x[:, 1])  # (batch, dim_t)
+        # (옵션) spatial embedding: x[:, 0]=lat, x[:, 1]=lon (정규화된 값)
+        if self.use_spatial_emb:
+            emb += self.spatial_emb(x[:, 0], x[:, 1])  # (batch, dim_t)
 
         # proj + emb → mlp
         x = self.proj(x) + emb

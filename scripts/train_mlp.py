@@ -164,10 +164,11 @@ def main():
     # ----------------
     model, optim = build_model_and_optimizer(cfg)
 
-    model.spatial_emb.set_scaler(
-        mean=scalers.x_scaler.mean_,
-        std=scalers.x_scaler.scale_,
-    )
+    if getattr(model, "use_spatial_emb", False) and hasattr(model, "spatial_emb"):
+        model.spatial_emb.set_scaler(
+            mean=scalers.x_scaler.mean_,
+            std=scalers.x_scaler.scale_,
+        )
 
     model.train()
 

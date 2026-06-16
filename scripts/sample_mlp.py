@@ -64,6 +64,11 @@ def main():
     cfg_dict.pop("shp_path", None)
     cfg_dict.setdefault("mask_path", args.mask_path)
 
+    # 구버전 체크포인트(spatial_emb 가중치 포함) 호환:
+    # state_dict 에 spatial_emb.* 키가 있으면 use_spatial_emb 를 켜서 로딩이 깨지지 않게 함.
+    has_spatial = any(k.startswith("spatial_emb.") for k in ckpt["model"].keys())
+    cfg_dict["use_spatial_emb"] = bool(cfg_dict.get("use_spatial_emb", False) or has_spatial)
+
     cfg = MLPDiffusionConfig(**cfg_dict)
     device = torch.device(cfg.device)
     device_str = f"{device.type}:{device.index}" if device.index is not None else device.type
@@ -77,8 +82,9 @@ def main():
     x_scaler = scalers.x_scaler
     c_scaler = scalers.c_scaler
 
-    # 공간 임베딩 역변환용 스케일러 주입 (학습 때와 동일하게 설정)
-    model.spatial_emb.set_scaler(x_scaler.mean_, x_scaler.scale_)
+    # 공간 임베딩 역변환용 스케일러 주입 (use_spatial_emb=True 인 구버전 체크포인트만)
+    if getattr(model, "use_spatial_emb", False) and hasattr(model, "spatial_emb"):
+        model.spatial_emb.set_scaler(x_scaler.mean_, x_scaler.scale_)
 
     cond_dim = getattr(cfg, "cond_dim", 5)
     if cond_dim != 5:

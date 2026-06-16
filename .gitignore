@@ -34,3 +34,8 @@ pyrightconfig.json
 
 *csv
 *png
+
+# 도로망 원천/캐시 (대용량, build_road_cache.py 로 재생성 가능)
+NODELINKDATA/
+*.osm.pbf
+MCI_ADV2/scenarios/road_cache_*.pkl
