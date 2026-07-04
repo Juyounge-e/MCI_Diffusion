@@ -43,7 +43,11 @@ class TabDDPMGaussianScheduler:
     def gaussian_loss(self, model_out, x0, xt, t, noise):
         """Gaussian loss 계산"""
         return self.ddpm._gaussian_loss(model_out, x0, xt, t, noise)
-    
+
+    def predict_xstart(self, model_out, xt, t):
+        """eps 예측(model_out)으로부터 깨끗한 좌표 x̂₀ 복원 """
+        return self.ddpm._predict_xstart_from_eps(x_t=xt, t=t, eps=model_out)
+
     def gaussian_p_sample(self, model_out, xt, t, temperature=0.7):
         """Reverse sampling: xt -> x_{t-1}"""
         out = self.ddpm.gaussian_p_mean_variance(

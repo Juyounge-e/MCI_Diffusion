@@ -16,7 +16,10 @@ for _p in (_ROOT, _TABDDPM):
 
 import torch
 # TensorBoard가 distutils 의존으로 깨질 수 있어 선택적 임포트
+# (torch.utils.tensorboard 가 `distutils.version.LooseVersion`을 쓰는데, 최신 setuptools에서는
+#  distutils.version 서브모듈이 자동으로 안 붙어있어서 AttributeError가 남 → 미리 import 해서 방지)
 try:
+    import distutils.version  # noqa: F401
     from torch.utils.tensorboard import SummaryWriter  # type: ignore
 except Exception:
     class SummaryWriter:  # 최소 no-op 대체
@@ -38,6 +41,36 @@ from src.diffusion.scheduler import TabDDPMGaussianScheduler
 def linear_warmdown(step: int, total_steps: int, base_lr: float) -> float:
     frac_done = step / max(1, total_steps)
     return base_lr * (1.0 - frac_done)
+
+
+@torch.no_grad()
+def evaluate(model, val_loader, scheduler, road_loss_fn, road_lambda, device):
+    """val_loader 전체에 대한 평균 loss(gauss/road/total). best_model 선정 및 과적합 모니터링용."""
+    model.eval()
+    total_gauss, total_road, total_n = 0.0, 0.0, 0
+    for xb, cb in val_loader:
+        xb = xb.to(device)
+        cb = cb.to(device)
+        b = xb.shape[0]
+        t, _ = scheduler.sample_time(b, device, method='uniform')
+        noise = torch.randn_like(xb)
+        xt = scheduler.gaussian_q_sample(xb, t, noise=noise)
+        model_out = model(xt, t, y=cb)
+        loss_gauss = scheduler.gaussian_loss(model_out, xb, xt, t, noise).mean()
+        total_gauss += loss_gauss.item() * b
+
+        if road_loss_fn is not None:
+            x0_hat = scheduler.predict_xstart(model_out, xt, t)
+            w = scheduler.ddpm.alphas_cumprod[t]
+            l_road = road_loss_fn(x0_hat, weight=w)
+            total_road += l_road.item() * b
+        total_n += b
+    model.train()
+
+    val_gauss = total_gauss / max(1, total_n)
+    val_road = (total_road / max(1, total_n)) if road_loss_fn is not None else None
+    val_total = val_gauss + (road_lambda * val_road if val_road is not None else 0.0)
+    return val_gauss, val_road, val_total
 
 # CSV에서 r/y/g/b 비율 계산 (N-only 옵션에서 활용)
 def build_ratio_bank(df: pd.DataFrame):
@@ -78,6 +111,48 @@ def main():
         type=str,
         default=os.path.join("MCI_ADV2", "scenarios", "mask_cache_0.005.npz"),
         help="사전 계산된 spatial mask npz 경로 (scripts/build_spatial_mask.py 로 생성)",
+    )
+    parser.add_argument(
+        "--road_points",
+        type=str,
+        default="",
+        help="도로점 npz 경로 (scripts/build_road_points.py). 지정 시 road-distance aux loss 사용.",
+    )
+    parser.add_argument(
+        "--road_lambda",
+        type=float,
+        default=0.0,
+        help="road-distance aux loss 가중치 (0이면 비활성). 정규화좌표 스케일상 보통 1e2~1e3.",
+    )
+    parser.add_argument(
+        "--total_steps",
+        type=int,
+        default=10000,
+        help="총 학습 스텝 수 (빠른 실험 시 줄여서 사용).",
+    )
+    parser.add_argument(
+        "--val_ratio",
+        type=float,
+        default=0.1,
+        help="검증셋 비율 (0이면 검증 없이 기존과 동일하게 전체 train으로 사용).",
+    )
+    parser.add_argument(
+        "--val_every",
+        type=int,
+        default=500,
+        help="검증 loss 측정 주기(step).",
+    )
+    parser.add_argument(
+        "--resume_ckpt",
+        type=str,
+        default="",
+        help="이어서 학습할 체크포인트 경로 (model_step*.pt 또는 last_model.pt).",
+    )
+    parser.add_argument(
+        "--resume_step",
+        type=int,
+        default=0,
+        help="resume_ckpt의 학습 시작 스텝 (LR 스케줄 이어받기용). 보통 저장된 스텝 수와 동일하게 입력.",
     )
 
     args = parser.parse_args()
@@ -141,7 +216,7 @@ def main():
     print(f"  data: {csv_path}")
     print(f"  saved outputs to: {out_dir}")
     x, c = load_csv(csv_path, x_cols, c_cols)
-    train, val, test = make_splits(x, c, val_ratio=0, test_ratio=0, seed=seed)
+    train, val, test = make_splits(x, c, val_ratio=args.val_ratio, test_ratio=0, seed=seed)
 
     # 학습 데이터 랜덤 샘플링 
     if max_train_samples > 0:
@@ -155,7 +230,7 @@ def main():
             train = (x_train, c_train)
             print(f"  train 샘플링: {n_train} -> {max_train_samples}")
 
-    print(f"  train n = {len(train[0])}")
+    print(f"  train n = {len(train[0])}, val n = {len(val[0])}")
     train_s, val_s, test_s, scalers = fit_transform_scalers(train, val, test, scale_condition=True)
     train_loader, val_loader, _ = make_loaders(train_s, val_s, test_s, batch_size=128, num_workers=0)
 
@@ -164,6 +239,15 @@ def main():
     # ----------------
     model, optim = build_model_and_optimizer(cfg)
 
+    # ----------------
+    # Resume (선택)
+    # ----------------
+    global_step = args.resume_step
+    if args.resume_ckpt:
+        ckpt = torch.load(args.resume_ckpt, map_location=device)
+        model.load_state_dict(ckpt["model"])
+        print(f"  [resume] {args.resume_ckpt} 로드 완료 (resume_step={global_step})")
+
     if getattr(model, "use_spatial_emb", False) and hasattr(model, "spatial_emb"):
         model.spatial_emb.set_scaler(
             mean=scalers.x_scaler.mean_,
@@ -171,6 +255,20 @@ def main():
         )
 
     model.train()
+
+    # ----------------
+    # Road-distance aux loss (선택)
+    # ----------------
+    road_loss_fn = None
+    if args.road_lambda > 0 and args.road_points:
+        from src.diffusion.road_loss import RoadDistanceLoss
+        road_loss_fn = RoadDistanceLoss(
+            args.road_points,
+            x_mean=scalers.x_scaler.mean_,
+            x_std=scalers.x_scaler.scale_,
+            device=device,
+        )
+        print(f"  road-distance aux loss 활성: lambda={args.road_lambda}")
 
     # ----------------
     # Diffusion Scheduler
@@ -190,11 +288,13 @@ def main():
     # ----------------
     # Train loop
     # ----------------
-    total_steps = 10_000
+    total_steps = args.total_steps
     log_every = 100
-    ckpt_every = 1000
+    ckpt_every = 5000
 
-    global_step = 0
+    has_val = args.val_ratio > 0 and len(val_loader) > 0
+    best_val_loss = float("inf")
+
     start_time = time.time()
     while global_step < total_steps:
         for xb, cb in train_loader:
@@ -216,6 +316,15 @@ def main():
             loss_gauss = scheduler.gaussian_loss(model_out, xb, xt, t, noise)
             loss = loss_gauss.mean()
 
+            # road-distance aux loss: x̂₀(복원 좌표)를 도로 매니폴드로 당김.
+            # 고-t의 garbage x̂₀ 가 폭주하지 않게 ᾱ_t(SNR)로 가중.
+            l_road = None
+            if road_loss_fn is not None:
+                x0_hat = scheduler.predict_xstart(model_out, xt, t)
+                w = scheduler.ddpm.alphas_cumprod[t]  # (B,) ∈ (0,1], 저-t≈1 고-t≈0
+                l_road = road_loss_fn(x0_hat, weight=w)
+                loss = loss + args.road_lambda * l_road
+
             optim.zero_grad(set_to_none=True)
             loss.backward()
             optim.step()
@@ -227,10 +336,34 @@ def main():
 
             if (global_step + 1) % log_every == 0:
                 elapsed = time.time() - start_time
-                print(f"[{global_step+1}/{total_steps}] loss={loss.item():.4f} lr={lr:.2e} ({elapsed:.1f}s)")
+                road_str = f" road={l_road.item():.4f}" if l_road is not None else ""
+                print(f"[{global_step+1}/{total_steps}] loss={loss.item():.4f} "
+                      f"gauss={loss_gauss.mean().item():.4f}{road_str} lr={lr:.2e} ({elapsed:.1f}s)")
                 writer.add_scalar("train/loss", loss.item(), global_step + 1)
+                writer.add_scalar("train/gauss", loss_gauss.mean().item(), global_step + 1)
+                if l_road is not None:
+                    writer.add_scalar("train/road", l_road.item(), global_step + 1)
                 writer.add_scalar("train/lr", lr, global_step + 1)
                 start_time = time.time()
+
+            if has_val and (global_step + 1) % args.val_every == 0:
+                val_gauss, val_road, val_total = evaluate(
+                    model, val_loader, scheduler, road_loss_fn, args.road_lambda, device)
+                road_str = f" road={val_road:.4f}" if val_road is not None else ""
+                print(f"  [val] step={global_step+1} gauss={val_gauss:.4f}{road_str} total={val_total:.4f}")
+                writer.add_scalar("val/gauss", val_gauss, global_step + 1)
+                if val_road is not None:
+                    writer.add_scalar("val/road", val_road, global_step + 1)
+                writer.add_scalar("val/total", val_total, global_step + 1)
+
+                if val_total < best_val_loss:
+                    best_val_loss = val_total
+                    torch.save(
+                        {"model": model.state_dict(), "cfg": asdict(cfg),
+                         "step": global_step + 1, "val_loss": best_val_loss},
+                        os.path.join(out_dir, "best_model.pt"),
+                    )
+                    print(f"  [val] best 갱신 → best_model.pt 저장 (val_total={best_val_loss:.4f})")
 
             if (global_step + 1) % ckpt_every == 0:
                 ckpt_path = os.path.join(out_dir, f"model_step{global_step+1}.pt")
@@ -241,7 +374,7 @@ def main():
                 break
 
     # 최종 저장
-    torch.save({"model": model.state_dict(), "cfg": asdict(cfg)}, os.path.join(out_dir, "model_last.pt"))
+    torch.save({"model": model.state_dict(), "cfg": asdict(cfg)}, os.path.join(out_dir, "last_model.pt"))
     # 스케일러 저장(샘플링 시 재사용)
     with open(os.path.join(out_dir, "scalers.pkl"), "wb") as f:
         pickle.dump(scalers, f)

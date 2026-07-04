@@ -1,18 +1,24 @@
+import argparse
 import os
 import re
 import csv
 from glob import glob
 from typing import Dict, Tuple, Optional
 
-# 새 실험 결과/메타데이터 경로
-RESULTS_ROOT = r"./MCI_ADV2/results/gyeongbuk_exp_20260518_032552"
-METADATA_CSV = r"./MCI_ADV2/scenarios/gyeongbuk_exp_20260518_032552/experiment_metadata.csv"
+_ap = argparse.ArgumentParser(add_help=False)
+_ap.add_argument("--results_root", default=None)
+_ap.add_argument("--metadata_csv", default=None)
+_ap.add_argument("--out_csv", default=None)
+_args, _ = _ap.parse_known_args()
 
-OUT_CSV = "src/data/national/gyeongbuk_random.csv"
+# 새 실험 결과/메타데이터 경로
+RESULTS_ROOT = _args.results_root or r"./MCI_ADV2/results/custom_national_lam10"
+METADATA_CSV = _args.metadata_csv or r"./MCI_ADV2/scenarios/custom_national_lam10/experiment_metadata.csv"
+
+OUT_CSV = _args.out_csv or r"src/data/roadloss_simul_result/national_lam10_200k.csv"
 
 PDR_LINE_INDEX = 2
 PDR_WoG_LINE_INDEX = 4
-
 RED_LINE_INDEX = 5
 YELLOW_LINE_INDEX = 6
 GREEN_LINE_INDEX = 7
