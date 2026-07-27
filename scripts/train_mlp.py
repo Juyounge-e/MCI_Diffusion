@@ -15,20 +15,17 @@ for _p in (_ROOT, _TABDDPM):
         sys.path.insert(0, _p)
 
 import torch
-# TensorBoard가 distutils 의존으로 깨질 수 있어 선택적 임포트
+# TensorBoard가 distutils 의존으로 깨질 수 있어 명시적으로 확인한다.
 # (torch.utils.tensorboard 가 `distutils.version.LooseVersion`을 쓰는데, 최신 setuptools에서는
 #  distutils.version 서브모듈이 자동으로 안 붙어있어서 AttributeError가 남 → 미리 import 해서 방지)
 try:
     import distutils.version  # noqa: F401
     from torch.utils.tensorboard import SummaryWriter  # type: ignore
-except Exception:
-    class SummaryWriter:  # 최소 no-op 대체
-        def __init__(self, *args, **kwargs): 
-            pass
-        def add_scalar(self, *args, **kwargs): 
-            pass
-        def close(self): 
-            pass
+except Exception as exc:
+    raise RuntimeError(
+        "TensorBoard를 불러오지 못했습니다. 현재 Python 환경에 tensorboard를 "
+        "설치한 뒤 다시 실행하세요: pip install tensorboard"
+    ) from exc
 
 import numpy as np
 import pandas as pd
@@ -202,7 +199,9 @@ def main():
 
     out_dir = args.out_dir
     os.makedirs(out_dir, exist_ok=True)
-    writer = SummaryWriter(log_dir=os.path.join(out_dir, "tb"))
+    tb_dir = os.path.join(out_dir, "tb")
+    writer = SummaryWriter(log_dir=tb_dir, flush_secs=30)
+    print(f"[tensorboard] log_dir={os.path.abspath(tb_dir)}")
 
     # ---------------
     # ratio bank 구축 (N-only 모델에서 활용)
@@ -344,6 +343,7 @@ def main():
                 if l_road is not None:
                     writer.add_scalar("train/road", l_road.item(), global_step + 1)
                 writer.add_scalar("train/lr", lr, global_step + 1)
+                writer.flush()
                 start_time = time.time()
 
             if has_val and (global_step + 1) % args.val_every == 0:
@@ -355,6 +355,7 @@ def main():
                 if val_road is not None:
                     writer.add_scalar("val/road", val_road, global_step + 1)
                 writer.add_scalar("val/total", val_total, global_step + 1)
+                writer.flush()
 
                 if val_total < best_val_loss:
                     best_val_loss = val_total
@@ -378,6 +379,7 @@ def main():
     # 스케일러 저장(샘플링 시 재사용)
     with open(os.path.join(out_dir, "scalers.pkl"), "wb") as f:
         pickle.dump(scalers, f)
+    writer.flush()
     writer.close()
     #ratio_bank 저장 (N-only 모델에서 활용)
     with open(os.path.join(out_dir, "ratio_bank.pkl"), "wb") as f:

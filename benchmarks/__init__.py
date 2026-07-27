@@ -1,1 +1,1 @@
-# benchmarks: DDPM vs CVAE vs CFM 비교용
+"""Conditional generation benchmarks for the MCI diffusion project."""

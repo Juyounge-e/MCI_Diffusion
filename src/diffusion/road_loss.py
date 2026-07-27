@@ -18,11 +18,15 @@ class RoadDistanceLoss:
         self.device = device
         print(f"[RoadDistanceLoss] 도로점 {len(pts):,}개 로드, KDTree 구성 완료")
 
-    def __call__(self, x0_hat: torch.Tensor, weight: torch.Tensor = None) -> torch.Tensor:
+    def nearest(self, x0_hat: torch.Tensor) -> torch.Tensor:
+        """정규화 공간에서 각 좌표의 최근접 도로점을 반환 (미분 불가, snap 용)."""
         with torch.no_grad():
             q = x0_hat.detach().cpu().numpy()
-            _, idx = self.tree.query(q, k=1)            # 최근접 도로 1개를 찾음 
-        nearest = self.pts_scaled[torch.as_tensor(idx, device=self.device)]
+            _, idx = self.tree.query(q, k=1)            # 최근접 도로 1개를 찾음
+        return self.pts_scaled[torch.as_tensor(idx, device=self.device)]
+
+    def __call__(self, x0_hat: torch.Tensor, weight: torch.Tensor = None) -> torch.Tensor:
+        nearest = self.nearest(x0_hat)
         d2 = ((x0_hat - nearest) ** 2).sum(dim=1)        # (B,) 미분 가능
         if weight is not None:
             return (weight * d2).sum() / (weight.sum() + 1e-8)

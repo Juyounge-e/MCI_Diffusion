@@ -53,7 +53,34 @@ def main():
     parser.add_argument("--n_tol", type=int, default=2, help="ratio_bank N 검색 허용 범위")
     parser.add_argument("--timesteps", type=int, default=1000)
     parser.add_argument( "--mask_path",  type=str, default=os.path.join("MCI_ADV2", "scenarios", "mask_cache.npz"), help="사전 계산된 공간 마스크 npz 경로", )
+    parser.add_argument(
+        "--project_road_points",
+        type=str,
+        default="",
+        help="도로점 npz 경로 (scripts/build_road_points.py). 지정 시 매 reverse step마다 "
+             "예측된 x̂₀를 최근접 도로점으로 snap한 뒤 renoise (predict-project-renoise).",
+    )
+    parser.add_argument(
+        "--project_min_t",
+        type=int,
+        default=200,
+        help="이 값 이하의 timestep에서만 projection 적용 (노이즈가 큰 초반 step은 x̂₀ 예측이 "
+             "불안정해서 snap이 오히려 해로울 수 있음). 항상 적용하려면 --timesteps 이상으로 설정.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="샘플링 재현용 랜덤 시드. 지정 시 torch/numpy RNG를 모두 고정해 동일 세팅이면 "
+             "동일 결과를 낸다. 생략 시 매 실행마다 다른 랜덤 draw.",
+    )
     args = parser.parse_args()
+
+    if args.seed is not None:
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
+        np.random.seed(args.seed)
+        print(f"[seed] {args.seed} 고정 (torch/numpy)")
 
     ckpt = torch.load(args.ckpt, map_location="cpu")
     cfg_dict = ckpt.get("cfg", None)
@@ -91,7 +118,7 @@ def main():
         raise ValueError(f"현재 sample_mlp.py는 cond_dim=5 전용입니다. 현재 cond_dim={cond_dim}")
 
     n_samples = args.sample_num
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(args.seed)
 
     N_val = args.N
     if N_val <= 0:
@@ -147,10 +174,31 @@ def main():
         device=device_str,
     )
 
+    project_fn = None
+    if args.project_road_points:
+        from src.diffusion.road_loss import RoadDistanceLoss
+        road_dist = RoadDistanceLoss(
+            args.project_road_points,
+            x_mean=x_scaler.mean_,
+            x_std=x_scaler.scale_,
+            device=device,
+        )
+        min_t = args.project_min_t
+
+        def project_fn(x0_hat, t):
+            mask = (t <= min_t)
+            if not bool(mask.any()):
+                return x0_hat
+            snapped = road_dist.nearest(x0_hat)
+            mask_f = mask.float().view(-1, *([1] * (len(x0_hat.shape) - 1)))
+            return mask_f * snapped + (1.0 - mask_f) * x0_hat
+
+        print(f"  predict-project-renoise 활성: min_t={min_t}")
+
     for t_ in reversed(range(T)):
         t = torch.full((N,), t_, device=device, dtype=torch.long)
         eps = model(x, t, y=cond)
-        x = scheduler.gaussian_p_sample(eps, x, t)
+        x = scheduler.gaussian_p_sample(eps, x, t, project_fn=project_fn)
 
     x_np = x.detach().cpu().numpy()
     x_np = x_scaler.inverse_transform(x_np)

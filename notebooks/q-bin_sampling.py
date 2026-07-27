@@ -168,13 +168,13 @@ def main():
 
     parser.add_argument("--training_csv", type=str, default=None, help="전체 학습 데이터 CSV")
     parser.add_argument("--bin_stats", type=str, default= None)
-    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "resolution_test_national"))
-    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_national", "model_last.pt"))
-    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_national", "scalers.pkl"))
-    parser.add_argument("--ratio_bank", type=str,default=os.path.join("outputs", "mlp_diffusion", "test_national", "ratio_bank.pkl"))
+    parser.add_argument("--out_dir", type=str, default=os.path.join("outputs", "mlp_diffusion", "test"))
+    parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "national_lam0_200k", "last_model.pt"))
+    parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "national_lam0_200k", "scalers.pkl"))
+    parser.add_argument("--ratio_bank", type=str,default=os.path.join("outputs", "mlp_diffusion", "national_lam0_200k", "ratio_bank.pkl"))
     parser.add_argument("--N", type=int, default=30)
     parser.add_argument("--timesteps", type=int, default=1000)
-    parser.add_argument("--total_samples", type=int, default=50000)
+    parser.add_argument("--total_samples", type=int, default=300)
     parser.add_argument("--num_bins", type=int, default=10)
     parser.add_argument("--n_min", type=int, default=27)
     parser.add_argument("--n_max", type=int, default=33)
@@ -182,6 +182,27 @@ def main():
     parser.add_argument("--rygb", nargs=4, type=float, default=None, metavar=("red", "yellow", "green", "black"),
                         help="r/y/g/b 비율 직접 입력 옵션")
     parser.add_argument("--n_tol", type=int, default=3, help="N-only에서 ratio 검색 허용 범위")
+    parser.add_argument(
+        "--project_road_points",
+        type=str,
+        default="",
+        help="도로점 npz 경로 (scripts/build_road_points.py). 지정 시 각 q-bin sample_mlp.py 호출에 "
+             "predict-project-renoise를 적용.",
+    )
+    parser.add_argument(
+        "--project_min_t",
+        type=int,
+        default=200,
+        help="--project_road_points 사용 시, 이 값 이하 timestep에서만 projection 적용.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=200,
+        help="재현용 base seed. 지정 시 bin i는 (seed + i)로 sample_mlp.py를 호출한다. "
+             "서로 다른 projection 세팅을 같은 seed로 돌리면 bin별 초기 노이즈/ratio가 동일해져 "
+             "projection 효과만 순수 비교할 수 있다.",
+    )
 
     args = parser.parse_args()
 
@@ -203,6 +224,7 @@ def main():
     # =============================================
     # q-bin별 sample_mlp.py 실행
     # =============================================
+    out_csv_paths = []
     for i, (_, row) in enumerate(bin_stats.iterrows()):
         q_bin     = row["q_bin"]
         pdr_mean  = float(row["pdr_mean"]) if not pd.isna(row["pdr_mean"]) else None
@@ -233,6 +255,15 @@ def main():
         if args.rygb is not None:
             cmd += ["--rygb"] + [str(v) for v in args.rygb]
 
+        if args.project_road_points:
+            cmd += [
+                "--project_road_points", args.project_road_points,
+                "--project_min_t", str(args.project_min_t),
+            ]
+
+        if args.seed is not None:
+            cmd += ["--seed", str(args.seed + i)]
+
         # df_30 실제 min/max 기준으로 샘플링
         sample_min = float(row["pdr_min"]) if not pd.isna(row["pdr_min"]) else pdr_mean
         sample_max = float(row["pdr_max"]) if not pd.isna(row["pdr_max"]) else pdr_mean
@@ -246,6 +277,16 @@ def main():
 
         subprocess.run(cmd, check=True)
         print(f"  저장 완료: {out_csv}\n")
+        out_csv_paths.append(out_csv)
+
+    # =============================================
+    # q-bin CSV 전체 병합
+    # =============================================
+    if out_csv_paths:
+        merged_path = os.path.join(args.out_dir, "all_bins.csv")
+        merged_df = pd.concat([pd.read_csv(p) for p in out_csv_paths], ignore_index=True)
+        merged_df.to_csv(merged_path, index=False)
+        print(f"전체 병합 저장 완료: {merged_path} ({len(merged_df)}행)")
 
 
 if __name__ == "__main__":

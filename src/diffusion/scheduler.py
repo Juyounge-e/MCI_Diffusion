@@ -48,20 +48,33 @@ class TabDDPMGaussianScheduler:
         """eps 예측(model_out)으로부터 깨끗한 좌표 x̂₀ 복원 """
         return self.ddpm._predict_xstart_from_eps(x_t=xt, t=t, eps=model_out)
 
-    def gaussian_p_sample(self, model_out, xt, t, temperature=0.7):
-        """Reverse sampling: xt -> x_{t-1}"""
+    def gaussian_p_sample(self, model_out, xt, t, temperature=0.7, project_fn=None):
+        """Reverse sampling: xt -> x_{t-1}
+
+        project_fn: (x0_hat, t) -> x0_hat_projected. 주어지면 posterior mean을
+        계산하기 전에 예측된 x̂₀를 feasible set(예: 도로점)으로 project한 뒤
+        renoise한다 (predict-project-renoise, 도로 스냅 비율 감소 목적).
+        """
         out = self.ddpm.gaussian_p_mean_variance(
             model_out,
             xt,
             t,
         )
 
+        mean = out["mean"]
+        if project_fn is not None:
+            x0_projected = project_fn(out["pred_xstart"], t)
+            mean, _, _ = self.ddpm.gaussian_q_posterior_mean_variance(
+                x_start=x0_projected, x_t=xt, t=t
+            )
+
         noise = torch.randn_like(xt)
+        
 
         nonzero_mask = (
             (t != 0).float().view(-1, *([1] * (len(xt.shape) - 1)))
         )
 
-        sample = out["mean"] + nonzero_mask * torch.exp(0.5 * out["log_variance"]) * noise * temperature
+        sample = mean + nonzero_mask * torch.exp(0.5 * out["log_variance"]) * noise * temperature
         # float64 -> float32 변환 (dtype 불일치 방지)
         return sample.float() if sample.dtype == torch.float64 else sample

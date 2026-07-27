@@ -12,10 +12,10 @@ _ap.add_argument("--out_csv", default=None)
 _args, _ = _ap.parse_known_args()
 
 # 새 실험 결과/메타데이터 경로
-RESULTS_ROOT = _args.results_root or r"./MCI_ADV2/results/custom_national_lam10"
-METADATA_CSV = _args.metadata_csv or r"./MCI_ADV2/scenarios/custom_national_lam10/experiment_metadata.csv"
+RESULTS_ROOT = _args.results_root or r"./MCI_ADV2/results/custom_national_lam0_mint0_1k_seed200"
+METADATA_CSV = _args.metadata_csv or r"./MCI_ADV2/scenarios/custom_national_lam0_mint0_1k_seed200/experiment_metadata.csv"
 
-OUT_CSV = _args.out_csv or r"src/data/roadloss_simul_result/national_lam10_200k.csv"
+OUT_CSV = _args.out_csv or r"src/data/simul_result/national_lam0_mint0_1k_seed200.csv"
 
 PDR_LINE_INDEX = 2
 PDR_WoG_LINE_INDEX = 4
