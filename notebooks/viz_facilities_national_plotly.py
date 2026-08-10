@@ -37,7 +37,11 @@ SHOW_FACILITIES = True
 
 SHOW_FIRE = False              # 소방서 표시 여부 (옵션)
 # 병원 종별코드 → (이름, 마커색, 마커크기 배율). 마커 = 이모지 크기 × 배율
-HOSP_TYPES = [(1, "상급종합", "red", 2.0), (11, "종합병원", "orange", 1.5), (21, "병원", "green", 1.5)]
+HOSP_TYPES = [
+    (1, "Tertiary Hospital", "red", 2.0),
+    (11, "Secondary General Hospital", "orange", 1.5),
+    (21, "Hospital", "green", 1.5),
+]
 HOSP_SHOW_CODES = [1,11]     # 표시할 병원 종별코드 (일반=21 제외). 전부 보려면 [1, 11, 21]
 SCATTER_ORDER = "shuffle"     # 점 그리는 순서(z-order):
                               #   "q1_first"  → q1..q10 순서로 그림 → q10(고PDR)이 맨 위
@@ -54,7 +58,7 @@ TRAIN_CSV = os.path.join(ROOT, "src", "data", "national_all.csv")
 
 SIMPLIFY_TOL = 0.005
 JEJU_BBOX = (126.10, 33.10, 126.98, 34.02)
-NATIONAL_VIEW = dict(x=[124.5, 130.5], y=[33.8, 38.7])
+NATIONAL_VIEW = dict(x=[124.9, 129.8], y=[33.95, 38.75])
 ASPECT = 1.3                   # lat/lon 축 비율 (지리 왜곡 보정)
 
 if DATA_SOURCE == "train":
@@ -153,7 +157,10 @@ iv = sdf["pdr_q"].apply(parse_interval)
 bins = np.unique(np.array([iv.iloc[0][0]] + [x[1] for x in iv], dtype=float))
 bins.sort()
 bins[0], bins[-1] = -np.inf, np.inf
-labels = sdf["pdr_q"].tolist()
+labels = [
+    f"Q{i + 1} [{low:.3f}, {high:.3f}]"
+    for i, (low, high) in enumerate(iv)
+]
 nq = len(labels)
 
 # 경계 (제주 제외, cp949 한글)
@@ -162,6 +169,9 @@ regions = regions[regions["CTP_ENG_NM"].str.lower() != "jeju-do"].copy()
 regions["geometry"] = regions.geometry.simplify(SIMPLIFY_TOL)
 regions = regions.reset_index(drop=True)
 region_names = sorted(regions["CTP_KOR_NM"].tolist())
+region_display = dict(
+    zip(regions["CTP_KOR_NM"], regions["CTP_ENG_NM"])
+)
 
 # 생성/학습 좌표
 if DATA_SOURCE == "train":
@@ -215,9 +225,26 @@ def make_traces(pred_sub, fire_sub, hosp_sub, bnd_gdf, emoji_size, pt_size,
         x=pred_sub["lon"], y=pred_sub["lat"], mode="markers", xaxis=xa, yaxis=ya,
         marker=dict(size=pt_size, color=pred_sub["q_idx"], colorscale="RdBu_r",
                     cmin=0, cmax=nq - 1, opacity=0.55, showscale=showscale,
-                    colorbar=dict(title="PDR q-bin", tickmode="array",
-                                  tickvals=list(range(nq)), ticktext=labels, len=0.85)),
-        name="generated", showlegend=False, hoverinfo="skip"))
+                    colorbar=dict(
+                        title=dict(
+                            text="PDR Quantile Bin",
+                            font=dict(
+                                family="Times New Roman",
+                                size=15,
+                                color="black",
+                            ),
+                        ),
+                        tickmode="array",
+                        tickvals=list(range(nq)),
+                        ticktext=labels,
+                        tickfont=dict(
+                            family="Times New Roman",
+                            size=13,
+                            color="black",
+                        ),
+                        len=0.85,
+                    )),
+        name="Generated locations", showlegend=False, hoverinfo="skip"))
     if SHOW_FACILITIES:
         def ftrace(df, lat_c, lon_c, glyph, label):   # 이모지만 (소방용)
             sub = df.copy()
@@ -257,25 +284,46 @@ def make_traces(pred_sub, fire_sub, hosp_sub, bnd_gdf, emoji_size, pt_size,
     return traces
 
 
-def save_single(pred_sub, fire_sub, hosp_sub, bnd_gdf, view, title, path, w=1000, h=1150):
+def save_single(pred_sub, fire_sub, hosp_sub, bnd_gdf, view, title, path, w=900, h=1000):
     fig = go.Figure()
     for t in make_traces(pred_sub, fire_sub, hosp_sub, bnd_gdf,
                          EMOJI_SIZE, PT_SIZE, showscale=True, showlegend=True):
         fig.add_trace(t)
     fig.update_layout(
-        title=title, xaxis_title="lon", yaxis_title="lat",
-        xaxis=dict(range=view["x"]),
-        yaxis=dict(range=view["y"], scaleanchor="x", scaleratio=ASPECT),
+        title=dict(
+            text=title,
+            x=0.5,
+            xanchor="center",
+            y=0.96,
+            yanchor="top",
+            font=dict(
+                family="Times New Roman",
+                size=22,
+                color="black",
+            ),
+            pad=dict(t=5, b=5),
+        ),
+        xaxis_title="Longitude",
+        yaxis_title="Latitude",
+        xaxis=dict(range=view["x"], constrain="domain"),
+        yaxis=dict(
+            range=view["y"],
+            scaleanchor="x",
+            scaleratio=ASPECT,
+            constrain="domain",
+        ),
         width=w, height=h, template="plotly_white",
-        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.7)"),
-        margin=dict(l=10, r=10, t=50, b=10))
+        font=dict(family="Times New Roman", size=14, color="black"),
+        legend=dict(x=0.01, y=0.93, bgcolor="rgba(255,255,255,0.7)"),
+        margin=dict(l=45, r=30, t=80, b=45))
     fig.write_image(path, scale=EXPORT_SCALE)
     print(f"[saved] {path}")
 
 
 # ── 1) 전국 1장 ──────────────────────────────────────────────────────
 save_single(pred, fire, hosp, regions, NATIONAL_VIEW,
-            f"[{TAG}] 전국 — 생성좌표 + 병원/소방 (N={len(pred):,})",
+            f"Nationwide Generated Incident Locations with Hospitals",
+            # f"(N={len(pred):,})",
             os.path.join(OUT_DIR, "national.png"))
 
 # ── 2) 지역별 개별 16장 ──────────────────────────────────────────────
@@ -286,11 +334,13 @@ for rn in region_names:
     hsub = hosp[hosp["_region"] == rn]
     safe = re.sub(r"[^\w가-힣]", "_", rn)
     save_single(p, fsub, hsub, bnd, region_view(bnd),
-                f"[{TAG}] {rn} (N={len(p):,})",
+                f"[{TAG}] {region_display[rn]} (N={len(p):,})",
                 os.path.join(OUT_DIR, "regions", f"{safe}.png"), w=850, h=850)
 
 # ── 3) 지역 4×4 그리드 1장 ───────────────────────────────────────────
-fig = make_subplots(rows=4, cols=4, subplot_titles=region_names,
+fig = make_subplots(
+                    rows=4, cols=4,
+                    subplot_titles=[region_display[name] for name in region_names],
                     horizontal_spacing=0.03, vertical_spacing=0.05)
 for idx, rn in enumerate(region_names):
     row, col = idx // 4 + 1, idx % 4 + 1
@@ -307,8 +357,16 @@ for idx, rn in enumerate(region_names):
     fig.update_xaxes(range=v["x"], row=row, col=col)
     fig.update_yaxes(range=v["y"], scaleanchor=xa, scaleratio=ASPECT, row=row, col=col)
 
-fig.update_layout(title=f"[{TAG}] 시도별 생성좌표 + 병원/소방 (4×4)",
+for annotation in fig.layout.annotations:
+    annotation.font = dict(
+        family="Times New Roman",
+        size=15,
+        color="black",
+    )
+
+fig.update_layout(title=f"Generated Locations and Hospitals by Region",
                   width=1600, height=1750, template="plotly_white",
+                  font=dict(family="Times New Roman", size=14, color="black"),
                   margin=dict(l=10, r=10, t=60, b=10))
 grid_path = os.path.join(OUT_DIR, "regions_4x4.png")
 fig.write_image(grid_path, scale=EXPORT_SCALE)

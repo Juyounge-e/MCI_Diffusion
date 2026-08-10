@@ -36,16 +36,16 @@ def parse_args():
     parser.add_argument("--csv_name", default="samples.csv")
     parser.add_argument("--model_label", required=True)
     parser.add_argument("--out", required=True)
-    parser.add_argument("--n_list", nargs="+", type=int, default=[15, 25, 35, 45])
+    parser.add_argument("--n_list", nargs="+", type=int, default=[15, 25, 45])
     parser.add_argument(
-        "--pdr_list", nargs="+", type=float, default=[0.01, 0.05, 0.09, 0.13]
+        "--pdr_list", nargs="+", type=float, default=[0.01, 0.08, 0.13]
     )
     parser.add_argument("--shp", default="MCI_ADV2/scenarios/ctprvn.shp")
     parser.add_argument(
         "--summary", default="notebooks/outputs/analysis/national_all_summary.csv"
     )
-    parser.add_argument("--point_size", type=float, default=3.0)
-    parser.add_argument("--export_scale", type=float, default=2.0)
+    parser.add_argument("--point_size", type=float, default=5.0)
+    parser.add_argument("--export_scale", type=float, default=3.0)
     return parser.parse_args()
 
 
@@ -64,6 +64,10 @@ def main():
     bins.sort()
     bins[0], bins[-1] = -np.inf, np.inf
     labels = summary["pdr_q"].astype(str).tolist()
+    colorbar_labels = [
+        f"Q{i + 1} [{low:.3f}, {high:.3f}]"
+        for i, (low, high) in enumerate(intervals)
+    ]
     nq = len(labels)
 
     # All national administrative boundaries, including Jeju.
@@ -93,13 +97,13 @@ def main():
     view = dict(x=[124.5, 130.5], y=[33.8, 38.7])
 
     n_rows, n_cols = len(args.n_list), len(args.pdr_list)
-    titles = [f"N={n}, pdr={p:g}" for n in args.n_list for p in args.pdr_list]
+    titles = [f"N={n}, PDR={p:g}" for n in args.n_list for p in args.pdr_list]
     fig = make_subplots(
         rows=n_rows,
         cols=n_cols,
         subplot_titles=titles,
-        horizontal_spacing=0.04,
-        vertical_spacing=0.06,
+        horizontal_spacing=0.015,
+        vertical_spacing=0.025,
     )
 
     shown_colorbar = False
@@ -118,7 +122,7 @@ def main():
                     mode="lines",
                     xaxis=xaxis,
                     yaxis=yaxis,
-                    line=dict(color="black", width=1),
+                    line=dict(color="black", width=1.5),
                     showlegend=False,
                     hoverinfo="skip",
                 ),
@@ -156,10 +160,22 @@ def main():
                             line=dict(width=0.5, color="rgba(70,70,70,0.6)"),
                             showscale=not shown_colorbar,
                             colorbar=dict(
-                                title="PDR q-bin (national)",
+                                title=dict(
+                                    text="PDR quantile bin",
+                                    font=dict(
+                                        family="Times New Roman",
+                                        size=15,
+                                        color="black",
+                                    ),
+                                ),
                                 tickmode="array",
                                 tickvals=list(range(nq)),
-                                ticktext=[f"q{i + 1} {label}" for i, label in enumerate(labels)],
+                                ticktext=colorbar_labels,
+                                tickfont=dict(
+                                    family="Times New Roman",
+                                    size=13,
+                                    color="black",
+                                ),
                                 len=0.85,
                                 x=1.01,
                             ),
@@ -173,14 +189,14 @@ def main():
                 shown_colorbar = True
                 q_values = sorted(q_index.dropna().astype(int).unique().tolist())
                 if len(q_values) == 1:
-                    q_text = f"q{q_values[0] + 1}"
+                    q_text = f"Q{q_values[0] + 1}"
                 else:
-                    q_text = ",".join(f"q{value + 1}" for value in q_values)
+                    q_text = ",".join(f"Q{value + 1}" for value in q_values)
                 fig.layout.annotations[subplot_index - 1].text = (
-                    f"N={n_value} | pdr={p_value:g} | {q_text}"
+                    f"n={n_value} | pdr={p_value:g} | {q_text}"
                 )
                 print(
-                    f"[color-check] N={n_value} pdr={p_value:g} "
+                    f"[color-check] n={n_value} pdr={p_value:g} "
                     f"q-bin={q_text} n={len(frame)} unique={unique_coordinates}"
                 )
             else:
@@ -202,14 +218,24 @@ def main():
             )
 
     for annotation in fig.layout.annotations:
-        annotation.font.size = 10
+        annotation.font = dict(
+            family="Times New Roman",
+            size=25,
+            color="black",
+        )
 
     fig.update_layout(
-        title=f"{args.model_label} — national conditional samples",
-        width=1300,
-        height=1500,
+        width=370 * n_cols + 170,
+        height=390 * n_rows + 40,
         template="plotly_white",
-        margin=dict(l=10, r=150, t=70, b=10),
+        font=dict(
+            family="Times New Roman",
+            size=14,
+            color="black",
+        ),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        margin=dict(l=8, r=175, t=42, b=8),
     )
     fig.write_image(output, scale=args.export_scale)
     print(f"[saved] {output}")

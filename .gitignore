@@ -43,3 +43,5 @@ MCI_ADV2/scenarios/road_cache_*.pkl
 # 대용량 npz (재생성 가능: build_spatial_mask.py, build_road_points.py)
 MCI_ADV2/scenarios/mask_cache_0.005.npz
 MCI_ADV2/scenarios/road_points_*.npz
+MCI_ADV2/scenarios/mask_cache_*.npz
+
