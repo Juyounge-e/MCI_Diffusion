@@ -1,0 +1,28 @@
+# 도솔대교 차단.
+#
+# OSM 에는 '도솔대교' 라는 이름이 없다(pbf 전체를 노드·way·관계 모두 검색해 확인).
+# 한국 교량 고유명은 OSM 에 거의 등록되지 않고, 다리를 지나는 도로 way 에
+# bridge=yes 태그만 붙는다. 그래서 도솔대교는 도로명 '원신흥로' 의 교량 구간으로
+# 들어가 있다.
+#
+#   way 1212783229  idx 41986  tertiary  240m  36.34147,127.35208   상행
+#   way 1212783228  idx 41985  tertiary  240m  36.34138,127.35211   하행
+#
+# 상·하행 2개 way 로 나뉘어 있으므로 **둘 다** 지워야 완전히 끊긴다.
+#
+# 태그 필터(name=원신흥로 AND bridge=*)를 쓰지 않고 way id 를 직접 지정한 이유:
+# 원신흥로에는 bridge 태그가 붙은 way 가 3개 있고, 그중 967258578(81m,
+# 36.33831,127.33682)은 서쪽 1.4km 지점의 다른 다리다. 태그로 걸면 그것까지
+# 끊긴다.
+#
+# 다른 다리를 끊으려면 지도에서 좌표를 찍고
+#   python road_disruption/scripts/whats_here.py --region daejeon \
+#       --at <lat>,<lon> --radius 250 --bridge-only
+# 로 way id 를 찾을 것.
+name: daejeon_wonsinheung_bridge
+region: daejeon
+description: 도솔대교(원신흥로 교량, 상·하행) 차단
+
+select:
+  type: way_id
+  ids: [1212783228, 1212783229]

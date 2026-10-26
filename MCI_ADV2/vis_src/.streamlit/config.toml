@@ -1,0 +1,126 @@
+[theme]
+# ══ Dispatch Light — 재난 상황실 팔레트 ═══════════════════════════
+# 저장소 루트 .streamlit/config.toml 의 미러. 이 디렉터리에서 직접
+# `streamlit run MCI_Streamlit.py` 를 실행할 때 적용된다 (로컬 개발).
+# 두 파일은 반드시 같은 값을 유지한다. 팔레트 정본은 src/vis_src/_theme.py.
+#
+# 여기(config)에 쓸 수 있는 것은 손으로 쓴 CSS 보다 항상 우선한다.
+# Streamlit 1.44+ 의 고급 테마 옵션이 위젯 내부(데이터프레임 캔버스, 슬라이더,
+# alert, 코드블록, 사이드바)까지 닿기 때문에, _theme.py 의 CSS 는 config 로
+# 표현할 수 없는 것(헤더 장식, tabular-nums, nav 활성 표시)만 담당한다.
+base = "light"
+
+primaryColor = "#0B63CE"            # EMS 블루 — 액션/선택
+backgroundColor = "#F4F7FA"         # 본문 바닥
+secondaryBackgroundColor = "#FFFFFF"  # 카드/패널/입력
+textColor = "#16232E"
+linkColor = "#0B63CE"
+borderColor = "#DCE4EC"
+showWidgetBorder = true
+showSidebarBorder = true
+
+# 계기판 느낌은 남기되 90년대 각진 박스는 피한다: 아주 작은 라운드.
+baseRadius = "0.3rem"
+buttonRadius = "0.3rem"
+
+# ── 타이포: 라벨·본문은 산세리프, 숫자/코드만 모노 ────────────────
+# 웹폰트 자체는 _theme.py 의 @import 가 불러온다(Google Fonts).
+font = "IBM Plex Sans KR, IBM Plex Sans, Malgun Gothic, sans-serif"
+headingFont = "IBM Plex Sans KR, IBM Plex Sans, Malgun Gothic, sans-serif"
+codeFont = "IBM Plex Mono, ui-monospace, Consolas, monospace"
+baseFontSize = 15
+codeFontSize = "0.82rem"
+headingFontSizes = ["1.5rem", "1.18rem", "1.0rem", "0.9rem", "0.84rem", "0.8rem"]
+headingFontWeights = [700, 600, 600, 600, 600, 600]
+
+# ── 표 ────────────────────────────────────────────────────────────
+dataframeBorderColor = "#DCE4EC"
+dataframeHeaderBackgroundColor = "#EDF2F7"
+
+# ── 코드블록 ──────────────────────────────────────────────────────
+codeBackgroundColor = "#EFF3F7"
+codeTextColor = "#0F5C8C"
+
+# ── 의미색: st.info / st.warning / st.error / st.success / st.badge ──
+# 재난 대시보드 관례에 맞춘다. 빨강=위험, 주황=경고, 초록=정상, 파랑=정보.
+redColor = "#D93B30"
+redBackgroundColor = "#FDECEA"
+redTextColor = "#8C1F17"
+
+orangeColor = "#E08A00"
+orangeBackgroundColor = "#FFF4E0"
+orangeTextColor = "#8A5300"
+
+yellowColor = "#E0A32B"
+yellowBackgroundColor = "#FFF8E4"
+yellowTextColor = "#7D5A0B"
+
+greenColor = "#17805A"
+greenBackgroundColor = "#E7F5EF"
+greenTextColor = "#0E5C41"
+
+blueColor = "#0B63CE"
+blueBackgroundColor = "#E8F1FC"
+blueTextColor = "#0A4A9C"
+
+violetColor = "#6B4FD8"
+violetBackgroundColor = "#EFEBFD"
+violetTextColor = "#43308F"
+
+grayColor = "#5B6B78"
+grayBackgroundColor = "#EDF2F6"
+grayTextColor = "#3C4B57"
+
+# ── 차트 기본 색 순서 (st.line_chart / st.bar_chart / st.area_chart) ──
+# plotly / altair 는 _theme.py 가 같은 값으로 템플릿을 등록한다.
+chartCategoricalColors = [
+  "#0B63CE", "#17805A", "#E08A00", "#D93B30",
+  "#6B4FD8", "#0F8FA8", "#B5651D", "#5B6B78",
+]
+chartSequentialColors = [
+  "#EAF2FB", "#CFE0F6", "#AFCCEF", "#8AB5E7",
+  "#639BDD", "#3E80D0", "#2266BE", "#0B4E9E",
+  "#073A78",
+]
+
+# ── 사이드바만 딥네이비: 상황실 느낌은 여기서 낸다 ────────────────
+[theme.sidebar]
+backgroundColor = "#12212E"
+secondaryBackgroundColor = "#1B2E3E"
+textColor = "#DCE7EF"
+primaryColor = "#4D9BF0"            # 어두운 바닥에서 대비 확보용 밝은 블루
+linkColor = "#7FBBF7"
+borderColor = "#2A4152"
+showWidgetBorder = true
+baseRadius = "0.3rem"
+buttonRadius = "0.3rem"
+font = "IBM Plex Sans KR, IBM Plex Sans, Malgun Gothic, sans-serif"
+codeFont = "IBM Plex Mono, ui-monospace, Consolas, monospace"
+codeBackgroundColor = "#1B2E3E"
+codeTextColor = "#8FD0FF"
+dataframeBorderColor = "#2A4152"
+dataframeHeaderBackgroundColor = "#1B2E3E"
+
+# 사이드바에도 st.success / st.warning / st.caption 이 있으므로 의미색을
+# 어두운 바닥용으로 따로 준다. 없으면 밝은 배경 그대로 찍혀 눈을 찌른다.
+redColor = "#FF7A6E"
+redBackgroundColor = "#3A1C19"
+redTextColor = "#FFC9C2"
+orangeColor = "#FFB427"
+orangeBackgroundColor = "#3A2A12"
+orangeTextColor = "#FFD9A0"
+yellowColor = "#FFC94D"
+yellowBackgroundColor = "#3A3113"
+yellowTextColor = "#FFE7A8"
+greenColor = "#3FCB94"
+greenBackgroundColor = "#12352A"
+greenTextColor = "#A8ECCE"
+blueColor = "#4D9BF0"
+blueBackgroundColor = "#12293D"
+blueTextColor = "#B3D8FA"
+grayColor = "#8798A6"
+grayBackgroundColor = "#1B2E3E"
+grayTextColor = "#B9C7D2"
+
+[server]
+headless = true
