@@ -1,4 +1,20 @@
+import os
 import numpy as np
+
+from EntityManager import EntityManager
+
+
+def _cap_gate_is_occ():
+    """발송(현장→병원) 용량 게이트 신호 선택 (2026-07-03 통신축 재정의).
+    occ(기본)=통신 가용: 병원 입원 census(수술완료 시 감소=완료 확인) + 이송중
+    in-flight(도착 예상)를 앎. psent=통신 단절: 현장이 보낸 누적(p_sent)만 앎.
+    MCI_CAP_GATE 로 토글하며 RL(MCIEnvironment_gymnasium._cap_gate_is_occ)·
+    휴리스틱(여기)·obs(hospital_feature_wrapper cap_remain)가 같은 env 변수를 공유한다.
+    ⚠️ 이건 '발송 결정' 게이트일 뿐 — 병원의 실제 입원/diversion 은 sim 이 항상 occ
+    (n_occupied<max_capa, 퇴원 시 occ-=1, 꽉 차면 diversion)로 처리한다(불변)."""
+    return os.environ.get("MCI_CAP_GATE", "occ").strip().lower() != "psent"
+
+
 class RuleManager():
     def __init__(self, configs, scenario, rng=None):
         if rng is not None:
@@ -9,23 +25,33 @@ class RuleManager():
         self.scenario = scenario
         self.rules = []
         self.rule_names = []
-        if configs['isFullFactorial']:
-            for priority in ["START", "ReSTART"]:
-                # for hos_select in ["RedOnly", "YellowHalf"]:
-                for hos_select in ["RedOnly", "YellowNearest"]:
-                    for mode_R in ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]:
-                        for mode_Y in ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]:
-                            self.rules.append(Universal_Rule(priority, hos_select, mode_R, mode_Y))
-                            self.rules[-1].set_seed(self.rng)
-                            self.rules[-1].init_with_scenario(self.scenario)
-        else:
-            for priority in configs['priority_rule']:
-                for hos_select in configs['hos_select_rule']:
-                    for mode_R in configs['red_mode_rule']:
-                        for mode_Y in configs['yellow_mode_rule']:
-                            self.rules.append(Universal_Rule(priority, hos_select, mode_R, mode_Y))
-                            self.rules[-1].set_seed(self.rng)
-                            self.rules[-1].init_with_scenario(self.scenario)
+        include_standard = configs.get('include_standard', True)
+        if include_standard:
+            if configs['isFullFactorial']:
+                priorities = ["START", "ReSTART"]
+                hospital_rules = ["RedOnly", "YellowNearest"]
+                red_modes = ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]
+                yellow_modes = ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]
+            else:
+                priorities = configs['priority_rule']
+                hospital_rules = configs['hos_select_rule']
+                red_modes = configs['red_mode_rule']
+                yellow_modes = configs['yellow_mode_rule']
+            for priority in priorities:
+                for hos_select in hospital_rules:
+                    for mode_R in red_modes:
+                        for mode_Y in yellow_modes:
+                            self._append(Universal_Rule(priority, hos_select, mode_R, mode_Y))
+
+        # MCI_ADV 는 Shin and Lee (2020) 문헌 휴리스틱을 비교군으로 쓰지 않는다.
+        # (MCI_UAV 정본에는 include_shin 으로 16종을 추가하는 분기가 있다.)
+
+        self.rule_names = [rule.rule_name for rule in self.rules]
+
+    def _append(self, rule):
+        rule.set_seed(self.rng)
+        rule.init_with_scenario(self.scenario)
+        self.rules.append(rule)
 
     def set_seed(self, rng):
         self.rng = rng
@@ -46,33 +72,49 @@ class Rule:
     # UAV 대수 먼저 확인
         self.K_uav = en_properties['uav']['uav_num']
         self.K_amb = en_properties['ambulance']['amb_num']
-    
-    # AMB theta 계산 (항상 계산, 3대 이상이면 위의 주석처럼 원래대로, 그 이하면 전체 평균, 공란이면 0)
-        amb_distances = en_properties['ambulance']['amb_HtoS_t'][0]
-        if len(amb_distances) >= 3:
-            self.theta_amb = np.mean(amb_distances[0:3]) * 2
-        else:
-            self.theta_amb = np.mean(amb_distances) * 2 if len(amb_distances) > 0 else 0
-    
-    # UAV theta 계산 (UAV=0 대응)
+
+        self.hos_num = en_properties['hospital']['hos_num']
+        self.tier3_idx = en_properties['hospital']['hos_tier3_idx'] # Tier3 = 상급종합병원, Tier2 = 나머지
+        self.tier2_idx = en_properties['hospital']['hos_tier2_idx'] # Tier3 = 상급종합병원, Tier2 = 나머지
+        self.helipad_idx = en_properties['hospital'].get('hos_helipad_idx', np.array([]))
+        self.hos_max_send = en_properties['hospital']['hos_max_send'] # 최대 보낼 수 있는 환자수 (목표치)
+
+        # ScenarioManager가 is_use_time을 이미 반영한 실제 평균 ETA를 단일 기준으로 사용한다.
+        # AMB: API duration 또는 거리/속도, UAV: 유클리드 거리/속도.
+        self.amb_eta = np.asarray(en_properties['ambulance']['amb_HtoS_t'][0], dtype=float)
+        self.uav_eta = np.asarray(en_properties['uav']['uav_HtoS_t'][0], dtype=float)
+
+        def nearest_roundtrip_mean(eta, candidates=None):
+            if candidates is not None:
+                candidates = np.asarray(candidates, dtype=int)
+                eta = eta[candidates] if candidates.size else np.array([], dtype=float)
+            if eta.size == 0:
+                return 0.0
+            n_nearest = min(3, eta.size)
+            return float(np.mean(np.sort(eta, kind='stable')[:n_nearest]) * 2)
+
+        # ReSTART theta는 병원 배열 앞 3개가 아니라 실제 ETA가 가장 짧은 3개 왕복 평균.
+        self.theta_amb = nearest_roundtrip_mean(self.amb_eta)
+
+    # UAV theta 계산 (UAV=0 대응, 헬기장 병원만 실제 후보)
         if self.K_uav == 0:
             self.theta_uav = 0  # UAV가 없으면 0으로 설정
         else:
-            uav_distances = en_properties['uav']['uav_HtoS_t'][0]
-            if len(uav_distances) >= 3:
-                self.theta_uav = np.mean(uav_distances[0:3]) * 2
-            else:
-                self.theta_uav = np.mean(uav_distances) * 2 if len(uav_distances) > 0 else 0
+            self.theta_uav = nearest_roundtrip_mean(self.uav_eta, self.helipad_idx)
 
         self.expected_R = en_properties['patient']['incident_size'] * en_properties['patient']['patient_info']['ratio'][0]
         self.expected_Y = en_properties['patient']['incident_size'] * en_properties['patient']['patient_info']['ratio'][1]
 
-        self.hos_num = en_properties['hospital']['hos_num']
-        self.tier1_idx = en_properties['hospital']['hos_tier1_idx'] # tier1 = 상급종합병원, Tier2 = 나머지
-        self.tier2_idx = en_properties['hospital']['hos_tier2_idx'] # tier1 = 상급종합병원, Tier2 = 나머지
-        self.helipad_idx = en_properties['hospital'].get('hos_helipad_idx', np.array([]))
-
-        self.hos_max_send = en_properties['hospital']['hos_max_send'] # 최대 보낼 수 있는 환자수 (목표치)
+    def _ordered_hospital_indices(self, candidates, mode):
+        """현재 이송수단의 실제 평균 ETA 오름차순으로 병원 후보를 반환."""
+        candidates = np.asarray(list(candidates), dtype=int)
+        if candidates.size == 0:
+            return candidates
+        eta = self.uav_eta if int(mode) == 1 else self.amb_eta
+        if eta.size != self.hos_num:
+            return candidates
+        order = np.argsort(eta[candidates], kind='stable')
+        return candidates[order]
 
 
     def set_seed(self, rng):
@@ -120,75 +162,16 @@ class Universal_Rule(Rule):
 
             num_D = max(self.expected_Y - yellow_move,0) # yellow 환자 발생 예상 환자 수, yellow_count = yellow 환자 이송 수
             num_I = max(self.expected_R - red_move,0)
-            # self.tau = 71 - (0.5 * num_D * (self.theta_amb/self.K_amb + self.theta_uav/self.K_uav))
-            if self.K_uav > 0:
-                self.tau = 71 - (0.5 * num_D * (self.theta_amb/self.K_amb + self.theta_uav/self.K_uav))
-            else:
-                self.tau = 71 - (0.5 * num_D * (self.theta_amb/self.K_amb))
+            # K_amb=0(UAV-only) 또는 K_uav=0 어느 쪽이든 ZeroDivisionError 방지
+            amb_term = (self.theta_amb / self.K_amb) if self.K_amb > 0 else 0.0
+            uav_term = (self.theta_uav / self.K_uav) if self.K_uav > 0 else 0.0
+            self.tau = 71 - (0.5 * num_D * (amb_term + uav_term))
             
 
         red_exist = self.obs['p_wait'][0][0]
         yellow_exist = self.obs['p_wait'][1][0]
-        # num_D 원인 추적 디버깅 (ReSTART에서만)
-        if self.priority == "ReSTART":
-            import sys
-            import numpy as np
-
-            
-            expected_Y = float(self.expected_Y)
-            expected_R = float(self.expected_R)
-
-            red_move_sum = float(red_move)
-            yellow_move_sum = float(yellow_move)
-
-            # move를 "인원수"로 세는 대안 지표 (환자 1명이 여러 상태에 1이 찍히면 sum이 과대계상될 수 있음)
-            red_move_any = int((self.obs['p_states'][mask_red][:, 1:] > 0).any(axis=1).sum())
-            yellow_move_any = int((self.obs['p_states'][mask_yellow][:, 1:] > 0).any(axis=1).sum())
-
-            # p_wait(대기열)에서 실제 대기중인 개수 
-            def _safe_len(x):
-                try:
-                    return len(x)
-                except Exception:
-                    return int(bool(x))
-
-            red_wait_n = _safe_len(red_exist)
-            yellow_wait_n = _safe_len(yellow_exist)
-
-            # num_D/num_I 
-            num_D_calc = max(expected_Y - yellow_move_sum, 0.0)
-            num_I_calc = max(expected_R - red_move_sum, 0.0)
-
-            # 이상 징후 플래그
-            flag_wait_mismatch = (yellow_wait_n > 0 and num_D_calc == 0.0)                # 대기열엔 있는데 계산상 0
-            flag_move_over = (expected_Y > 0 and yellow_move_sum >= expected_Y)           # move가 expected 초과
-            flag_sum_exploding = (yellow_move_sum > yellow_move_any + 1e-6)               # sum이 인원수(any)보다 큼
-
-            # 중복 출력 방지 (로그 폭발 방지)
-            t = float(self.obs['time'])
-            key = (int(t), yellow_wait_n, int(flag_wait_mismatch), int(flag_move_over), int(flag_sum_exploding))
-            if not hasattr(self, "_nd_dbg_prev"):
-                self._nd_dbg_prev = None
-
-            if (flag_wait_mismatch or flag_move_over or flag_sum_exploding) and key != self._nd_dbg_prev:
-                y_col_sums = self.obs['p_states'][mask_yellow][:, 1:].sum(axis=0)
-                r_col_sums = self.obs['p_states'][mask_red][:, 1:].sum(axis=0)
-
-                print(
-                    f"[ND-TRACE] t={t:.2f} | wait(R,Y)=({red_wait_n},{yellow_wait_n}) | "
-                    f"expected(R,Y)=({expected_R:.2f},{expected_Y:.2f}) | "
-                    f"move_sum(R,Y)=({red_move_sum:.2f},{yellow_move_sum:.2f}) | "
-                    f"move_any(R,Y)=({red_move_any},{yellow_move_any}) | "
-                    f"num_I={num_I_calc:.2f} num_D={num_D_calc:.2f} | "
-                    f"flags(wait_mismatch={flag_wait_mismatch}, move_over={flag_move_over}, sum_exploding={flag_sum_exploding})",
-                    file=sys.stderr
-                )
-                print(f"[ND-TRACE] yellow_col_sums={np.array2string(y_col_sums, precision=0)}", file=sys.stderr)
-                print(f"[ND-TRACE] red_col_sums={np.array2string(r_col_sums, precision=0)}", file=sys.stderr)
-
-                self._nd_dbg_prev = key
-    
-
+        if not red_exist and not yellow_exist:
+            return action
 
         # 1. Prioirty selection
         if self.priority == "START":
@@ -202,12 +185,8 @@ class Universal_Rule(Rule):
                     action[0] = 1
                 elif red_exist:  # Red 환자 있는 경우
                     action[0] = 0  # Red
-            # elif self.tau >= num_I * (self.theta_amb / self.K_amb + self.theta_uav / self.K_uav):  # 모든 red 보내고 yellow
-            # 수정: UAV=0 대응
-            elif (self.K_uav > 0 and 
-                  self.tau >= num_I * (self.theta_amb/self.K_amb + self.theta_uav/self.K_uav)) or \
-                 (self.K_uav == 0 and 
-                  self.tau >= num_I * (self.theta_amb/self.K_amb)):
+            # K_amb=0(UAV-only) 또는 K_uav=0 어느 쪽이든 안전하게 처리
+            elif self.tau >= num_I * (amb_term + uav_term):
                 if red_exist:  # Red 환자 있는 경우
                     action[0] = 0  # Red
                 elif yellow_exist:  # Yellow 환자 있는 경우
@@ -231,6 +210,8 @@ class Universal_Rule(Rule):
         # 3. Mode selection
         available_UAV = self.obs['uav_wait'][0]
         available_Amb = self.obs['amb_wait'][0]
+        if not available_UAV and not available_Amb:
+            return action
         isSTAY = False
         if action[0] == 0: # Red selected
             if self.mode_R == "OnlyUAV":
@@ -270,7 +251,7 @@ class Universal_Rule(Rule):
 
                 if available_UAV: action[2] = 1  # UAV
                 elif available_Amb:
-                    if yellow_exist and self.mode_R != "OnlyUAV": # Send red via AMB
+                    if red_exist and self.mode_R != "OnlyUAV": # Send red via AMB
                         action[0] = 0 # Red
                         action[2] = 0 # AMB
                     else:
@@ -299,32 +280,41 @@ class Universal_Rule(Rule):
                 else: print("Error in Transition", action, self.obs)
         # 2. Hospital selection
         if not isSTAY:
+            # 발송 게이트 신호 (2026-07-03 통신축 재정의):
+            #   occ(통신 가용)  = n_occupied(입원 census, 수술완료 시 감소=완료 정보)
+            #                    + in_flight(그 병원으로 이송중=도착 예상 정보)
+            #   psent(통신 단절) = p_sent(현장이 보낸 누적) — 현장 지득 정보만
+            if _cap_gate_is_occ():
+                cap_used = (self.obs['h_states'][:, -1]
+                            + EntityManager.in_flight_by_hospital(self.obs, self.hos_num))
+            else:
+                cap_used = self.obs['p_sent']
             if self.hos_select == "RedOnly":
                 if action[0] == 0: # Red selected
-                    for i in self.tier1_idx:
+                    for i in self._ordered_hospital_indices(self.tier3_idx, action[2]):
                         # ★ 헬기장 체크 추가 (UAV 선택 시)
                         if action[2] == 1 and i not in self.helipad_idx:
                             continue
-                        if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+                        if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
                             action[1] = i + 1
                             break
                 elif action[0] == 1: # Yellow selected
-                    for i in range(self.hos_num):
-                        if i in self.tier1_idx:
+                    for i in self._ordered_hospital_indices(range(self.hos_num), action[2]):
+                        if i in self.tier3_idx:
                             continue
                         # ★ 헬기장 체크 추가 (UAV 선택 시)
                         if action[2] == 1 and i not in self.helipad_idx:
                             continue
-                        if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+                        if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
                             action[1] = i + 1
                             break
             # elif self.hos_select == "YellowHalf":
             #     if action[0] == 0:  # Red selected
-            #         for i in self.tier1_idx:
+            #         for i in self.tier3_idx:
             #             # ★ 헬기장 체크 추가 (UAV 선택 시)
             #             if action[2] == 1 and i not in self.helipad_idx:
             #                 continue
-            #             if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+            #             if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
             #                 action[1] = i + 1
             #                 break
             #     elif action[0] == 1: # Yellow selected
@@ -332,37 +322,37 @@ class Universal_Rule(Rule):
             #         r = self.rng.random()
             #         if r > 0.5: # Send to tier2
             #             for i in range(self.hos_num):
-            #                 if i in self.tier1_idx:  # tier1 skip → Tier2만 사용
+            #                 if i in self.tier3_idx:  # Tier3 skip → Tier2만 사용
             #                     continue
             #                 # ★ 헬기장 체크 추가 (UAV 선택 시)
             #                 if action[2] == 1 and i not in self.helipad_idx:
             #                     continue
-            #                 if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+            #                 if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
             #                     action[1] = i + 1
             #                     break
-            #         else: # Send to tier1
-            #             for i in self.tier1_idx:  # tier1만 사용
+            #         else: # Send to tier3
+            #             for i in self.tier3_idx:  # Tier3만 사용
             #                 # ★ 헬기장 체크 추가 (UAV 선택 시)
             #                 if action[2] == 1 and i not in self.helipad_idx:
             #                     continue
-            #                 if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+            #                 if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
             #                     action[1] = i + 1
             #                     break
             elif self.hos_select == "YellowNearest":
                 if action[0] == 0:  # Red selected
-                    for i in self.tier1_idx:
+                    for i in self._ordered_hospital_indices(self.tier3_idx, action[2]):
                         # ★ 헬기장 체크 추가 (UAV 선택 시)
                         if action[2] == 1 and i not in self.helipad_idx:
                             continue
-                        if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+                        if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
                             action[1] = i + 1
                             break
                 elif action[0] == 1: # Yellow selected - 거리순으로 tier 구분 없이 선택
-                    for i in range(self.hos_num):
+                    for i in self._ordered_hospital_indices(range(self.hos_num), action[2]):
                         # ★ 헬기장 체크 추가 (UAV 선택 시)
                         if action[2] == 1 and i not in self.helipad_idx:
                             continue
-                        if self.hos_max_send[i] > self.obs['h_states'][i,-1]: # max_send > n_occupied
+                        if self.hos_max_send[i] > cap_used[i]: # max_send > n_occupied
                             action[1] = i + 1
                             break
             
@@ -528,7 +518,7 @@ class Universal_Rule(Rule):
 #                             if self.env.capa_scale[i] > 0:
 #                                 action[1] = i + 1
 #                                 break
-#                     else: # Send to tier1
+#                     else: # Send to tier3
 #                         for i in range(self.env.numH):
 #                             if i in self.env.tier2_idx:
 #                                 continue
@@ -719,7 +709,7 @@ class Universal_Rule(Rule):
 #                         if self.env.capa_scale[i] > 0:
 #                             action[1] = i + 1
 #                             break
-#                 else: # Send to tier1
+#                 else: # Send to tier3
 #                     for i in range(self.env.numH):
 #                         if i in self.env.tier2_idx:
 #                             continue

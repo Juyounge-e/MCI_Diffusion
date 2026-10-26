@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "EntityManager": "f10c1691e23c4d3520c259f26226d1ebbe0c7d366af08816a40b42bc30d69937",
+    "EventManager": "9872170df83deb88f2e1a342f00f56d08ea81a722211a29d7a8dcc583d7dbe1a",
+    "MCIEnvironment_gymnasium": "2910e3b8aba7025ec239a4341102b43c98eeb59290f541ebc9499cc390676bcd",
+    "RuleManager": "e8137d3c0870d86ff9fb104d32282e81d42a255865faf7252c6bf8df46afa712",
+    "ScenarioManager": "670b9e0e01c526523672766866f963ede7e83c2a2ffb5010b05c8aa5e8c14520"
+  },
+  "note": "이 사본이 파생된 src/sim_src 파일들의 sha256. origin_sync.py --check 가 대조한다."
+}

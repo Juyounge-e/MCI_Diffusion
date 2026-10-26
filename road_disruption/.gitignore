@@ -1,0 +1,6 @@
+# 생성물 — 전부 스크립트로 재생성 가능하므로 git 에 올리지 않는다
+data/
+
+# 지역 pbf 는 OSRM 볼륨(C:/Users/user00/osrm-korea)에 쓰지만 혹시 여기 생기면 제외
+*.osm.pbf
+*.pbf
