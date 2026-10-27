@@ -99,7 +99,7 @@ def main():
     parser.add_argument(
         "--out_dir",
         type=str,
-        default=os.path.join("outputs", "mlp_diffusion", "test_national"),
+        default=os.path.join("outputs", "mlp_diffusion", "model", "test_national"),
         help="학습 결과를 저장할 디렉토리 경로",
     )
     parser.add_argument("--seed", type=int, default=42, help="랜덤 시드")

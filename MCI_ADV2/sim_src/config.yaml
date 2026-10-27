@@ -25,7 +25,7 @@ entity_info:
     dispatch_distance_info: "./scenarios/{EXP_ID}/{COORD}/amb_info_road.csv"
     velocity: 40 # unit: km/h
     handover_time: 10.0 # unit: minutes
-    is_use_time: True # True: API duration 사용 / False: 거리/속도 기반 계산
+    is_use_time: False # True: API duration 사용 / False: 거리/속도 기반 계산 (실험 기본: False)
     duration_coeff: 1.0 # API duration 시간가중치 (기본 1.0, 환경 요인 반영 시 조정)
     road_provider: kakao # 도로 데이터 공급자 (kakao | osrm) — 시나리오 생성 시 기록
   uav:

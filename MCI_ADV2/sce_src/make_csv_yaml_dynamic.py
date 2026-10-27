@@ -181,7 +181,11 @@ class ScenarioGenerator:
             "treat_tier3_mean": {"Red": 40, "Yellow": 20, "Green": 10, "Black": 0},
             "treat_tier2_mean": {"Red": float('inf'), "Yellow": 30, "Green": 15, "Black": 0}
         }
-        
+
+        # 좌표별 중증도 비율(rygb) 주입 지원. set_rygb_ratio() 로 덮어쓰면 patient_info.csv 의
+        # ratio 가 이 값으로 생성된다. 미설정 시 위 기본값(0.1/0.3/0.5/0.1) 사용.
+        self._rygb_override = None
+
         # 후보군 확장 배수 (AMB road distance 호출 수 완화)
         self.multiplier = 1.5
 
@@ -814,6 +818,9 @@ class ScenarioGenerator:
             buffer_ratio = 1.5
 
         ratio = self.patient_config.get("ratio", {"Red":0.1,"Yellow":0.3,"Green":0.5,"Black":0.1})
+        if self._rygb_override is not None:  # 좌표별 rygb 주입 시 병원 선정(Red 수요)도 그 비율로
+            _ov = self._rygb_override; _s = sum(_ov.values())
+            ratio = {k: (v / _s if _s > 0 else v) for k, v in _ov.items()}
         U = int(round(incident_size * float(ratio.get("Red", 0))))
         N = int(incident_size)
         
@@ -1203,15 +1210,24 @@ class ScenarioGenerator:
 
 
     def make_patient_info(self, save_folder):
-        """환자 정보 생성 (하드코딩된 값 사용)"""
+        """환자 정보 생성. _rygb_override 설정 시 그 비율로, 아니면 하드코딩 기본값."""
         print(f"  👥 환자 정보 생성 중...")
-        types = self.patient_config["ratio"].keys()
+        ratio_map = dict(self.patient_config["ratio"])
+        if self._rygb_override is not None:
+            ratio_map = dict(self._rygb_override)  # {"Red":..,"Yellow":..,"Green":..,"Black":..}
+            s = sum(ratio_map.values())
+            if s > 0:
+                ratio_map = {k: v / s for k, v in ratio_map.items()}  # 합=1 정규화(시뮬 assert 대비)
+            print(f"     ↳ rygb override 적용: "
+                  f"R={ratio_map['Red']:.3f} Y={ratio_map['Yellow']:.3f} "
+                  f"G={ratio_map['Green']:.3f} B={ratio_map['Black']:.3f}")
+        types = ratio_map.keys()
         rows = []
         for t in types:
             α, β = self.patient_config["rescue_param"][t]
             rows.append({
                 "type": t,
-                "ratio": self.patient_config["ratio"][t],
+                "ratio": ratio_map[t],
                 "rescue_param_alpha": α,
                 "rescue_param_beta": β,
                 "treat_tier3": self.patient_config["treat_tier3"][t],
@@ -1366,7 +1382,7 @@ class ScenarioGenerator:
                          amb_num=30, uav_num=3):
         """Config YAML 파일 생성"""
         print(f"  ⚙️ Config YAML 생성 중...")
-        folder_name = f"({latitude},{longitude})"
+        folder_name = f"lat{latitude}_lon{longitude}"  # dataset.py의 lat*_lon* 글롭/정규식과 정합
         config_filename = f"config_{folder_name}.yaml"
         config_path = os.path.join(save_folder, config_filename)
         relative_folder = f"./MCI_ADV2/scenarios/{self.experiment_id}/{folder_name}"
@@ -1415,11 +1431,11 @@ entity_info:
 event_info_path: "./MCI_ADV2/sim_src/event_info.json"
 
 rule_info:
-  isFullFactorial: True
-  priority_rule: ["START", "ReSTART"]
-  hos_select_rule: ["RedOnly", "YellowNearest"] # hos_select_rule: ["RedOnly", "YellowHalf"]
-  red_mode_rule: ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]
-  yellow_mode_rule: ["OnlyUAV", "Both_UAVFirst", "Both_AMBFirst", "OnlyAMB"]
+  isFullFactorial: False          # False여야 아래 단일 규칙 리스트 사용(True면 RuleManager가 64규칙 하드코딩)
+  priority_rule: ["START"]        # 고정 (타 옵션: "ReSTART")
+  hos_select_rule: ["RedOnly"]    # 고정 (타 옵션: "YellowNearest")
+  red_mode_rule: ["OnlyAMB"]      # 고정: Red OnlyAMB (타 옵션: "OnlyUAV","Both_UAVFirst","Both_AMBFirst")
+  yellow_mode_rule: ["OnlyAMB"]   # 고정: Yellow OnlyAMB (타 옵션: "OnlyUAV","Both_UAVFirst","Both_AMBFirst")
 
 run_setting:
   totalSamples: {total_samples} # number of samples
@@ -1482,7 +1498,7 @@ run_setting:
 
         print(f"""\n📍 좌표 ({latitude},{longitude}) 시나리오 생성 시작...""")
         start_time = time.time()
-        folder_name = f"({latitude},{longitude})"
+        folder_name = f"lat{latitude}_lon{longitude}"  # dataset.py의 lat*_lon* 글롭/정규식과 정합
         save_folder = os.path.join(self.base_path, "scenarios", self.experiment_id, folder_name)
         os.makedirs(save_folder, exist_ok=True)
 
@@ -1581,6 +1597,9 @@ if __name__ == "__main__":
     parser.add_argument("--buffer_ratio", type=float, help="후보군 버퍼 배수 (기본 1.5)")
     parser.add_argument("--util_by_tier", type=str, help='예: "1:0.90,11:0.75,etc:0.60"')
     parser.add_argument("--hospital_max_send_coeff", type=str, default=None, help="전송계수 'a,b' 형식 (예: 1.1,1.0). 미입력시 ENV(MCI_MAX_SEND_COEFF) 또는 기본 1,1")
+    parser.add_argument("--rygb", nargs=4, type=float, default=None, metavar=("RED", "YELLOW", "GREEN", "BLACK"),
+                        help="좌표별 환자 중증도 비율(red/yellow/green/black). 지정 시 patient_info.csv 의 "
+                             "ratio 와 병원선정 Red 수요가 이 값(합=1 정규화)으로 생성된다. 미지정 시 기본 0.1/0.3/0.5/0.1.")
 
     # 카카오 API 관련 파라미터
     parser.add_argument("--kakao_api_key", type=str, default=None, help="카카오 모빌리티 REST API 키 (is_use_time=true 모드 필수)")
@@ -1633,6 +1652,11 @@ if __name__ == "__main__":
             m = parse_util_map(args.util_by_tier)
             if m:
                 generator.util_by_tier = m
+        if args.rygb is not None:
+            generator._rygb_override = {
+                "Red": float(args.rygb[0]), "Yellow": float(args.rygb[1]),
+                "Green": float(args.rygb[2]), "Black": float(args.rygb[3]),
+            }
 
         # 현재 적용값 재출력
         print(f"buffer_ratio={generator.buffer_ratio}")

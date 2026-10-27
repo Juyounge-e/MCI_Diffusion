@@ -39,7 +39,7 @@ def sample_ratio_from_bank(ratio_bank, n_val, tol, rng):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ckpt", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "model_last.pt"))
-    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "samples_n_only.csv"))
+    parser.add_argument("--out", type=str, default=os.path.join("outputs", "mlp_diffusion", "sample", "test_rygb", "samples_n_only.csv"))
     parser.add_argument("--scalers", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "scalers.pkl"))
     parser.add_argument("--sample_num", type=int, default=50, help="샘플링할 데이터 수")
     parser.add_argument("--pdr", type=float, default=0.042927, help="pdr_mean 값")
