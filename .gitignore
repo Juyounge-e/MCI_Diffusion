@@ -45,3 +45,26 @@ MCI_ADV2/scenarios/mask_cache_0.005.npz
 MCI_ADV2/scenarios/road_points_*.npz
 MCI_ADV2/scenarios/mask_cache_*.npz
 
+
+# ===== 저장소 정리 (2026-10-27) =====
+# 캐시 / 원천 데이터 (재생성·재다운로드 가능)
+*.pkl
+*.npz
+*.xlsx
+*.shp
+*.shx
+*.dbf
+ctprvn.*
+road_cache_*.pkl
+road_points_*.npz
+
+# 임시 작업 디렉터리
+.tmp_paper/
+
+# 실행 로그
+*.log
+experiment_logs/
+
+# 대용량 노트북 (로컬 보관, 추적 제외)
+notebooks/national_map.ipynb
+notebooks/pdr_analysis.ipynb
