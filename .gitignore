@@ -13,6 +13,7 @@ MCI_ADV2/results/
 MCI_ADV2/experiment_logs/
 MCI_ADV2/scenarios/*/
 MCI_ADV2/!scenarios/*
+MCI_ADV2/scenarios/
 
 .claude/
 MCI_ADV2/visualizations/
@@ -40,6 +41,9 @@ NODELINKDATA/
 *.osm.pbf
 MCI_ADV2/scenarios/road_cache_*.pkl
 
-# 대용량 npz (재생성 가능: build_spatial_mask.py, build_road_points.py)
-MCI_ADV2/scenarios/mask_cache_0.005.npz
-MCI_ADV2/scenarios/road_points_*.npz
+# 대용량 파일(로컬에 남김))
+road_points_*.npz
+road_cache_national_osm.pkl
+
+# 논문 저장소
+.tmp_paper/
