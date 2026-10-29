@@ -40,11 +40,15 @@ def linear_warmdown(step: int, total_steps: int, base_lr: float) -> float:
     return base_lr * (1.0 - frac_done)
 
 
+# [road loss 폐기] 샘플링 snapping(sample_mlp.py --project_road_points) 대비 이점이 없어 비활성.
+# road loss 관련 코드는 "# [road loss]" 로 주석 처리해 둠.
 @torch.no_grad()
-def evaluate(model, val_loader, scheduler, road_loss_fn, road_lambda, device):
-    """val_loader 전체에 대한 평균 loss(gauss/road/total). best_model 선정 및 과적합 모니터링용."""
+# def evaluate(model, val_loader, scheduler, road_loss_fn, road_lambda, device):  # [road loss]
+def evaluate(model, val_loader, scheduler, device):
+    """val_loader 전체에 대한 평균 loss(gauss/total). best_model 선정 및 과적합 모니터링용."""
     model.eval()
-    total_gauss, total_road, total_n = 0.0, 0.0, 0
+    # total_gauss, total_road, total_n = 0.0, 0.0, 0  # [road loss]
+    total_gauss, total_n = 0.0, 0
     for xb, cb in val_loader:
         xb = xb.to(device)
         cb = cb.to(device)
@@ -56,18 +60,22 @@ def evaluate(model, val_loader, scheduler, road_loss_fn, road_lambda, device):
         loss_gauss = scheduler.gaussian_loss(model_out, xb, xt, t, noise).mean()
         total_gauss += loss_gauss.item() * b
 
-        if road_loss_fn is not None:
-            x0_hat = scheduler.predict_xstart(model_out, xt, t)
-            w = scheduler.ddpm.alphas_cumprod[t]
-            l_road = road_loss_fn(x0_hat, weight=w)
-            total_road += l_road.item() * b
+        # [road loss]
+        # if road_loss_fn is not None:
+        #     x0_hat = scheduler.predict_xstart(model_out, xt, t)
+        #     w = scheduler.ddpm.alphas_cumprod[t]
+        #     l_road = road_loss_fn(x0_hat, weight=w)
+        #     total_road += l_road.item() * b
         total_n += b
     model.train()
 
     val_gauss = total_gauss / max(1, total_n)
-    val_road = (total_road / max(1, total_n)) if road_loss_fn is not None else None
-    val_total = val_gauss + (road_lambda * val_road if val_road is not None else 0.0)
-    return val_gauss, val_road, val_total
+    # [road loss]
+    # val_road = (total_road / max(1, total_n)) if road_loss_fn is not None else None
+    # val_total = val_gauss + (road_lambda * val_road if val_road is not None else 0.0)
+    # return val_gauss, val_road, val_total
+    val_total = val_gauss
+    return val_gauss, val_total
 
 # CSV에서 r/y/g/b 비율 계산 (N-only 옵션에서 활용)
 def build_ratio_bank(df: pd.DataFrame):
@@ -109,18 +117,19 @@ def main():
         default=os.path.join("MCI_ADV2", "scenarios", "mask_cache_0.005.npz"),
         help="사전 계산된 spatial mask npz 경로 (scripts/build_spatial_mask.py 로 생성)",
     )
-    parser.add_argument(
-        "--road_points",
-        type=str,
-        default="",
-        help="도로점 npz 경로 (scripts/build_road_points.py). 지정 시 road-distance aux loss 사용.",
-    )
-    parser.add_argument(
-        "--road_lambda",
-        type=float,
-        default=0.0,
-        help="road-distance aux loss 가중치 (0이면 비활성). 정규화좌표 스케일상 보통 1e2~1e3.",
-    )
+    # [road loss]
+    # parser.add_argument(
+    #     "--road_points",
+    #     type=str,
+    #     default="",
+    #     help="도로점 npz 경로 (scripts/build_road_points.py). 지정 시 road-distance aux loss 사용.",
+    # )
+    # parser.add_argument(
+    #     "--road_lambda",
+    #     type=float,
+    #     default=0.0,
+    #     help="road-distance aux loss 가중치 (0이면 비활성). 정규화좌표 스케일상 보통 1e2~1e3.",
+    # )
     parser.add_argument(
         "--total_steps",
         type=int,
@@ -256,18 +265,18 @@ def main():
     model.train()
 
     # ----------------
-    # Road-distance aux loss (선택)
+    # [road loss] Road-distance aux loss (선택)
     # ----------------
-    road_loss_fn = None
-    if args.road_lambda > 0 and args.road_points:
-        from src.diffusion.road_loss import RoadDistanceLoss
-        road_loss_fn = RoadDistanceLoss(
-            args.road_points,
-            x_mean=scalers.x_scaler.mean_,
-            x_std=scalers.x_scaler.scale_,
-            device=device,
-        )
-        print(f"  road-distance aux loss 활성: lambda={args.road_lambda}")
+    # road_loss_fn = None
+    # if args.road_lambda > 0 and args.road_points:
+    #     from src.diffusion.road_loss import RoadDistanceLoss
+    #     road_loss_fn = RoadDistanceLoss(
+    #         args.road_points,
+    #         x_mean=scalers.x_scaler.mean_,
+    #         x_std=scalers.x_scaler.scale_,
+    #         device=device,
+    #     )
+    #     print(f"  road-distance aux loss 활성: lambda={args.road_lambda}")
 
     # ----------------
     # Diffusion Scheduler
@@ -315,14 +324,14 @@ def main():
             loss_gauss = scheduler.gaussian_loss(model_out, xb, xt, t, noise)
             loss = loss_gauss.mean()
 
-            # road-distance aux loss: x̂₀(복원 좌표)를 도로 매니폴드로 당김.
+            # [road loss] road-distance aux loss: x̂₀(복원 좌표)를 도로 매니폴드로 당김.
             # 고-t의 garbage x̂₀ 가 폭주하지 않게 ᾱ_t(SNR)로 가중.
-            l_road = None
-            if road_loss_fn is not None:
-                x0_hat = scheduler.predict_xstart(model_out, xt, t)
-                w = scheduler.ddpm.alphas_cumprod[t]  # (B,) ∈ (0,1], 저-t≈1 고-t≈0
-                l_road = road_loss_fn(x0_hat, weight=w)
-                loss = loss + args.road_lambda * l_road
+            # l_road = None
+            # if road_loss_fn is not None:
+            #     x0_hat = scheduler.predict_xstart(model_out, xt, t)
+            #     w = scheduler.ddpm.alphas_cumprod[t]  # (B,) ∈ (0,1], 저-t≈1 고-t≈0
+            #     l_road = road_loss_fn(x0_hat, weight=w)
+            #     loss = loss + args.road_lambda * l_road
 
             optim.zero_grad(set_to_none=True)
             loss.backward()
@@ -335,25 +344,29 @@ def main():
 
             if (global_step + 1) % log_every == 0:
                 elapsed = time.time() - start_time
-                road_str = f" road={l_road.item():.4f}" if l_road is not None else ""
+                # road_str = f" road={l_road.item():.4f}" if l_road is not None else ""  # [road loss]
                 print(f"[{global_step+1}/{total_steps}] loss={loss.item():.4f} "
-                      f"gauss={loss_gauss.mean().item():.4f}{road_str} lr={lr:.2e} ({elapsed:.1f}s)")
+                      f"gauss={loss_gauss.mean().item():.4f} lr={lr:.2e} ({elapsed:.1f}s)")
                 writer.add_scalar("train/loss", loss.item(), global_step + 1)
                 writer.add_scalar("train/gauss", loss_gauss.mean().item(), global_step + 1)
-                if l_road is not None:
-                    writer.add_scalar("train/road", l_road.item(), global_step + 1)
+                # [road loss]
+                # if l_road is not None:
+                #     writer.add_scalar("train/road", l_road.item(), global_step + 1)
                 writer.add_scalar("train/lr", lr, global_step + 1)
                 writer.flush()
                 start_time = time.time()
 
             if has_val and (global_step + 1) % args.val_every == 0:
-                val_gauss, val_road, val_total = evaluate(
-                    model, val_loader, scheduler, road_loss_fn, args.road_lambda, device)
-                road_str = f" road={val_road:.4f}" if val_road is not None else ""
-                print(f"  [val] step={global_step+1} gauss={val_gauss:.4f}{road_str} total={val_total:.4f}")
+                # [road loss]
+                # val_gauss, val_road, val_total = evaluate(
+                #     model, val_loader, scheduler, road_loss_fn, args.road_lambda, device)
+                # road_str = f" road={val_road:.4f}" if val_road is not None else ""
+                val_gauss, val_total = evaluate(model, val_loader, scheduler, device)
+                print(f"  [val] step={global_step+1} gauss={val_gauss:.4f} total={val_total:.4f}")
                 writer.add_scalar("val/gauss", val_gauss, global_step + 1)
-                if val_road is not None:
-                    writer.add_scalar("val/road", val_road, global_step + 1)
+                # [road loss]
+                # if val_road is not None:
+                #     writer.add_scalar("val/road", val_road, global_step + 1)
                 writer.add_scalar("val/total", val_total, global_step + 1)
                 writer.flush()
 
