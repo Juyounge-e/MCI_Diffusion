@@ -269,8 +269,8 @@ def main():
     # ----------------
     # road_loss_fn = None
     # if args.road_lambda > 0 and args.road_points:
-    #     from src.diffusion.road_loss import RoadDistanceLoss
-    #     road_loss_fn = RoadDistanceLoss(
+    #     from src.diffusion.road_snap import RoadSnapper
+    #     road_loss_fn = RoadSnapper(
     #         args.road_points,
     #         x_mean=scalers.x_scaler.mean_,
     #         x_std=scalers.x_scaler.scale_,

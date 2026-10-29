@@ -3,7 +3,7 @@ import torch
 from scipy.spatial import cKDTree
 
 
-class RoadDistanceLoss:
+class RoadSnapper:
     def __init__(self, road_points_npz: str, x_mean, x_std, device):
         d = np.load(road_points_npz)
         pts = d["points"].astype(np.float64)            # (M, 2) = lat, lon 
@@ -16,7 +16,7 @@ class RoadDistanceLoss:
             pts_scaled, dtype=torch.float32, device=device
         )
         self.device = device
-        print(f"[RoadDistanceLoss] 도로점 {len(pts):,}개 로드, KDTree 구성 완료")
+        print(f"[RoadSnapper] 도로점 {len(pts):,}개 로드, KDTree 구성 완료")
 
     def nearest(self, x0_hat: torch.Tensor) -> torch.Tensor:
         """정규화 공간에서 각 좌표의 최근접 도로점을 반환 (미분 불가, snap 용)."""

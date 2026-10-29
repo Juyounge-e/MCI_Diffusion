@@ -176,8 +176,8 @@ def main():
 
     project_fn = None
     if args.project_road_points:
-        from src.diffusion.road_loss import RoadDistanceLoss
-        road_dist = RoadDistanceLoss(
+        from src.diffusion.road_snap import RoadSnapper
+        road_dist = RoadSnapper(
             args.project_road_points,
             x_mean=x_scaler.mean_,
             x_std=x_scaler.scale_,
