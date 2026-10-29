@@ -52,7 +52,6 @@ def main():
     parser.add_argument("--ratio_bank", type=str, default=os.path.join("outputs", "mlp_diffusion", "test_rygb", "ratio_bank.pkl"))
     parser.add_argument("--n_tol", type=int, default=2, help="ratio_bank N 검색 허용 범위")
     parser.add_argument("--timesteps", type=int, default=1000)
-    parser.add_argument( "--mask_path",  type=str, default=os.path.join("MCI_ADV2", "scenarios", "mask_cache.npz"), help="사전 계산된 공간 마스크 npz 경로", )
     parser.add_argument(
         "--project_road_points",
         type=str,
@@ -87,14 +86,9 @@ def main():
     if cfg_dict is None:
         raise RuntimeError("Checkpoint에 cfg가 없습니다.")
 
-    # 구버전 체크포인트(shp_path) 또는 mask_path 미포함 시 현재 경로로 보완
-    cfg_dict.pop("shp_path", None)
-    cfg_dict.setdefault("mask_path", args.mask_path)
-
-    # 구버전 체크포인트(spatial_emb 가중치 포함) 호환:
-    # state_dict 에 spatial_emb.* 키가 있으면 use_spatial_emb 를 켜서 로딩이 깨지지 않게 함.
-    has_spatial = any(k.startswith("spatial_emb.") for k in ckpt["model"].keys())
-    cfg_dict["use_spatial_emb"] = bool(cfg_dict.get("use_spatial_emb", False) or has_spatial)
+    # 구버전 체크포인트 cfg 의 삭제된 공간 임베딩 관련 키 제거
+    for k in ("shp_path", "mask_path", "use_spatial_emb"):
+        cfg_dict.pop(k, None)
 
     cfg = MLPDiffusionConfig(**cfg_dict)
     device = torch.device(cfg.device)
@@ -108,10 +102,6 @@ def main():
         scalers = pickle.load(f)
     x_scaler = scalers.x_scaler
     c_scaler = scalers.c_scaler
-
-    # 공간 임베딩 역변환용 스케일러 주입 (use_spatial_emb=True 인 구버전 체크포인트만)
-    if getattr(model, "use_spatial_emb", False) and hasattr(model, "spatial_emb"):
-        model.spatial_emb.set_scaler(x_scaler.mean_, x_scaler.scale_)
 
     cond_dim = getattr(cfg, "cond_dim", 5)
     if cond_dim != 5:

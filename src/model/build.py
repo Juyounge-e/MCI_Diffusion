@@ -4,8 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
-from src.model.spatial_embedding import SpatialValidityEmbedding
+from typing import List, Tuple
 from tab_ddpm.modules import timestep_embedding
 
 try:
@@ -35,32 +34,20 @@ class MLPDiffusionConfig:
     lr: float = 1e-3
     weight_decay: float = 1e-4
     device: torch.device = None
-    mask_path: Optional[str] = None   # build_spatial_mask.py 로 생성한 npz 경로
-    use_spatial_emb: bool = False     # 육지/바다 SpatialValidityEmbedding 사용 여부
-                                      # (기본 OFF — 도로망 후처리/제약으로 대체됨)
 
     def __post_init__(self):
         if self.d_layers is None:
             self.d_layers = [128, 128, 128]
         if self.device is None:
             self.device = get_device()
-        if self.use_spatial_emb and self.mask_path is None:
-            raise ValueError(
-                "use_spatial_emb=True 이면 mask_path 가 필요합니다.\n"
-                "먼저 scripts/build_spatial_mask.py 를 실행하여 mask_cache.npz 를 생성하세요."
-            )
 
 
-class MLPDiffusionWithSpatial(MLPDiffusion):
+class MLPDiffusionCond(MLPDiffusion):
     """
-    tab_ddpm.MLPDiffusion 을 상속받아 forward 만 오버라이드.
+    tab_ddpm.MLPDiffusion 을 상속받아 forward 만 오버라이드 (조건 임베딩 합산).
 
-    use_spatial_emb=True 일 때만 SpatialValidityEmbedding(육지/바다) 을
-    time_embed, label_emb 와 동일한 레벨(emb)에서 합산.
-
-    NOTE: 육지/바다 spatial_emb 는 (1) 노이즈 좌표 조회 (2) 육지-only 학습 데이터로
-    학습 신호 부재 라는 한계가 확인되어 기본 비활성화. 도로망 후처리/제약(거리 페널티)
-    으로 대체하는 방향. 기존 체크포인트 호환을 위해 플래그로만 보존.
+    NOTE: 예전 육지/바다 공간 임베딩(spatial_emb)은 한계가 확인되고 샘플링 snapping 으로
+    대체되어 삭제됨. 해당 가중치가 든 체크포인트(test_national)는 더 이상 로드되지 않음.
     """
 
     def __init__(self, cfg: MLPDiffusionConfig):
@@ -75,14 +62,6 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
             dim_t=cfg.dim_t,
             d_y_cond=cfg.cond_dim,
         )
-
-        self.use_spatial_emb = cfg.use_spatial_emb
-        if self.use_spatial_emb:
-            # Spatial Validity Embedding — npz 캐시로 초기화 (geopandas 불필요)
-            self.spatial_emb = SpatialValidityEmbedding(
-                mask_path=cfg.mask_path,
-                dim_t=cfg.dim_t,
-            )
 
     def forward(
         self,
@@ -100,10 +79,6 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
                 y = y.unsqueeze(1)
             emb += F.silu(self.label_emb(y))
 
-        # (옵션) spatial embedding: x[:, 0]=lat, x[:, 1]=lon (정규화된 값)
-        if self.use_spatial_emb:
-            emb += self.spatial_emb(x[:, 0], x[:, 1])  # (batch, dim_t)
-
         # proj + emb → mlp
         x = self.proj(x) + emb
         return self.mlp(x)
@@ -111,7 +86,7 @@ class MLPDiffusionWithSpatial(MLPDiffusion):
 
 def build_mlp_diffusion(cfg: MLPDiffusionConfig) -> nn.Module:
     """모델만 반환 (샘플링 시 사용)."""
-    return MLPDiffusionWithSpatial(cfg).to(cfg.device)
+    return MLPDiffusionCond(cfg).to(cfg.device)
 
 
 def build_model_and_optimizer(
