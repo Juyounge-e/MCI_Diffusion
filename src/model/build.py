@@ -1,20 +1,9 @@
-import os
-import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dataclasses import dataclass
 from typing import List, Tuple
-from tab_ddpm.modules import timestep_embedding
-
-try:
-    from tab_ddpm.modules import MLPDiffusion
-except ImportError:
-    this_dir = os.path.dirname(__file__)
-    tab_ddpm_root = os.path.abspath(os.path.join(this_dir, "..", "..", "tab-ddpm"))
-    if tab_ddpm_root not in sys.path:
-        sys.path.append(tab_ddpm_root)
-    from tab_ddpm.modules import MLPDiffusion
+from src.diffusion.tabddpm_modules import MLPDiffusion, timestep_embedding
 
 
 def get_device(prefer_cuda: bool = True) -> torch.device:
@@ -44,7 +33,7 @@ class MLPDiffusionConfig:
 
 class MLPDiffusionCond(MLPDiffusion):
     """
-    tab_ddpm.MLPDiffusion 을 상속받아 forward 만 오버라이드 (조건 임베딩 합산).
+    MLPDiffusion(src/diffusion/tabddpm_modules.py) 을 상속받아 forward 만 오버라이드 (조건 임베딩 합산).
 
     NOTE: 예전 육지/바다 공간 임베딩(spatial_emb)은 한계가 확인되고 샘플링 snapping 으로
     대체되어 삭제됨. 해당 가중치가 든 체크포인트(test_national)는 더 이상 로드되지 않음.

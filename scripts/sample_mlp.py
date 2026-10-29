@@ -8,10 +8,8 @@ import torch
 import numpy as np
 
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-_TABDDPM = os.path.join(_ROOT, "tab-ddpm")
-for _p in (_ROOT, _TABDDPM):
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
 from src.model.build import MLPDiffusionConfig, build_mlp_diffusion
 from src.diffusion.scheduler import TabDDPMGaussianScheduler

@@ -1,16 +1,6 @@
-import torch 
-import os
-import sys
+import torch
 
-# tab-ddpm 패키지 경로 보정
-try:
-    from tab_ddpm.gaussian_multinomial_diffsuion import GaussianMultinomialDiffusion
-except ImportError:
-    this_dir = os.path.dirname(__file__)
-    tab_ddpm_root = os.path.abspath(os.path.join(this_dir, "..", "..", "tab-ddpm"))
-    if tab_ddpm_root not in sys.path:
-        sys.path.insert(0, tab_ddpm_root)
-    from tab_ddpm.gaussian_multinomial_diffsuion import GaussianMultinomialDiffusion
+from src.diffusion.tabddpm_gaussian_multinomial_diffusion import GaussianMultinomialDiffusion
 
 #  1. forward noising; gaussian_q_sample
 # TODO 2. reverse mean/variance; gaussian_p_mean_variance

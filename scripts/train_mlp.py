@@ -7,12 +7,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Ensure project root and tab-ddpm are importable
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-_TABDDPM = os.path.join(_ROOT, "tab-ddpm")
-for _p in (_ROOT, _TABDDPM):
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
 
 import torch
 # TensorBoard가 distutils 의존으로 깨질 수 있어 명시적으로 확인한다.
