@@ -148,6 +148,11 @@ class RunManager():
         results_pdr = np.zeros((len(rules), totalSamples), dtype=float)
         results_rewWOG = np.zeros((len(rules), totalSamples), dtype=float)
         results_pdrWOG = np.zeros((len(rules), totalSamples), dtype=float)
+        # 중증도별 초기 환자 수 (stat.txt 6~9행)
+        results_red = np.zeros((len(rules), totalSamples), dtype=float)
+        results_yellow = np.zeros((len(rules), totalSamples), dtype=float)
+        results_green = np.zeros((len(rules), totalSamples), dtype=float)
+        results_black = np.zeros((len(rules), totalSamples), dtype=float)
         # results_preventable = np.zeros((len(rules), totalSamples), dtype=float)
 
         rule_names = np.array([rule.rule_name for rule in rules])
@@ -161,6 +166,10 @@ class RunManager():
                 print(rules[r_idx].rule_name)
                 self.set_random_seed(iter)
                 obs, _ = env.reset()
+                total_Red = (obs['p_states'][:, 0] == 0).sum()
+                total_Yellow = (obs['p_states'][:, 0] == 1).sum()
+                total_Green = (obs['p_states'][:, 0] == 2).sum()
+                total_Black = (obs['p_states'][:, 0] == 3).sum()
                 done = False
                 cumul_reward = 0
                 cumul_r_woG = 0.0  # 정확 woG — env info['r_woG'] 누적 (2026-07-03 수정)
@@ -201,6 +210,11 @@ class RunManager():
                 if self.enable_trace:
                     trace_key = f"{rules[r_idx].rule_name}__iter{iter}"
                     self._all_traces[trace_key] = env.ev_manager.get_trace()
+                results_red[r_idx, iter - 1] = total_Red
+                results_yellow[r_idx, iter - 1] = total_Yellow
+                results_green[r_idx, iter - 1] = total_Green
+                results_black[r_idx, iter - 1] = total_Black
+
                 results_rew[r_idx, iter - 1] = cumul_reward
                 results_time[r_idx, iter - 1] = info['time']
                 results_pdr[r_idx, iter - 1] = safe_pdr(cumul_reward, env.preventable)
@@ -216,6 +230,10 @@ class RunManager():
         stat_pdr = np.zeros((len(rules), 3), dtype=float)
         stat_rewWOG = np.zeros((len(rules), 3), dtype=float)
         stat_pdrWOG = np.zeros((len(rules), 3), dtype=float)
+        stat_red = np.zeros((len(rules), 3), dtype=float)
+        stat_yellow = np.zeros((len(rules), 3), dtype=float)
+        stat_green = np.zeros((len(rules), 3), dtype=float)
+        stat_black = np.zeros((len(rules), 3), dtype=float)
         from scipy.stats import t  # 느린 import(≈1s) — 통계 단계에서만 필요
 
         def get_CI(data):
@@ -232,21 +250,37 @@ class RunManager():
             stat_pdr[r_idx][:] = get_CI(results_pdr[r_idx])
             stat_rewWOG[r_idx][:] = get_CI(results_rewWOG[r_idx])
             stat_pdrWOG[r_idx][:] = get_CI(results_pdrWOG[r_idx])
+            stat_red[r_idx][:] = get_CI(results_red[r_idx])
+            stat_yellow[r_idx][:] = get_CI(results_yellow[r_idx])
+            stat_green[r_idx][:] = get_CI(results_green[r_idx])
+            stat_black[r_idx][:] = get_CI(results_black[r_idx])
+
         stat_print_rew = np.column_stack((rule_names, stat_rew))
         stat_print_time = np.column_stack((rule_names, stat_time))
         stat_print_pdr = np.column_stack((rule_names, stat_pdr))
         stat_print_rewWOG = np.column_stack((rule_names, stat_rewWOG))
         stat_print_pdrWOG = np.column_stack((rule_names, stat_pdrWOG))
 
+        stat_print_red = np.column_stack((rule_names, stat_red))
+        stat_print_yellow = np.column_stack((rule_names, stat_yellow))
+        stat_print_green = np.column_stack((rule_names, stat_green))
+        stat_print_black = np.column_stack((rule_names, stat_black))
+
         outcomes_rew = np.column_stack((rule_names, results_rew))
         outcomes_time = np.column_stack((rule_names, results_time))
         outcomes_pdr = np.column_stack((rule_names, results_pdr))
         outcomes_rewWOG = np.column_stack((rule_names, results_rewWOG))
         outcomes_pdrWOG = np.column_stack((rule_names, results_pdrWOG))
+        outcomes_red = np.column_stack((rule_names, results_red))
+        outcomes_yellow = np.column_stack((rule_names, results_yellow))
+        outcomes_green = np.column_stack((rule_names, results_green))
+        outcomes_black = np.column_stack((rule_names, results_black))
         # outcomes_preventable = np.column_stack((rule_names, results_preventable))
 
-        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG), axis=0)
-        output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG), axis=0)
+        output = np.concatenate((outcomes_rew, outcomes_time, outcomes_pdr, outcomes_rewWOG, outcomes_pdrWOG,
+                                 outcomes_red, outcomes_yellow, outcomes_green, outcomes_black), axis=0)
+        output_stat = np.concatenate((stat_print_rew, stat_print_time, stat_print_pdr, stat_print_rewWOG, stat_print_pdrWOG,
+                                      stat_print_red, stat_print_yellow, stat_print_green, stat_print_black), axis=0)
 
         return output, output_stat
 
