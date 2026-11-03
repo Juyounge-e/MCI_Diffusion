@@ -38,7 +38,7 @@ class TabDDPMGaussianScheduler:
         """eps 예측(model_out)으로부터 깨끗한 좌표 x̂₀ 복원 """
         return self.ddpm._predict_xstart_from_eps(x_t=xt, t=t, eps=model_out)
 
-    def gaussian_p_sample(self, model_out, xt, t, temperature=0.7, project_fn=None):
+    def gaussian_p_sample(self, model_out, xt, t, temperature=1, project_fn=None):
         """Reverse sampling: xt -> x_{t-1}
 
         project_fn: (x0_hat, t) -> x0_hat_projected. 주어지면 posterior mean을
