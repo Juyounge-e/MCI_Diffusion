@@ -68,3 +68,6 @@ experiment_logs/
 # 대용량 노트북 (로컬 보관, 추적 제외)
 notebooks/national_map.ipynb
 notebooks/pdr_analysis.ipynb
+
+# 리뷰 관련 파일 
+rebuttal/
