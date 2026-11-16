@@ -1604,7 +1604,7 @@ if __name__ == "__main__":
     # 카카오 API 관련 파라미터
     parser.add_argument("--kakao_api_key", type=str, default=None, help="카카오 모빌리티 REST API 키 (is_use_time=true 모드 필수)")
     parser.add_argument("--departure_time", type=str, default=None, help="출발시간 (YYYYMMDDHHMM 형식, 예: 202512241800)")
-    parser.add_argument("--is_use_time", type=str2bool, default=True,
+    parser.add_argument("--is_use_time", type=str2bool, default=False,
                         help="True: 카카오 API duration 기반 / False: OSRM 정적 거리 기반(distance/velocity). 시뮬 재실행 시에도 OSRM duration을 활용 가능")
     # OSRM 백엔드 (is_use_time=false일 때 사용)
     parser.add_argument("--osrm_url", type=str, default=None,

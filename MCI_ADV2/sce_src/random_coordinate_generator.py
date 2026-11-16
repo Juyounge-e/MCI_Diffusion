@@ -240,6 +240,7 @@ class RandomCoordinateGenerator:
         seed: Optional[int] = None,
         rate_limit_delay: float = 0.3,
         allow_overpass_failure: bool = True,
+        ratio_dirichlet: Optional[float] = None,
     ) -> None:
         self.shp_path = shp_path or ""
         self.osrm_base = osrm_base
@@ -252,6 +253,8 @@ class RandomCoordinateGenerator:
             raise ValueError("incident_size_min은 incident_size_max보다 클 수 없습니다.")
         self.rate_limit_delay = rate_limit_delay
         self.allow_overpass_failure = allow_overpass_failure
+        # 중증도 비율 Dirichlet(α,α,α,α) 농도. None이면 비율 열을 만들지 않음(시뮬 기본 0.1/0.3/0.5/0.1)
+        self.ratio_dirichlet = ratio_dirichlet
         self._rng = random.Random(seed)
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": "mci-random-generator/1.0"})
@@ -281,6 +284,15 @@ class RandomCoordinateGenerator:
 
     def _sample_incident_size(self) -> int:
         return int(self._rng.randint(self.incident_size_min, self.incident_size_max))
+
+    def _sample_ratio(self) -> Dict[str, float]:
+        """r/y/g/b 비율을 Dirichlet(α,α,α,α)에서 샘플링. batch_experiment가 좌표별로 읽는 열 이름을 쓴다."""
+        if self.ratio_dirichlet is None:
+            return {}
+        # random.Random에는 dirichlet이 없어 Gamma(α,1) 정규화로 샘플링 (α=1이면 단체 위 균등)
+        g = [self._rng.gammavariate(self.ratio_dirichlet, 1.0) for _ in range(4)]
+        s = sum(g)
+        return {k: v / s for k, v in zip(("r_ratio", "y_ratio", "g_ratio", "b_ratio"), g)}
 
     @staticmethod
     def _snapped_key(lat: float, lon: float, precision: int = 7) -> Tuple[float, float]:
@@ -372,6 +384,7 @@ class RandomCoordinateGenerator:
                 "snapped_longitude": snapped_lon,
                 "snap_distance_m": dist_m,
                 "N": self._sample_incident_size(),
+                **self._sample_ratio(),
                 "region": self._region_key,
                 "is_valid": True,
             }
@@ -399,6 +412,7 @@ class RandomCoordinateGenerator:
                 "snapped_longitude": snapped_lon,
                 "snap_distance_m": dist_m,
                 "N": self._sample_incident_size(),
+                **self._sample_ratio(),
             }
 
         while len(points) < target_count and attempts < max_attempts:
@@ -596,6 +610,8 @@ def main() -> int:
     parser.add_argument("--overpass", default="", help="Overpass API URL (빈 문자열이면 비활성화)")
     parser.add_argument("--profile", default="driving", help="OSRM 프로파일")
     parser.add_argument("--seed", type=int, default=None, help="난수 시드")
+    parser.add_argument("--ratio-dirichlet", "--ratio_dirichlet", dest="ratio_dirichlet", type=float, default=None,
+                        help="좌표별 r/y/g/b 비율을 Dirichlet(α×4)로 샘플링 (1.0=균등). 미지정 시 비율 열 없음")
     parser.add_argument("--max-attempts", type=int, default=600000, help="최대 시도 횟수")
     parser.add_argument("--rate-limit-delay", type=float, default=0.3, help="OSRM 호출 간 지연(초)")
     parser.add_argument("--progress-every", type=int, default=50, help="진행 로그 출력 간격(생성 개수 기준)")
@@ -629,6 +645,7 @@ def main() -> int:
             incident_size_max=args.incident_size_max,
             seed=args.seed,
             rate_limit_delay=args.rate_limit_delay,
+            ratio_dirichlet=args.ratio_dirichlet,
         )
 
         output_dir = BASE_DIR / "scenarios" / f"custom_{exp_id}"
@@ -712,6 +729,7 @@ def main() -> int:
             incident_size_max=args.incident_size_max,
             seed=args.seed,
             rate_limit_delay=args.rate_limit_delay,
+            ratio_dirichlet=args.ratio_dirichlet,
         )
 
         all_points: List[Dict[str, Any]] = []
@@ -791,6 +809,7 @@ def main() -> int:
         incident_size_max=args.incident_size_max,
         seed=args.seed,
         rate_limit_delay=args.rate_limit_delay,
+        ratio_dirichlet=args.ratio_dirichlet,
     )
 
     output_dir = BASE_DIR / "scenarios" / f"{generator.region_key}_{exp_id}"
