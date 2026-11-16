@@ -108,7 +108,7 @@ class ScenarioGenerator:
 
     def __init__(self, base_path, experiment_id=None, kakao_api_key=None, departure_time=None,
                  osrm_url=None, road_provider=None, is_use_time=True, fixed_hos_num=None,
-                 min_hos_num=None, max_hos_num=None):
+                 min_hos_num=None, max_hos_num=None, all_hospitals=False):
         # 실제 도로 API 호출 횟수 카운터 (Kakao + OSRM 공통)
         self.api_call_count = 0
         # 프로젝트 경로 절대화
@@ -157,7 +157,7 @@ class ScenarioGenerator:
 
         # OSRM 백엔드 설정 (is_use_time=False일 때 사용; kakao 모드에서도 스냅/폴백용으로 사용)
         self.osrm_url = (osrm_url
-                         or os.environ.get("MCI_OSRM_URL", "https://router.project-osrm.org"))
+                         or os.environ.get("MCI_OSRM_URL", "http://localhost:5001"))
 
         # 라우팅 스냅/폴백 상태 (kakao 모드): 도로에 스냅되지 않는 산간/오지 대표점은
         # OSRM /nearest 로 가장 가까운 도로에 스냅해 Kakao 재시도, 해상/페리 구간은 OSRM 폴백.
@@ -214,6 +214,9 @@ class ScenarioGenerator:
         self.max_hos_num = int(max_hos_num) if max_hos_num else None
         if sum(x is not None for x in (self.fixed_hos_num, self.min_hos_num, self.max_hos_num)) > 1:
             raise ValueError("fixed_hos_num(cap+fill)/min_hos_num(floor)/max_hos_num(cap-only)은 동시 지정 불가 (상호배타).")
+        self.all_hospitals = bool(all_hospitals)
+        if self.all_hospitals and any(x is not None for x in (self.fixed_hos_num, self.min_hos_num, self.max_hos_num)):
+            raise ValueError("all_hospitals 는 fixed/min/max_hos_num 과 동시 지정 불가.")
 
         print(f"📁 프로젝트 경로: {self.base_path}")
         print(f"🆔 실험 ID: {self.experiment_id}")
@@ -263,7 +266,7 @@ class ScenarioGenerator:
         if coord in self._snap_cache:
             return self._snap_cache[coord]
         lat, lon = coord
-        base = (self.osrm_url or "https://router.project-osrm.org").rstrip("/")
+        base = (self.osrm_url or "http://localhost:5001").rstrip("/")
         out = (lat, lon, 0.0)
         try:
             r = _HTTP.get(f"{base}/nearest/v1/driving/{lon},{lat}",
@@ -514,7 +517,7 @@ class ScenarioGenerator:
         Returns:
             (distance_km, duration_min)
         """
-        base = (self.osrm_url or "https://router.project-osrm.org").rstrip("/")
+        base = (self.osrm_url or "http://localhost:5001").rstrip("/")
         url = f"{base}/route/v1/driving/{start[1]},{start[0]};{end[1]},{end[0]}"
         params = {
             "overview": "full",
@@ -854,6 +857,10 @@ class ScenarioGenerator:
         df_sorted = df_sorted.drop_duplicates(subset="요양기관명", keep="first").reset_index(drop=True)
         if len(df_sorted) < _before_dedup:
             print(f"  ⚠️ 소스 병원풀 중복 {_before_dedup - len(df_sorted)}곳 제거 (요양기관명 기준)")
+        # all_hospitals: 후보군·보장룰 없이 전체 병원 사용 (병원 제외 실험에서 대체 병원이 자연히 남도록)
+        if getattr(self, "all_hospitals", False):
+            print(f"  all_hospitals: 선정 규칙 없이 전체 {len(df_sorted)}곳 사용 (상급 {int(df_sorted['is_tier3'].sum())}곳)")
+            return df_sorted.copy(), df_sorted
         sum_capa = 0; sum_capa_tier3 = 0; cand_idx = [];
         for i, row in df_sorted.iterrows():
             cand_idx.append(i)
@@ -1608,7 +1615,7 @@ if __name__ == "__main__":
                         help="True: 카카오 API duration 기반 / False: OSRM 정적 거리 기반(distance/velocity). 시뮬 재실행 시에도 OSRM duration을 활용 가능")
     # OSRM 백엔드 (is_use_time=false일 때 사용)
     parser.add_argument("--osrm_url", type=str, default=None,
-                        help="OSRM HTTP API base URL (기본: env MCI_OSRM_URL 또는 https://router.project-osrm.org)")
+                        help="OSRM HTTP API base URL (기본: env MCI_OSRM_URL 또는 http://localhost:5001)")
     parser.add_argument("--amb_handover_time", type=float, default=10.0, help="구급차 환자 인계시간 (분)")
     parser.add_argument("--uav_handover_time", type=float, default=15.0, help="UAV 환자 인계시간 (분)")
     parser.add_argument("--duration_coeff", type=float, default=1.0, help="API duration 시간가중치 (기본값: 1.0)")
@@ -1618,6 +1625,8 @@ if __name__ == "__main__":
                         help="hos_num floor (보장 룰 후 ≥N 보장, cap-down 안 함). 2-pass H_max floor 용. 미지정 시 동적")
     parser.add_argument("--max_hos_num", type=int, default=None,
                         help="hos_num cap-only (v6 자연-H: 자연 선정 유지, 초과분만 절단 — floor 없음). fixed/min 과 동시지정 불가")
+    parser.add_argument("--all_hospitals", action="store_true",
+                        help="병원 선정 규칙(후보군·보장룰·수 조정) 없이 병원 데이터 전체를 hospital_info.csv 에 넣는다")
 
     args = parser.parse_args()
     try:
@@ -1639,6 +1648,7 @@ if __name__ == "__main__":
             fixed_hos_num=args.fixed_hos_num,
             min_hos_num=args.min_hos_num,
             max_hos_num=args.max_hos_num,
+            all_hospitals=args.all_hospitals,
         )
 
         # CLI가 주어지면 ENV 기본값을 덮어씀
